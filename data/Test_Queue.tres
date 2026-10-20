@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="QueueData" format=3 uid="uid://bkysbbmvo7v5y"]
+
+[ext_resource type="PackedScene" uid="uid://bsg566ksmssc0" path="res://enemy.tscn" id="1_uw1yv"]
+[ext_resource type="Script" uid="uid://b243fk7jdlvh2" path="res://data/QueueData.gd" id="2_0qft0"]
+
+[resource]
+script = ExtResource("2_0qft0")
+enemy_scene = ExtResource("1_uw1yv")
+start_pos = Vector2(-100, 600)
+direction = "Left_To_Right"
+path_type = "Sine"
+speed = 200.0
+metadata/_custom_type_script = "uid://b243fk7jdlvh2"

@@ -1,0 +1,11 @@
+# Godot 4+ specific ignores
+.godot/
+/android/
+
+# Godot temporary scene backups
+*.tmp
+
+# OS junk
+.DS_Store
+Thumbs.db
+desktop.ini

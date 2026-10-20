@@ -1,0 +1,127 @@
+[gd_scene format=3 uid="uid://bhf682agxlcbn"]
+
+[ext_resource type="Script" uid="uid://bwklvr8y54405" path="res://main.gd" id="1_ig7tw"]
+[ext_resource type="PackedScene" uid="uid://cgyd11qxpykik" path="res://player.tscn" id="2_h2yge"]
+[ext_resource type="PackedScene" uid="uid://bsg566ksmssc0" path="res://enemy.tscn" id="3_1bvp3"]
+[ext_resource type="Resource" uid="uid://bkysbbmvo7v5y" path="res://data/Test_Queue.tres" id="3_5vw27"]
+[ext_resource type="Resource" uid="uid://b1cu2nogbsw5v" path="res://data/Spell_Single.tres" id="3_7mycd"]
+[ext_resource type="Resource" uid="uid://dxcisce55kuyj" path="res://data/Test_Formation.tres" id="4_kek77"]
+[ext_resource type="Script" uid="uid://dyy1ypg53wmuj" path="res://scripts/EnemySpawner.gd" id="6_7mycd"]
+[ext_resource type="Script" uid="uid://c3rtqvo4vb33u" path="res://rest_station_ui.gd" id="7_272bh"]
+
+[node name="Main" type="Node2D" unique_id=399607641]
+script = ExtResource("1_ig7tw")
+enemy_scene = ExtResource("3_1bvp3")
+wave_pool = Array[Resource]([ExtResource("3_5vw27"), ExtResource("4_kek77")])
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=951383898]
+z_index = -1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 720.0
+offset_bottom = 1280.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.7921569)
+metadata/_edit_use_anchors_ = true
+
+[node name="player" parent="." unique_id=1088136196 instance=ExtResource("2_h2yge")]
+position = Vector2(360, 1000)
+current_spell = ExtResource("3_7mycd")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=968548100]
+
+[node name="Label" type="Label" parent="CanvasLayer" unique_id=209205065]
+offset_left = 1.0
+offset_top = 49.0
+offset_right = 125.0
+offset_bottom = 104.0
+theme_override_font_sizes/font_size = 40
+text = "得分：0"
+
+[node name="GoldLabel" type="Label" parent="CanvasLayer" unique_id=481701930]
+offset_right = 40.0
+offset_bottom = 23.0
+theme_override_font_sizes/font_size = 40
+text = "金币：0"
+
+[node name="HpLabel" type="Label" parent="CanvasLayer" unique_id=452583444]
+offset_left = 13.0
+offset_top = 1196.0
+offset_right = 185.0
+offset_bottom = 1265.0
+theme_override_font_sizes/font_size = 50
+text = "HP: 3/3"
+
+[node name="RestStationUI" type="CanvasLayer" parent="." unique_id=1684649622]
+process_mode = 3
+visible = false
+script = ExtResource("7_272bh")
+
+[node name="ColorRect" type="ColorRect" parent="RestStationUI" unique_id=1258798564]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.9372549)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="RestStationUI" unique_id=106440551]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ShopGoldLabel" type="Label" parent="RestStationUI/VBoxContainer" unique_id=1184879899]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "当前金币：0"
+
+[node name="Label" type="Label" parent="RestStationUI/VBoxContainer" unique_id=155045184]
+layout_mode = 2
+theme_override_font_sizes/font_size = 80
+text = "魔法休息站"
+
+[node name="Btn_Slot1" type="Button" parent="RestStationUI/VBoxContainer" unique_id=511127489]
+layout_mode = 2
+text = "单发（免费）"
+
+[node name="Btn_Slot2" type="Button" parent="RestStationUI/VBoxContainer" unique_id=754300397]
+layout_mode = 2
+text = "散射（50金币）"
+
+[node name="Btn_Slot3" type="Button" parent="RestStationUI/VBoxContainer" unique_id=554168203]
+layout_mode = 2
+text = "追踪（100金币）"
+
+[node name="Btn_Refresh" type="Button" parent="RestStationUI/VBoxContainer" unique_id=1133249741]
+layout_mode = 2
+text = "刷新"
+
+[node name="Btn_Resume" type="Button" parent="RestStationUI/VBoxContainer" unique_id=1937472454]
+layout_mode = 2
+text = "继续战斗 (ESC)"
+
+[node name="DescLabel" type="Label" parent="RestStationUI" unique_id=277639561]
+custom_minimum_size = Vector2(400, 60)
+offset_left = 160.0
+offset_top = 1000.0
+offset_right = 560.0
+offset_bottom = 1100.0
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 15
+text = "将鼠标悬停在法杖上查看说明"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="Spawner" type="Node" parent="." unique_id=9712878]
+script = ExtResource("6_7mycd")

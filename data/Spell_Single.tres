@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://b1cu2nogbsw5v"]
+
+[ext_resource type="Script" uid="uid://bs1k2fbrjlf4v" path="res://data/SpellData.gd" id="1_wwiae"]
+
+[resource]
+script = ExtResource("1_wwiae")
+display_name = "单发法杖"
+description = "默认装备
+"
+metadata/_custom_type_script = "uid://bs1k2fbrjlf4v"
