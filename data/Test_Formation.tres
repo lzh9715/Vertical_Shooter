@@ -10,6 +10,6 @@ metadata/_custom_type_script = "uid://dhh374tskanol"
 
 [resource]
 script = ExtResource("1_kgcjn")
-enemy_data = ExtResource("1_y8cru")
 shape = SubResource("Resource_w48qg")
+enemy_data = ExtResource("1_y8cru")
 metadata/_custom_type_script = "uid://c8cfy3fxh0ei"

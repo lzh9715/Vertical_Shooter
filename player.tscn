@@ -9,7 +9,7 @@ size = Vector2(40, 40)
 [sub_resource type="CircleShape2D" id="CircleShape2D_eyboa"]
 radius = 11.045361
 
-[node name="player" type="CharacterBody2D" unique_id=1088136196]
+[node name="player" type="CharacterBody2D" unique_id=1088136196 groups=["player"]]
 script = ExtResource("1_4flbx")
 bullet_scene = ExtResource("2_onrkg")
 

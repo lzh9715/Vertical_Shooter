@@ -17,3 +17,12 @@ class_name LevelConfig
 @export_group("难度")
 @export var base_difficulty := 1.0
 @export var difficulty_per_layer := 0.1
+
+@export_group("波次池")
+@export var mob_pool: Array[WaveData] = []
+@export var elite_pool: Array[WaveData] = []
+@export var boss_pool: Array[WaveData] = []
+
+@export_group("商店")
+@export var spell_pool: Array[SpellData] = []
+@export var pricing: ShopPricing          # 留空则使用默认定价（20~150，倍率 1）

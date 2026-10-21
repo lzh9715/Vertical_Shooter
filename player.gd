@@ -1,5 +1,7 @@
 extends CharacterBody2D
 
+signal hp_changed(current: int, max_hp: int)   # HUD 自己订阅，玩家不需要知道谁在显示血量
+
 @export var speed := 400.0
 @export var bullet_scene: PackedScene # 这个变量用来在编辑器里装子弹场景
 @export var current_spell: SpellData # 玩家当前装备的法术
@@ -13,10 +15,14 @@ var is_invincible := false # 是否无敌
 @onready var hurtbox: Area2D = $Hurtbox
 
 func _ready():
-	current_hp = max_hp
-	# 连接受击信号（玩家自己监听）
+	max_hp = GameFlow.max_hp
+	current_hp = GameFlow.hp
+	if GameFlow.spell != null:
+		current_spell = GameFlow.spell
+
 	hurtbox.area_entered.connect(_on_hurtbox_area_entered)
 	shoot_timer.timeout.connect(_on_shoot_timer_timeout)
+	hp_changed.emit(current_hp, max_hp)
 
 
 func _physics_process(_delta):
@@ -71,26 +77,23 @@ func _on_hurtbox_area_entered(area):
 
 func take_damage():
 	current_hp -= 1
-	print("玩家扣血！剩余血量: ", current_hp)
-	
-	# 更新主 UI 的血量显示（稍后在 main.gd 里写）
-	if has_node("/root/Main"):
-		get_parent().update_hp_ui(current_hp, max_hp)
-	
+	GameFlow.hp = current_hp
+	hp_changed.emit(current_hp, max_hp)
+
 	if current_hp <= 0:
-		print("玩家死亡，游戏结束！")
-		get_tree().reload_current_scene()
-	else:
-		# 触发无敌闪烁
-		is_invincible = true
-		
-		# 闪烁效果（用 Tween 改变透明度）
-		var tween = create_tween()
-		tween.set_loops(6) # 闪烁 6 次
-		tween.tween_property(self, "modulate:a", 0.2, 0.1)
-		tween.tween_property(self, "modulate:a", 1.0, 0.1)
-		
-		# 1.2 秒后解除无敌，恢复透明度
-		await get_tree().create_timer(1.2).timeout
-		modulate.a = 1.0
-		is_invincible = false
+		GameFlow.end_run()
+		return
+
+	# 触发无敌闪烁
+	is_invincible = true
+
+	# 闪烁效果（用 Tween 改变透明度）
+	var tween = create_tween()
+	tween.set_loops(6) # 闪烁 6 次
+	tween.tween_property(self, "modulate:a", 0.2, 0.1)
+	tween.tween_property(self, "modulate:a", 1.0, 0.1)
+
+	# 1.2 秒后解除无敌，恢复透明度
+	await get_tree().create_timer(1.2, false).timeout
+	modulate.a = 1.0
+	is_invincible = false

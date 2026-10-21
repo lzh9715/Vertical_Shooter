@@ -1,19 +1,35 @@
-extends Resource
+extends SpawnGroup
 class_name FormationData
 
-@export var enemy_data: EnemyData
-
 @export_group("阵型")
-@export var shape: FormationShape              # 形状库
-@export var count: int = 5                     # 出几只
-@export var spacing := Vector2(60, 50)         # 720 基准下的间距
+@export var shape: FormationShape
+@export var count: int = 5
+@export var spacing := Vector2(60, 50)
 
-@export_group("出场位置")
-@export var anchor := Vector2(0, -1.15)        # 阵型「中心」的归一化位置
-@export var offset_px := Vector2.ZERO
+@export_group("节奏")
+@export var delay: float = 0.0
+@export var interval: float = 0.0
 
-@export_group("行为")
-@export_enum("Top_To_Bottom", "Left_To_Right", "Right_To_Left") var direction: String = "Top_To_Bottom"
-@export var movement: MovementPattern
-@export var delay: float = 0.0                 # 整队延迟
-@export var interval: float = 0.0              # 队内每只间隔
+func spawn(spawner) -> void:
+	if shape == null:
+		push_warning("FormationData 缺 shape")
+		return
+
+	var center := ScreenUtil.from_anchor(anchor) + offset_px * ScreenUtil.scale_factor()
+	var scale := ScreenUtil.scale_factor()
+	var offsets := shape.build_offsets(count, spacing)
+
+	if offsets.is_empty():
+		push_warning("阵型算不出点位")
+		return
+
+	for i in range(offsets.size()):
+		var enemy = spawner.create_enemy(enemy_data)
+		if enemy == null:
+			return
+
+		enemy.start_position = center
+		enemy.offset = offsets[i] * scale
+		enemy.direction = direction
+		enemy.movement = movement
+		spawner.schedule(enemy, delay + i * interval)

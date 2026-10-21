@@ -1,0 +1,62 @@
+[gd_scene format=3 uid="uid://dna807mrye0ob"]
+
+[ext_resource type="Script" uid="uid://bwklvr8y54405" path="res://main.gd" id="1_g3qtk"]
+[ext_resource type="Resource" uid="uid://462hhv1t3d2u" path="res://data/Spell_Boom.tres" id="5_kos6x"]
+[ext_resource type="Script" uid="uid://6wp4d30kylxh" path="res://data/WaveData.gd" id="11_lo8qj"]
+[ext_resource type="Resource" uid="uid://bat1ik28shbwl" path="res://data/Test_Wave.tres" id="12_xrhbq"]
+[ext_resource type="PackedScene" uid="uid://cgyd11qxpykik" path="res://player.tscn" id="13_k4nrn"]
+[ext_resource type="Script" uid="uid://dyy1ypg53wmuj" path="res://scripts/EnemySpawner.gd" id="15_sbc7h"]
+[ext_resource type="Resource" uid="uid://biqolq4lyjw36" path="res://data/Difficulty_Default.tres" id="16_6o4vi"]
+[ext_resource type="Script" uid="uid://d00dio2xlf2ck" path="res://scripts/battle/BattleRunner.gd" id="17_d2pdu"]
+
+[node name="Main" type="Node2D" unique_id=399607641]
+script = ExtResource("1_g3qtk")
+test_waves = Array[ExtResource("11_lo8qj")]([ExtResource("12_xrhbq"), ExtResource("12_xrhbq"), ExtResource("12_xrhbq")])
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=951383898]
+z_index = -1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 720.0
+offset_bottom = 1280.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.7921569)
+metadata/_edit_use_anchors_ = true
+
+[node name="player" parent="." unique_id=1088136196 instance=ExtResource("13_k4nrn")]
+position = Vector2(360, 1000)
+current_spell = ExtResource("5_kos6x")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=968548100]
+
+[node name="Label" type="Label" parent="CanvasLayer" unique_id=209205065]
+offset_left = 1.0
+offset_top = 49.0
+offset_right = 125.0
+offset_bottom = 104.0
+theme_override_font_sizes/font_size = 40
+text = "得分：0"
+
+[node name="GoldLabel" type="Label" parent="CanvasLayer" unique_id=481701930]
+offset_right = 40.0
+offset_bottom = 23.0
+theme_override_font_sizes/font_size = 40
+text = "金币：0"
+
+[node name="HpLabel" type="Label" parent="CanvasLayer" unique_id=452583444]
+offset_left = 13.0
+offset_top = 1196.0
+offset_right = 185.0
+offset_bottom = 1265.0
+theme_override_font_sizes/font_size = 50
+text = "HP: 3/3"
+
+[node name="Spawner" type="Node" parent="." unique_id=9712878]
+script = ExtResource("15_sbc7h")
+difficulty = ExtResource("16_6o4vi")
+
+[node name="BattleRunner" type="Node" parent="." unique_id=1019166911 node_paths=PackedStringArray("spawner")]
+script = ExtResource("17_d2pdu")
+spawner = NodePath("../Spawner")

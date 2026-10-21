@@ -11,9 +11,13 @@ config_version=5
 [application]
 
 config/name="竖版飞行射击"
-run/main_scene="uid://bhf682agxlcbn"
+run/main_scene="uid://b1yv3c6hepkqt"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
+
+[autoload]
+
+GameFlow="*uid://clvix6f16v14p"
 
 [display]
 

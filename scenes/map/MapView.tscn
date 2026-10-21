@@ -1,0 +1,37 @@
+[gd_scene format=3 uid="uid://b1yv3c6hepkqt"]
+
+[ext_resource type="Script" uid="uid://cqnwls7pimmd6" path="res://scenes/map/MapView.gd" id="1_xnhjo"]
+
+[node name="MapView" type="Control" unique_id=1886520298]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_xnhjo")
+
+[node name="Background" type="ColorRect" parent="." unique_id=754304525]
+show_behind_parent = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.078431375, 0.078431375, 0.10980392, 1)
+
+[node name="Tooltip" type="Panel" parent="." unique_id=1535531749]
+visible = false
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+mouse_filter = 2
+
+[node name="Label" type="Label" parent="Tooltip" unique_id=1276761156]
+custom_minimum_size = Vector2(160, 60)
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+text = "测试
+"

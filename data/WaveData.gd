@@ -1,9 +1,19 @@
 extends Resource
 class_name WaveData
 
-@export var enemy_scene: PackedScene
-@export var enemy_count: int = 5
-# 👇 就是这一行！允许我们在检查器里下拉选择 Line 或 V_Shape
-@export_enum("Line", "V_Shape") var formation: String = "Line" 
-@export var spacing: float = 60.0
-@export var speed: float = 150.0
+## 一波：若干条生成指令 + 波与波之间的节奏。
+## 同一个 WaveData 可以给关卡用，也可以塞进无尽池被反复抽到。
+
+@export var entries: Array[WaveEntry] = []
+
+@export_group("节奏")
+@export var gap_after: float = 1.5          # 本波清空后，隔多久出下一波（秒）
+@export var clear_to_advance: bool = true   # true=清空才推进；false=按时间推进
+
+## 这一波实际会生成几组敌人（调试用）
+func group_count() -> int:
+	var n := 0
+	for e in entries:
+		if e != null and e.spawn != null:
+			n += 1
+	return n

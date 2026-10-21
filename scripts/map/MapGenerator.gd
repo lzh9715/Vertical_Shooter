@@ -12,6 +12,7 @@ class_name MapGenerator
 const GRID_WIDTH := 4
 const MAX_ATTEMPTS := 100
 const X_SPACING := 0.22          # UI 里相邻列的横向间距（归一化）
+const POSITION_JITTER := Vector2(0.032, 0.012)   # 节点位置的轻微随机偏移
 
 static func generate(config: LevelConfig, rng: RandomNumberGenerator) -> MapData:
 	var total_layers := config.middle_layers + 2
@@ -83,10 +84,16 @@ static func _build_map(windows: Array[Vector2i], center: int, total_layers: int,
 			n.id = map.nodes.size()
 			n.layer = layer
 			n.column = col
-			n.position = Vector2(
+			var base := Vector2(
 				0.5 + (col - center) * X_SPACING,
 				float(layer) / float(total_layers - 1)
 			)
+			# 轻微抖动，避免地图看起来像死板的表格；不影响连通关系
+			var jitter := Vector2(
+				rng.randf_range(-POSITION_JITTER.x, POSITION_JITTER.x),
+				rng.randf_range(-POSITION_JITTER.y, POSITION_JITTER.y)
+			)
+			n.position = (base + jitter).clamp(Vector2(0.03, 0.0), Vector2(0.97, 1.0))
 			n.type = _roll_type(layer, total_layers, rng)
 			n.display_name = "%s · 第%d层" % [MapNodeData.type_name(n.type), layer]
 			if n.type == MapNodeData.NodeType.BATTLE or n.type == MapNodeData.NodeType.ELITE:
