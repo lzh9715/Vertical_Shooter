@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3 uid="uid://bfyei2vo2slcb"]
+
+[ext_resource type="PackedScene" uid="uid://bsg566ksmssc0" path="res://enemy.tscn" id="1_1hq4j"]
+[ext_resource type="Script" uid="uid://dwcgj366c6xq6" path="res://data/EnemyData.gd" id="1_6wjup"]
+
+[resource]
+script = ExtResource("1_6wjup")
+scene = ExtResource("1_1hq4j")
+metadata/_custom_type_script = "uid://dwcgj366c6xq6"

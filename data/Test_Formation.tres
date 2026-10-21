@@ -1,9 +1,15 @@
 [gd_resource type="Resource" script_class="FormationData" format=3 uid="uid://dxcisce55kuyj"]
 
 [ext_resource type="Script" uid="uid://c8cfy3fxh0ei" path="res://data/FormationData.gd" id="1_kgcjn"]
-[ext_resource type="PackedScene" uid="uid://bsg566ksmssc0" path="res://enemy.tscn" id="1_y8cru"]
+[ext_resource type="Resource" uid="uid://bfyei2vo2slcb" path="res://data/Enemy_Basic.tres" id="1_y8cru"]
+[ext_resource type="Script" uid="uid://dhh374tskanol" path="res://data/shapes/ShapeLine.gd" id="3_6act0"]
+
+[sub_resource type="Resource" id="Resource_w48qg"]
+script = ExtResource("3_6act0")
+metadata/_custom_type_script = "uid://dhh374tskanol"
 
 [resource]
 script = ExtResource("1_kgcjn")
-enemy_scene = ExtResource("1_y8cru")
+enemy_data = ExtResource("1_y8cru")
+shape = SubResource("Resource_w48qg")
 metadata/_custom_type_script = "uid://c8cfy3fxh0ei"

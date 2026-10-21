@@ -28,6 +28,8 @@ func _ready():
 	$RestStationUI/VBoxContainer/Btn_Slot3.pressed.connect(func(): buy_slot(2))
 	$RestStationUI/VBoxContainer/Btn_Resume.pressed.connect(toggle_rest_station)
 	$RestStationUI/VBoxContainer/Btn_Refresh.pressed.connect(refresh_shop)
+	$Spawner.enemy_died.connect(_on_enemy_died)
+
 		# 监听鼠标进入和离开事件
 	$RestStationUI/VBoxContainer/Btn_Slot1.mouse_entered.connect(func(): show_tooltip(0))
 	$RestStationUI/VBoxContainer/Btn_Slot1.mouse_exited.connect(hide_tooltip)
@@ -37,6 +39,8 @@ func _ready():
 	
 	$RestStationUI/VBoxContainer/Btn_Slot3.mouse_entered.connect(func(): show_tooltip(2))
 	$RestStationUI/VBoxContainer/Btn_Slot3.mouse_exited.connect(hide_tooltip)
+
+	
 	
 	# 游戏开局先随机生成一次货架
 	generate_shop_items()
@@ -74,7 +78,7 @@ func buy_slot(slot_index: int):
 	
 	if gold >= target_spell.price:
 		gold -= target_spell.price
-		var player = get_node_or_null("Player")
+		var player = get_node_or_null("player")
 		if player:
 			player.current_spell = target_spell
 		update_ui()
@@ -83,11 +87,10 @@ func buy_slot(slot_index: int):
 		print("金币不足，无法购买！")
 
 
-func _on_enemy_destroyed():
-	score += 10
-	gold += 5 # 【新增】每杀一个怪给 5 金币
+func _on_enemy_died(score_gain: int, gold_gain: int) -> void:
+	score += score_gain
+	gold += gold_gain
 	update_ui()
-
 
 func toggle_rest_station():
 	rest_ui.visible = not rest_ui.visible

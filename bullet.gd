@@ -31,28 +31,25 @@ func _physics_process(delta):
 func _on_area_entered(area):
 	if area.is_in_group("enemy") and not area in pierced_enemies:
 		pierced_enemies.append(area)
-		
-		# 如果开启了爆炸，就在当前位置引发爆炸
+
 		if is_explosive:
 			explode()
-			
-		area.queue_free() # 摧毁打中的敌人
-		
-		# 判断穿透逻辑
+
+		# ← 原来这里是 area.queue_free()
+		if area.has_method("take_damage"):
+			area.take_damage(1)
+
 		if is_piercing and pierced_enemies.size() < pierce_amount:
-			# 还有穿透次数，子弹不销毁，继续飞
-			pass 
+			pass
 		else:
-			# 没次数了，或者没开穿透，销毁自己
 			queue_free()
 
 func explode():
-	# 获取场景里所有敌人
 	var enemies = get_tree().get_nodes_in_group("enemy")
 	for enemy in enemies:
-		# 如果敌人在爆炸范围内，直接秒杀
 		if global_position.distance_to(enemy.global_position) <= explosion_radius:
-			enemy.queue_free()
+			if enemy.has_method("take_damage"):
+				enemy.take_damage(9999)   # ← 原来是 enemy.queue_free()
 	
 	# 视觉反馈（可选）：在屏幕上画一个圈代表爆炸范围
 	var explosion_visual = Polygon2D.new()

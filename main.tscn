@@ -5,13 +5,20 @@
 [ext_resource type="PackedScene" uid="uid://bsg566ksmssc0" path="res://enemy.tscn" id="3_1bvp3"]
 [ext_resource type="Resource" uid="uid://bkysbbmvo7v5y" path="res://data/Test_Queue.tres" id="3_5vw27"]
 [ext_resource type="Resource" uid="uid://b1cu2nogbsw5v" path="res://data/Spell_Single.tres" id="3_7mycd"]
+[ext_resource type="Script" uid="uid://bs1k2fbrjlf4v" path="res://data/SpellData.gd" id="3_ycdy4"]
 [ext_resource type="Resource" uid="uid://dxcisce55kuyj" path="res://data/Test_Formation.tres" id="4_kek77"]
+[ext_resource type="Resource" uid="uid://462hhv1t3d2u" path="res://data/Spell_Boom.tres" id="4_w48qg"]
+[ext_resource type="Resource" uid="uid://g1galv7uuqfr" path="res://data/Spell_Homing.tres" id="5_vivmo"]
+[ext_resource type="Resource" uid="uid://huekrp52bich" path="res://data/Spell_Pierce.tres" id="6_2cqfq"]
 [ext_resource type="Script" uid="uid://dyy1ypg53wmuj" path="res://scripts/EnemySpawner.gd" id="6_7mycd"]
 [ext_resource type="Script" uid="uid://c3rtqvo4vb33u" path="res://rest_station_ui.gd" id="7_272bh"]
+[ext_resource type="Resource" uid="uid://bk5ecnuq8vggg" path="res://data/Spell_Spread.tres" id="8_yaehf"]
+[ext_resource type="Resource" uid="uid://biqolq4lyjw36" path="res://data/Difficulty_Default.tres" id="14_w48qg"]
 
 [node name="Main" type="Node2D" unique_id=399607641]
 script = ExtResource("1_ig7tw")
 enemy_scene = ExtResource("3_1bvp3")
+all_spells = Array[ExtResource("3_ycdy4")]([ExtResource("4_w48qg"), ExtResource("5_vivmo"), ExtResource("6_2cqfq"), ExtResource("3_7mycd"), ExtResource("8_yaehf")])
 wave_pool = Array[Resource]([ExtResource("3_5vw27"), ExtResource("4_kek77")])
 
 [node name="ColorRect" type="ColorRect" parent="." unique_id=951383898]
@@ -125,3 +132,4 @@ autowrap_mode = 2
 
 [node name="Spawner" type="Node" parent="." unique_id=9712878]
 script = ExtResource("6_7mycd")
+difficulty = ExtResource("14_w48qg")

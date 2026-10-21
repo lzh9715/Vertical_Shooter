@@ -1,55 +1,83 @@
 extends Node
 
+signal enemy_died(score: int, gold: int)
 
-# 接收图纸，并开始生成
+@export var difficulty: DifficultyProfile
+
 func trigger_spawn(data: Resource):
-	print(">>> 生成器收到图纸：", data)
-	if data == null: return # 如果图纸为空，直接停止
+	if data == null: return
 	if data is QueueData:
 		_spawn_queue(data)
 	elif data is FormationData:
 		_spawn_formation(data)
 
-# 处理队列生成
+# —— 队列：同一个敌人按时间间隔依次出现
 func _spawn_queue(data: QueueData):
-	for i in range(data.count):
-		var enemy = data.enemy_scene.instantiate()
-		
-		var base_pos = data.start_pos
-		var offset = Vector2.ZERO
-		var delay = i * data.spacing_time
-		
-		# 👇【修改点】直接删掉下面这两行，不要强制纵向排开！
-		# if data.direction == "Left_To_Right" or data.direction == "Right_To_Left":
-		# 	offset.y = i * 50.0 
-		
-		enemy.start_position = base_pos
-		enemy.offset = offset # 这里保持在 (0, 0)
-		enemy.path_type = data.path_type
-		enemy.direction = data.direction
-		enemy.speed = data.speed
-		
-		# 依然靠时间延迟拉开距离
-		if delay > 0:
-			get_tree().create_timer(delay).timeout.connect(func(): add_child(enemy))
-		else:
-			add_child(enemy)
+	var start := ScreenUtil.from_anchor(data.anchor) + data.offset_px * ScreenUtil.scale_factor()
 
-# 处理阵型生成
+	for i in range(data.count):
+		var enemy = _create_enemy(data.enemy_data)
+		if enemy == null: return
+
+		enemy.start_position = start
+		enemy.offset = Vector2.ZERO
+		enemy.movement = data.movement
+		enemy.direction = data.direction
+		_schedule(enemy, i * data.spacing_time)
+
+# —— 阵型：同批敌人按形状排开
 func _spawn_formation(data: FormationData):
-	# 阵型通常是同时出现
-	var base_pos = Vector2(360, -100) # 默认屏幕顶部中间
-	
-	for point in data.points:
-		var enemy = data.enemy_scene.instantiate()
-		
-		# 阵型偏移 = 点位 + 全局偏移
-		var final_offset = point + Vector2(data.global_offset_x, 0)
-		
-		enemy.start_position = base_pos
-		enemy.offset = final_offset
-		enemy.path_type = "Straight" # 阵型默认直线下落
-		enemy.direction = "Top_To_Bottom"
-		enemy.speed = data.speed
-		
+	if data.shape == null:
+		push_warning("FormationData 缺 shape")
+		return
+
+	var center := ScreenUtil.from_anchor(data.anchor) + data.offset_px * ScreenUtil.scale_factor()
+	var scale := ScreenUtil.scale_factor()
+	var offsets := data.shape.build_offsets(data.count, data.spacing)
+
+	if offsets.is_empty():
+		push_warning("阵型算不出点位，检查 shape / count")
+		return
+
+	for i in range(offsets.size()):
+		var enemy = _create_enemy(data.enemy_data)
+		if enemy == null: return
+
+		enemy.start_position = center
+		enemy.offset = offsets[i] * scale
+		enemy.direction = data.direction
+		enemy.movement = data.movement
+		_schedule(enemy, data.delay + i * data.interval)
+
+# —— 延迟生成，带实例有效性检查
+func _schedule(enemy, delay: float) -> void:
+	if delay <= 0.0:
 		add_child(enemy)
+		return
+	var timer := get_tree().create_timer(delay)
+	timer.timeout.connect(func():
+		if is_instance_valid(enemy):
+			add_child(enemy)
+	)
+
+# —— 唯一创建入口
+func _create_enemy(data: EnemyData):
+	if data == null or data.scene == null:
+		push_warning("EnemyData 没配好：缺 scene")
+		return null
+
+	var hp_mult := difficulty.value(&"hp") if difficulty else 1.0
+	var speed_mult := difficulty.value(&"speed") if difficulty else 1.0
+	var reward_mult := difficulty.value(&"reward") if difficulty else 1.0
+
+	var enemy = data.scene.instantiate()
+	enemy.max_hp = maxi(1, roundi(data.max_hp * hp_mult))
+	enemy.speed = data.speed * speed_mult * ScreenUtil.scale_factor()
+	enemy.score_reward = roundi(data.score * reward_mult)
+	enemy.gold_reward = roundi(data.gold * reward_mult)
+	enemy.despawn_margin = data.despawn_margin * ScreenUtil.scale_factor()
+	enemy.died.connect(_on_enemy_died)
+	return enemy
+
+func _on_enemy_died(score: int, gold: int) -> void:
+	enemy_died.emit(score, gold)

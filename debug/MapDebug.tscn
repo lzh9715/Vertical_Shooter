@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://blu5l2undeyvj"]
+
+[ext_resource type="Script" uid="uid://cxvt4lybe2ybr" path="res://debug/MapDebug.gd" id="1_lh7mi"]
+
+[node name="MapDebug" type="Node" unique_id=1733478696]
+script = ExtResource("1_lh7mi")

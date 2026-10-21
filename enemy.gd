@@ -1,47 +1,51 @@
 extends Area2D
 
+signal died(score: int, gold: int)   # 死亡时广播，谁掉的钱谁加分由上层决定
+
+@export var movement: MovementPattern
 @export var speed := 200.0
+@export var direction := "Top_To_Bottom"
+@export var despawn_margin := 300.0
 
-var start_position := Vector2.ZERO 
-var offset := Vector2.ZERO         
-var path_type := "Straight"        
-var direction := "Top_To_Bottom"   
-var elapsed_time := 0.0            
+@export var max_hp := 1
+@export var score_reward := 10
+@export var gold_reward := 5
 
-func _physics_process(delta):
+var hp := 1
+var start_position := Vector2.ZERO
+var offset := Vector2.ZERO
+var elapsed_time := 0.0
+
+func _ready() -> void:
+	hp = max_hp
+
+func take_damage(amount: int) -> void:
+	hp -= amount
+	print("[", name, "] 受击 -", amount, "，剩余 ", max(hp, 0), "/", max_hp)  # 调试用，以后可删
+	if hp > 0:
+		return
+	died.emit(score_reward, gold_reward)
+	queue_free()
+
+func _physics_process(delta: float) -> void:
 	elapsed_time += delta
-	
-	# 1. 计算基础位移（根据方向决定主轴）
-	var base_x = start_position.x
-	var base_y = start_position.y
-	
-	if direction == "Top_To_Bottom":
-		base_y += speed * elapsed_time
-	elif direction == "Left_To_Right":
-		base_x += speed * elapsed_time
-	elif direction == "Right_To_Left":
-		base_x -= speed * elapsed_time
-	
-	# 2. 计算副轴偏移（完全独立的函数计算）
-	var wave_offset = 0.0
-	if path_type == "Sine":
-		wave_offset = 150.0 * sin(elapsed_time * 3.0)
-	elif path_type == "Zigzag":
-		var freq = 2.0
-		var amp = 100.0
-		var phase = fmod(elapsed_time * freq, 2.0)
-		wave_offset = amp * (1.0 - abs(phase - 1.0)) * (1 if int(elapsed_time * freq) % 2 == 0 else -1)
-	
-	# 3. 将波浪偏移加到正确的轴上
-	if direction == "Top_To_Bottom":
-		base_x += wave_offset # 从上往下飞，波浪在 X 轴（左右扭动）
-	else:
-		base_y += wave_offset # 从左右飞，波浪在 Y 轴（上下扭动）
-	
-	# 4. 最终位置
-	global_position = Vector2(base_x, base_y) + offset
-	
-	# 5. 越界销毁（全方位覆盖）
-	if global_position.y > 1400 or global_position.y < -300 or global_position.x < -300 or global_position.x > 1000:
-		queue_free()
 
+	var dir := _direction_vector()
+	var local: Vector2 = movement.sample(elapsed_time) * ScreenUtil.scale_factor() if movement else Vector2.ZERO
+	global_position = (
+		start_position
+		+ dir * speed * elapsed_time
+		+ dir.orthogonal() * local.x
+		+ dir * local.y
+		+ offset
+	)
+
+	if not get_viewport_rect().grow(despawn_margin).has_point(global_position):
+		var bounds := Rect2(Vector2.ZERO, ScreenUtil.size()).grow(despawn_margin)
+		if not bounds.has_point(global_position):
+			queue_free()
+func _direction_vector() -> Vector2:
+	match direction:
+		"Left_To_Right": return Vector2.RIGHT
+		"Right_To_Left": return Vector2.LEFT
+		_: return Vector2.DOWN
