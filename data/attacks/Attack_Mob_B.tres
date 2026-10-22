@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="EnemyAttackPattern" format=3 uid="uid://rvdvra3dor3j"]
+
+[ext_resource type="Script" uid="uid://c8c01nn8pfqai" path="res://data/bullet/EnemyAttackPattern.gd" id="1_vponj"]
+[ext_resource type="Script" uid="uid://dox3e2spp8fvl" path="res://data/bullet/AttackStep.gd" id="2_1wc6k"]
+[ext_resource type="Resource" uid="uid://cuyr3txouoeoe" path="res://data/bullets/BulletAimed_Fast.tres" id="3_1wc6k"]
+
+[sub_resource type="Resource" id="Resource_ssa66"]
+script = ExtResource("2_1wc6k")
+volley = ExtResource("3_1wc6k")
+cooldown = 2.8
+metadata/_custom_type_script = "uid://dox3e2spp8fvl"
+
+[resource]
+script = ExtResource("1_vponj")
+start_delay = 1.0
+steps = Array[ExtResource("2_1wc6k")]([SubResource("Resource_ssa66")])
+metadata/_custom_type_script = "uid://c8c01nn8pfqai"

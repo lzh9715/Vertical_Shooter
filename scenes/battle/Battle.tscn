@@ -1,9 +1,9 @@
 [gd_scene format=3 uid="uid://dna807mrye0ob"]
 
 [ext_resource type="Script" uid="uid://bwklvr8y54405" path="res://main.gd" id="1_g3qtk"]
+[ext_resource type="Resource" uid="uid://bqfpgikejj53i" path="res://data/Wave_Elites.tres" id="3_kos6x"]
 [ext_resource type="Resource" uid="uid://462hhv1t3d2u" path="res://data/Spell_Boom.tres" id="5_kos6x"]
 [ext_resource type="Script" uid="uid://6wp4d30kylxh" path="res://data/WaveData.gd" id="11_lo8qj"]
-[ext_resource type="Resource" uid="uid://bat1ik28shbwl" path="res://data/Test_Wave.tres" id="12_xrhbq"]
 [ext_resource type="PackedScene" uid="uid://cgyd11qxpykik" path="res://player.tscn" id="13_k4nrn"]
 [ext_resource type="Script" uid="uid://dyy1ypg53wmuj" path="res://scripts/EnemySpawner.gd" id="15_sbc7h"]
 [ext_resource type="Resource" uid="uid://biqolq4lyjw36" path="res://data/Difficulty_Default.tres" id="16_6o4vi"]
@@ -11,7 +11,7 @@
 
 [node name="Main" type="Node2D" unique_id=399607641]
 script = ExtResource("1_g3qtk")
-test_waves = Array[ExtResource("11_lo8qj")]([ExtResource("12_xrhbq"), ExtResource("12_xrhbq"), ExtResource("12_xrhbq")])
+test_waves = Array[ExtResource("11_lo8qj")]([ExtResource("3_kos6x")])
 
 [node name="ColorRect" type="ColorRect" parent="." unique_id=951383898]
 z_index = -1

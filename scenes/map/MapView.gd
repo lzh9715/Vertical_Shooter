@@ -17,6 +17,7 @@ const TYPE_LABEL := {
 	MapNodeData.NodeType.SHOP: "商",
 	MapNodeData.NodeType.EVENT: "事",
 	MapNodeData.NodeType.BOSS: "首",
+	MapNodeData.NodeType.REWARD: "奖",
 }
 
 const TYPE_COLOR := {
@@ -26,6 +27,7 @@ const TYPE_COLOR := {
 	MapNodeData.NodeType.SHOP: Color(0.35, 0.9, 0.45),
 	MapNodeData.NodeType.EVENT: Color(0.45, 0.72, 1.0),
 	MapNodeData.NodeType.BOSS: Color(1.0, 0.32, 0.32),
+	MapNodeData.NodeType.REWARD: Color(1.0, 0.85, 0.35),
 }
 
 @onready var tooltip: Panel = $Tooltip
@@ -110,9 +112,9 @@ func _draw_dashed_curve(a: Vector2, b: Vector2, color: Color, width: float, edge
 	var normal := Vector2(-dir.y, dir.x)
 
 	var h := absi(edge_seed)
-	var side := 1.0 if (h % 2) == 0 else -1.0                                  # 随机左/右弯
-	var bow := CURVE_BOW * (0.55 + 0.9 * float((h / 2) % 100) / 100.0)         # 弯曲幅度 0.55~1.45 倍
-	var along := (float((h / 200) % 100) / 100.0 - 0.5) * 0.3                  # 控制点沿行进方向前后 ±15%
+	var side := 1.0 if (h & 1) == 0 else -1.0                                 # 随机左/右弯
+	var bow := CURVE_BOW * (0.55 + 0.9 * float((h >> 1) & 0x7F) / 127.0)      # 弯曲幅度 0.55~1.45 倍
+	var along := (float((h >> 8) & 0x7F) / 127.0 - 0.5) * 0.3                 # 控制点沿行进方向前后 ±15%
 
 	var ctrl := (a + b) * 0.5 + normal * span * bow * side + dir * span * along
 
@@ -166,4 +168,5 @@ func _type_desc(t: int) -> String:
 		MapNodeData.NodeType.SHOP: return "商店"
 		MapNodeData.NodeType.EVENT: return "事件"
 		MapNodeData.NodeType.BOSS: return "首领"
+		MapNodeData.NodeType.REWARD: return "奖励关"
 	return "未知"

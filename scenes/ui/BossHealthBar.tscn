@@ -1,0 +1,22 @@
+[gd_scene format=3 uid="uid://bm1hwyw4lccle"]
+
+[ext_resource type="Script" uid="uid://bogrc0hflsn4s" path="res://scripts/ui/BossHealthBar.gd" id="1_v8qyo"]
+
+[node name="BossHealthBar" type="CanvasLayer" unique_id=1404937232]
+script = ExtResource("1_v8qyo")
+
+[node name="NameLabel" type="Label" parent="." unique_id=1553365285]
+offset_left = 20.0
+offset_top = 16.0
+offset_right = 82.0
+offset_bottom = 55.0
+theme_override_font_sizes/font_size = 28
+text = "boss"
+
+[node name="Bar" type="ProgressBar" parent="." unique_id=909213152]
+offset_left = 20.0
+offset_top = 16.0
+offset_right = 700.0
+offset_bottom = 42.0
+value = 100.0
+show_percentage = false

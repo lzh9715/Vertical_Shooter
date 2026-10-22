@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="EventTrade" format=3]
+
+[ext_resource type="Script" path="res://data/event/EventOption.gd" id="1_gx82o"]
+[ext_resource type="Script" path="res://data/event/EventTrade.gd" id="2_72mp5"]
+
+[resource]
+script = ExtResource("2_72mp5")
+title = "以物易物"
+body = "一个戴面具的人摊开手：\"用你有的，换你没有的。\""

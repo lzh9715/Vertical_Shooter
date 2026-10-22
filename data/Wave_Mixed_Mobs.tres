@@ -1,0 +1,61 @@
+[gd_resource type="Resource" script_class="WaveData" format=3 uid="uid://3d3ex7gjtw33"]
+
+[ext_resource type="Script" uid="uid://ys7eld55hqog" path="res://data/WaveEntry.gd" id="1_augyc"]
+[ext_resource type="Resource" uid="uid://bmqqioc5su1my" path="res://data/Enemy_Mob_A.tres" id="2_5grpf"]
+[ext_resource type="Script" uid="uid://6wp4d30kylxh" path="res://data/WaveData.gd" id="2_pudjq"]
+[ext_resource type="Script" uid="uid://b243fk7jdlvh2" path="res://data/QueueData.gd" id="3_gkiwp"]
+[ext_resource type="Resource" uid="uid://fi3512h4ent5" path="res://data/Enemy_Mob_B.tres" id="4_fs34r"]
+[ext_resource type="Resource" uid="uid://c6dye8hx7075i" path="res://data/Enemy_Mob_C.tres" id="5_ncm63"]
+[ext_resource type="Resource" uid="uid://cofnu0m47xs25" path="res://data/Enemy_Mob_D.tres" id="6_03n7k"]
+
+[sub_resource type="Resource" id="Resource_gkiwp"]
+script = ExtResource("3_gkiwp")
+count = 1
+enemy_data = ExtResource("2_5grpf")
+metadata/_custom_type_script = "uid://b243fk7jdlvh2"
+
+[sub_resource type="Resource" id="Resource_35ecg"]
+script = ExtResource("1_augyc")
+spawn = SubResource("Resource_gkiwp")
+metadata/_custom_type_script = "uid://ys7eld55hqog"
+
+[sub_resource type="Resource" id="Resource_fs34r"]
+script = ExtResource("3_gkiwp")
+count = 1
+enemy_data = ExtResource("4_fs34r")
+metadata/_custom_type_script = "uid://b243fk7jdlvh2"
+
+[sub_resource type="Resource" id="Resource_vv7r7"]
+script = ExtResource("1_augyc")
+spawn = SubResource("Resource_fs34r")
+delay = 0.8
+metadata/_custom_type_script = "uid://ys7eld55hqog"
+
+[sub_resource type="Resource" id="Resource_ncm63"]
+script = ExtResource("3_gkiwp")
+count = 1
+enemy_data = ExtResource("5_ncm63")
+metadata/_custom_type_script = "uid://b243fk7jdlvh2"
+
+[sub_resource type="Resource" id="Resource_o60vj"]
+script = ExtResource("1_augyc")
+spawn = SubResource("Resource_ncm63")
+delay = 1.6
+metadata/_custom_type_script = "uid://ys7eld55hqog"
+
+[sub_resource type="Resource" id="Resource_03n7k"]
+script = ExtResource("3_gkiwp")
+count = 1
+enemy_data = ExtResource("6_03n7k")
+metadata/_custom_type_script = "uid://b243fk7jdlvh2"
+
+[sub_resource type="Resource" id="Resource_5grpf"]
+script = ExtResource("1_augyc")
+spawn = SubResource("Resource_03n7k")
+delay = 2.4
+metadata/_custom_type_script = "uid://ys7eld55hqog"
+
+[resource]
+script = ExtResource("2_pudjq")
+entries = Array[ExtResource("1_augyc")]([SubResource("Resource_35ecg"), SubResource("Resource_vv7r7"), SubResource("Resource_o60vj"), SubResource("Resource_5grpf")])
+metadata/_custom_type_script = "uid://6wp4d30kylxh"

@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="WaveData" format=3 uid="uid://dd2t6uyw8sfv6"]
+
+[ext_resource type="Script" uid="uid://ys7eld55hqog" path="res://data/WaveEntry.gd" id="1_04e6g"]
+[ext_resource type="Resource" uid="uid://dvrogu3tbxoax" path="res://data/Enemy_Shooter.tres" id="2_bfq2l"]
+[ext_resource type="Script" uid="uid://b243fk7jdlvh2" path="res://data/QueueData.gd" id="3_m0oty"]
+[ext_resource type="Script" uid="uid://6wp4d30kylxh" path="res://data/WaveData.gd" id="4_w5nv1"]
+
+[sub_resource type="Resource" id="Resource_d5icy"]
+script = ExtResource("3_m0oty")
+count = 3
+spacing_time = 0.9
+enemy_data = ExtResource("2_bfq2l")
+
+[sub_resource type="Resource" id="Resource_mnrlk"]
+script = ExtResource("1_04e6g")
+spawn = SubResource("Resource_d5icy")
+
+[resource]
+script = ExtResource("4_w5nv1")
+entries = Array[ExtResource("1_04e6g")]([SubResource("Resource_mnrlk")])

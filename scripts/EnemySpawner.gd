@@ -41,6 +41,11 @@ func create_enemy(data: EnemyData):
 	enemy.score_reward = roundi(data.score * reward_mult)
 	enemy.gold_reward = roundi(data.gold * reward_mult)
 	enemy.despawn_margin = data.despawn_margin * ScreenUtil.scale_factor()
+	enemy.texture = data.texture
+	enemy.attack = data.attack
+	enemy.scale = Vector2.ONE * data.visual_scale
+	if enemy.has_method("configure_elite"):
+		enemy.configure_elite(data.elite_movement, data.elite_hover_height, data.elite_lane_offset)
 	enemy.died.connect(_on_enemy_died)
 	return enemy
 

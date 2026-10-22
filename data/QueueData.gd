@@ -17,4 +17,8 @@ func spawn(spawner) -> void:
 		enemy.movement = movement
 		enemy.direction = direction
 
+		# 精英需要知道自己是这一队里的第几只，用来分配互不重叠的悬停车道
+		if enemy.has_method("configure_lane"):
+			enemy.configure_lane(i, count)
+
 		spawner.schedule(enemy, i * spacing_time)

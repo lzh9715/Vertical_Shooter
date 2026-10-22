@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="BossData" format=3]
+
+[ext_resource type="Script" path="res://data/boss/BossPhaseData.gd" id="1_044wy"]
+[ext_resource type="Resource" path="res://data/attacks/Attack_Elite_Gunner.tres" id="2_l530s"]
+[ext_resource type="Resource" path="res://data/elite_movement/EliteMove_Hover_Gunner.tres" id="3_igi1a"]
+[ext_resource type="Resource" path="res://data/attacks/Attack_Mob_D.tres" id="4_oshs8"]
+[ext_resource type="Resource" path="res://data/elite_movement/EliteMove_Hover_Suppressor.tres" id="5_jqyig"]
+[ext_resource type="PackedScene" path="res://scenes/boss/base_boss.tscn" id="6_0qv4d"]
+[ext_resource type="Script" path="res://data/boss/BossData.gd" id="7_8f4kg"]
+
+[sub_resource type="Resource" id="Resource_6p43i"]
+script = ExtResource("1_044wy")
+movement = ExtResource("3_igi1a")
+attack = ExtResource("2_l530s")
+
+[sub_resource type="Resource" id="Resource_siia7"]
+script = ExtResource("1_044wy")
+hp_threshold = 0.5
+movement = ExtResource("5_jqyig")
+attack = ExtResource("4_oshs8")
+
+[resource]
+script = ExtResource("7_8f4kg")
+display_name = "扒手头目"
+scene = ExtResource("6_0qv4d")
+max_hp = 300
+visual_scale = 1.2
+enter_duration = 1.0
+phases = Array[ExtResource("1_044wy")]([SubResource("Resource_6p43i"), SubResource("Resource_siia7")])

@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Resource" path="res://data/attacks/Attack_Elite_Gunner.tres" id="1_p7bbw"]
+[ext_resource type="Script" path="res://data/EnemyData.gd" id="1_vwdon"]
+[ext_resource type="Resource" path="res://data/elite_movement/EliteMove_Hover_Gunner.tres" id="2_4kket"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/elite.tscn" id="2_p7bbw"]
+
+[resource]
+script = ExtResource("1_vwdon")
+tier = 1
+scene = ExtResource("2_p7bbw")
+max_hp = 45
+speed = 70.0
+score = 300
+gold = 120
+despawn_margin = 350.0
+visual_scale = 1.8
+attack = ExtResource("1_p7bbw")
+elite_movement = ExtResource("2_4kket")
+elite_lane_offset = -110.0
+metadata/_custom_type_script = "uid://dwcgj366c6xq6"

@@ -10,6 +10,9 @@ signal stats_changed
 const MAP_SCENE := "res://scenes/map/MapView.tscn"
 const BATTLE_SCENE := "res://scenes/battle/Battle.tscn"
 const SHOP_SCENE := "res://scenes/shop/ShopView.tscn"
+const RESULT_SCENE := "res://scenes/ui/ResultScreen.tscn"
+const REWARD_SCENE := "res://scenes/ui/RewardView.tscn"
+const EVENT_SCENE := "res://scenes/ui/EventView.tscn"
 
 var level: LevelConfig
 var map: MapData
@@ -24,6 +27,12 @@ var hp := 3
 var max_hp := 3
 var spell: SpellData
 var pricing: ShopPricing
+var last_result: Dictionary = {}       # 结算界面读取的上一局数据
+var current_reward: RewardData         # 当前奖励关
+var current_event: EventData           # 当前事件
+var event_context: Dictionary = {}     # 事件战斗上下文（Boss / 限时 / 被偷金额）
+var _used_events: Array[String] = []   # 本局已出现过的事件
+var _reward_modifiers: Dictionary = {} # 收益类 buff：来源 ID -> 倍率
 
 ## 开一局：生成/读取地图，起点自动算作已通过
 func start_run(config: LevelConfig, seed_value: int = 0) -> void:
@@ -42,6 +51,11 @@ func start_run(config: LevelConfig, seed_value: int = 0) -> void:
 	cleared.clear()
 	cleared.append(map.start_id)      # 起点默认通过
 	frontier = _next_ids_of(map.start_id)
+	current_reward = null
+	current_event = null
+	event_context.clear()
+	_used_events.clear()
+	_reward_modifiers.clear()
 	reset_stats()
 	run_started.emit()
 
@@ -57,8 +71,20 @@ func enter_node(node: MapNodeData) -> void:
 			get_tree().change_scene_to_file(BATTLE_SCENE)
 		MapNodeData.NodeType.SHOP:
 			get_tree().change_scene_to_file(SHOP_SCENE)
+		MapNodeData.NodeType.REWARD:
+			current_reward = _pick_reward()
+			if current_reward is RewardBattle:
+				get_tree().change_scene_to_file(BATTLE_SCENE)
+			else:
+				get_tree().change_scene_to_file(REWARD_SCENE)
+		MapNodeData.NodeType.EVENT:
+			current_event = _pick_event()
+			if current_event == null:
+				finish_node()
+			else:
+				get_tree().change_scene_to_file(EVENT_SCENE)
 		_:
-			# 事件节点还没有内容：先当作直接通过
+			# 未实现的节点类型：直接通过
 			finish_node()
 
 ## 节点打完
@@ -74,9 +100,12 @@ func finish_node() -> void:
 	frontier = _next_ids_of(finished.id)
 	node_finished.emit(finished)
 	current_node = null
+	current_reward = null
+	current_event = null
+	event_context.clear()
 
 	if finished.type == MapNodeData.NodeType.BOSS:
-		end_run()                        # 通关：暂时直接开新一局
+		end_run(true)                    # 通关
 	else:
 		get_tree().change_scene_to_file(MAP_SCENE)
 
@@ -89,8 +118,6 @@ func build_waves(node: MapNodeData) -> Array[WaveData]:
 	var pool: Array[WaveData] = level.mob_pool
 	if node.type == MapNodeData.NodeType.ELITE and not level.elite_pool.is_empty():
 		pool = level.elite_pool
-	elif node.type == MapNodeData.NodeType.BOSS and not level.boss_pool.is_empty():
-		pool = level.boss_pool
 
 	if pool.is_empty():
 		push_warning("波次池是空的：%s" % node.display_name)
@@ -130,14 +157,39 @@ func spend_gold(amount: int) -> bool:
 	stats_changed.emit()
 	return true
 
-## 结束一局（阵亡 / 通关）：清空地图，回地图界面重新开始
-func end_run() -> void:
+## 结束一局（阵亡 / 通关）：记录结果并进入结算界面
+func end_run(victory: bool = false) -> void:
 	get_tree().paused = false
-	print("Run 结束")
+
+	last_result = {
+		"victory": victory,
+		"score": score,
+		"gold": gold,
+		"hp": hp,
+		"max_hp": max_hp,
+		"nodes": cleared.size(),
+	}
+
+	print("Run 结束：", "通关" if victory else "阵亡")
+
 	map = null
 	current_node = null
-	get_tree().change_scene_to_file(MAP_SCENE)
+	current_reward = null
+	current_event = null
+	event_context.clear()
 	frontier.clear()
+
+	# 可能从物理回调（玩家受击）里调用，直接切场景会移除碰撞体 → 必须延迟
+	get_tree().call_deferred("change_scene_to_file", RESULT_SCENE)
+
+## 结算界面点“再来一局”
+func restart_after_result() -> void:
+	if level == null:
+		get_tree().change_scene_to_file(MAP_SCENE)
+		return
+
+	start_run(level)
+	get_tree().change_scene_to_file(MAP_SCENE)
 
 func _next_ids_of(node_id: int) -> Array[int]:
 	var out: Array[int] = []
@@ -160,3 +212,67 @@ func get_pricing() -> ShopPricing:
 	if pricing == null:
 		pricing = ShopPricing.new()
 	return pricing
+
+func get_boss() -> BossData:
+	if level == null:
+		return null
+	return level.boss
+
+# ---------- 奖励关 ----------
+
+func _pick_reward() -> RewardData:
+	if level == null or level.reward_pool.is_empty():
+		push_warning("奖励池是空的")
+		return null
+	return level.reward_pool[rng.randi_range(0, level.reward_pool.size() - 1)]
+
+## 收益倍率接口：未来的金币 buff / 道具往这里叠
+func add_reward_modifier(source_id: StringName, multiplier: float) -> void:
+	_reward_modifiers[source_id] = multiplier
+
+func remove_reward_modifier(source_id: StringName) -> void:
+	_reward_modifiers.erase(source_id)
+
+func get_reward_multiplier() -> float:
+	var total := 1.0
+	for m in _reward_modifiers.values():
+		total *= float(m)
+	return clampf(total, 0.1, 10.0)
+
+func heal(amount: int) -> void:
+	hp = mini(hp + amount, max_hp)
+	stats_changed.emit()
+
+## 事件用：改变当前血量（最低保留 1，避免事件直接致死）
+func change_hp(delta: int) -> void:
+	hp = clampi(hp + delta, 1, max_hp)
+	stats_changed.emit()
+
+## 事件用：改变最大生命（最低 1，当前血量跟随上限）
+func change_max_hp(delta: int) -> void:
+	max_hp = maxi(1, max_hp + delta)
+	hp = mini(hp, max_hp)
+	stats_changed.emit()
+
+# ---------- 事件 ----------
+
+func _pick_event() -> EventData:
+	if level == null or level.event_pool.is_empty():
+		return null
+
+	var candidates: Array[EventData] = []
+	for e in level.event_pool:
+		if e == null:
+			continue
+		if e.once_per_run and _used_events.has(e.resource_path):
+			continue
+		if current_node != null and current_node.layer < e.min_layer:
+			continue
+		candidates.append(e)
+
+	if candidates.is_empty():
+		return null
+
+	var picked := candidates[rng.randi_range(0, candidates.size() - 1)]
+	_used_events.append(picked.resource_path)
+	return picked

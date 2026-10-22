@@ -24,7 +24,7 @@ static func generate(config: LevelConfig, rng: RandomNumberGenerator) -> MapData
 			continue
 		var map := _build_map(windows, center, total_layers, config, rng)
 		if map != null:
-			map.seed = rng.seed
+			map.map_seed = rng.seed
 			return map
 
 	# 兜底：一条中轴直链（正常不会走到这里）
@@ -165,11 +165,13 @@ static func _roll_type(layer: int, total_layers: int, rng: RandomNumberGenerator
 
 	var roll := rng.randf()
 	if layer <= 3:
-		if roll < 0.70: return MapNodeData.NodeType.BATTLE
-		if roll < 0.90: return MapNodeData.NodeType.EVENT
-		return MapNodeData.NodeType.SHOP
+		if roll < 0.55: return MapNodeData.NodeType.BATTLE
+		if roll < 0.70: return MapNodeData.NodeType.EVENT
+		if roll < 0.80: return MapNodeData.NodeType.SHOP
+		return MapNodeData.NodeType.REWARD
 	else:
-		if roll < 0.50: return MapNodeData.NodeType.BATTLE
-		if roll < 0.70: return MapNodeData.NodeType.ELITE
-		if roll < 0.90: return MapNodeData.NodeType.EVENT
-		return MapNodeData.NodeType.SHOP
+		if roll < 0.45: return MapNodeData.NodeType.BATTLE
+		if roll < 0.65: return MapNodeData.NodeType.ELITE
+		if roll < 0.78: return MapNodeData.NodeType.EVENT
+		if roll < 0.88: return MapNodeData.NodeType.SHOP
+		return MapNodeData.NodeType.REWARD

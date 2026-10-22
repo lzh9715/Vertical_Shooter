@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="EnemyAttackPattern" format=3 uid="uid://7phn065emdpy"]
+
+[ext_resource type="Script" uid="uid://c8c01nn8pfqai" path="res://data/bullet/EnemyAttackPattern.gd" id="1_rb4ar"]
+[ext_resource type="Script" uid="uid://dox3e2spp8fvl" path="res://data/bullet/AttackStep.gd" id="2_sq177"]
+[ext_resource type="Resource" path="res://data/bullets/BulletSpread_Basic.tres" id="3_wt6tp"]
+[ext_resource type="Resource" path="res://data/bullets/BulletHeavy_Basic.tres" id="4_mg4ta"]
+
+[sub_resource type="Resource" id="Resource_wt6tp"]
+script = ExtResource("2_sq177")
+volley = ExtResource("3_wt6tp")
+repeat = 2
+gap = 0.3
+cooldown = 1.6
+metadata/_custom_type_script = "uid://dox3e2spp8fvl"
+
+[sub_resource type="Resource" id="Resource_mg4ta"]
+script = ExtResource("2_sq177")
+volley = ExtResource("4_mg4ta")
+cooldown = 2.6
+metadata/_custom_type_script = "uid://dox3e2spp8fvl"
+
+[resource]
+script = ExtResource("1_rb4ar")
+start_delay = 1.5
+steps = Array[ExtResource("2_sq177")]([SubResource("Resource_wt6tp"), SubResource("Resource_mg4ta")])
+metadata/_custom_type_script = "uid://c8c01nn8pfqai"

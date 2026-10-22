@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://drbdj2ree6yts"]
+
+[ext_resource type="Script" uid="uid://doiit7iimf00s" path="res://debug/EventTest.gd" id="1_k2w37"]
+
+[node name="EventTest" type="Node" unique_id=1711104490]
+script = ExtResource("1_k2w37")

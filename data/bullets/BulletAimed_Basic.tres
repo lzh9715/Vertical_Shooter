@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="BulletAimed" format=3]
+
+[ext_resource type="Script" path="res://data/bullet/BulletAimed.gd" id="1_efvyu"]
+
+[resource]
+script = ExtResource("1_efvyu")
+speed = 200.0
+interval = 1.6
+first_delay = 0.9

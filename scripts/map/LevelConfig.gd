@@ -21,8 +21,16 @@ class_name LevelConfig
 @export_group("波次池")
 @export var mob_pool: Array[WaveData] = []
 @export var elite_pool: Array[WaveData] = []
-@export var boss_pool: Array[WaveData] = []
 
 @export_group("商店")
 @export var spell_pool: Array[SpellData] = []
 @export var pricing: ShopPricing          # 留空则使用默认定价（20~150，倍率 1）
+
+@export_group("Boss")
+@export var boss: BossData
+
+@export_group("奖励关")
+@export var reward_pool: Array[RewardData] = []
+
+@export_group("事件")
+@export var event_pool: Array[EventData] = []

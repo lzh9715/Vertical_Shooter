@@ -9,6 +9,8 @@ class_name FormationData
 @export_group("节奏")
 @export var delay: float = 0.0
 @export var interval: float = 0.0
+@export var repeat := 1                 # 同一阵型重复生成几组
+@export var group_interval := 0.3       # 组与组之间的间隔
 
 func spawn(spawner) -> void:
 	if shape == null:
@@ -23,13 +25,27 @@ func spawn(spawner) -> void:
 		push_warning("阵型算不出点位")
 		return
 
-	for i in range(offsets.size()):
-		var enemy = spawner.create_enemy(enemy_data)
-		if enemy == null:
-			return
+	if shape.rotate_to_direction:
+		var angle := _direction_angle()
+		for i in range(offsets.size()):
+			offsets[i] = offsets[i].rotated(angle)
 
-		enemy.start_position = center
-		enemy.offset = offsets[i] * scale
-		enemy.direction = direction
-		enemy.movement = movement
-		spawner.schedule(enemy, delay + i * interval)
+	var groups := maxi(repeat, 1)
+	for g in range(groups):
+		var base_delay := delay + g * group_interval
+		for i in range(offsets.size()):
+			var enemy = spawner.create_enemy(enemy_data)
+			if enemy == null:
+				return
+
+			enemy.start_position = center
+			enemy.offset = offsets[i] * scale
+			enemy.direction = direction
+			enemy.movement = movement
+			spawner.schedule(enemy, base_delay + i * interval)
+
+func _direction_angle() -> float:
+	match direction:
+		"Left_To_Right": return 0.0
+		"Right_To_Left": return PI
+		_: return PI * 0.5      # Top_To_Bottom

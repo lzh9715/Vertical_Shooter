@@ -9,4 +9,5 @@ description = "范围伤害"
 price = 120
 is_explosive = true
 explosion_radius = 100.0
+explosion_damage = 3
 metadata/_custom_type_script = "uid://bs1k2fbrjlf4v"

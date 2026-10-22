@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3 uid="uid://fi3512h4ent5"]
+
+[ext_resource type="Script" uid="uid://dwcgj366c6xq6" path="res://data/EnemyData.gd" id="1_83f7u"]
+[ext_resource type="Resource" uid="uid://rvdvra3dor3j" path="res://data/attacks/Attack_Mob_B.tres" id="1_gx2p6"]
+[ext_resource type="PackedScene" uid="uid://bsg566ksmssc0" path="res://enemy.tscn" id="2_1rii5"]
+
+[resource]
+script = ExtResource("1_83f7u")
+scene = ExtResource("2_1rii5")
+max_hp = 6
+speed = 150.0
+score = 30
+gold = 12
+attack = ExtResource("1_gx2p6")
+metadata/_custom_type_script = "uid://dwcgj366c6xq6"

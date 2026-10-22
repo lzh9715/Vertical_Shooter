@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="EnemyAttackPattern" format=3 uid="uid://8silhc8epon7"]
+
+[ext_resource type="Script" uid="uid://c8c01nn8pfqai" path="res://data/bullet/EnemyAttackPattern.gd" id="1_k2o4w"]
+[ext_resource type="Script" uid="uid://dox3e2spp8fvl" path="res://data/bullet/AttackStep.gd" id="2_krxee"]
+[ext_resource type="Resource" uid="uid://cuyr3txouoeoe" path="res://data/bullets/BulletAimed_Fast.tres" id="3_akqyd"]
+[ext_resource type="Resource" path="res://data/bullets/BulletSpread_Basic.tres" id="4_krdpt"]
+
+[sub_resource type="Resource" id="Resource_akqyd"]
+script = ExtResource("2_krxee")
+volley = ExtResource("3_akqyd")
+repeat = 3
+gap = 0.15
+cooldown = 1.6
+metadata/_custom_type_script = "uid://dox3e2spp8fvl"
+
+[sub_resource type="Resource" id="Resource_krdpt"]
+script = ExtResource("2_krxee")
+volley = ExtResource("4_krdpt")
+cooldown = 2.2
+metadata/_custom_type_script = "uid://dox3e2spp8fvl"
+
+[resource]
+script = ExtResource("1_k2o4w")
+start_delay = 1.2
+steps = Array[ExtResource("2_krxee")]([SubResource("Resource_akqyd"), SubResource("Resource_krdpt")])
+metadata/_custom_type_script = "uid://c8c01nn8pfqai"

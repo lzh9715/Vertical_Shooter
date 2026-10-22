@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="RewardBattle" format=3]
+
+[ext_resource type="Script" path="res://data/reward/RewardBattle.gd" id="1_td07d"]
+[ext_resource type="Script" path="res://data/WaveData.gd" id="2_ubw8r"]
+[ext_resource type="Resource" path="res://data/Wave_RewardRush.tres" id="3_lx0sy"]
+
+[resource]
+script = ExtResource("1_td07d")
+waves = Array[ExtResource("2_ubw8r")]([ExtResource("3_lx0sy")])
+display_name = "小怪突袭"

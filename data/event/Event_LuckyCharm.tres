@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="EventData" format=3]
+
+[ext_resource type="Script" path="res://data/event/EventOption.gd" id="1_c8uwe"]
+[ext_resource type="Script" path="res://data/event/EventOutcome.gd" id="2_skauy"]
+[ext_resource type="Script" path="res://data/event/EventData.gd" id="3_j0gs2"]
+
+[sub_resource type="Resource" id="Resource_fur3x"]
+script = ExtResource("2_skauy")
+text = "本局金币收益 +30%。"
+reward_modifier_source = &"event_lucky_charm"
+reward_multiplier = 1.3
+
+[sub_resource type="Resource" id="Resource_t5bww"]
+script = ExtResource("1_c8uwe")
+label = "收下护符"
+outcome = SubResource("Resource_fur3x")
+
+[sub_resource type="Resource" id="Resource_twpqp"]
+script = ExtResource("2_skauy")
+text = "你没有碰它。"
+
+[sub_resource type="Resource" id="Resource_1q0te"]
+script = ExtResource("1_c8uwe")
+outcome = SubResource("Resource_twpqp")
+
+[resource]
+script = ExtResource("3_j0gs2")
+title = "镀金护符"
+body = "地上躺着一枚发光的护符，商人的天平似乎开始向你倾斜。"
+options = Array[ExtResource("1_c8uwe")]([SubResource("Resource_t5bww"), SubResource("Resource_1q0te")])

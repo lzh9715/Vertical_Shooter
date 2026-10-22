@@ -17,3 +17,6 @@ shape = SubResource("RectangleShape2D_eyboa")
 [node name="Polygon2D" type="Polygon2D" parent="." unique_id=210374588]
 color = Color(1, 0, 0, 1)
 polygon = PackedVector2Array(-15, -15, 15, -15, 15, 15, -15, 15)
+
+[node name="Body" type="Sprite2D" parent="." unique_id=210374589]
+visible = false

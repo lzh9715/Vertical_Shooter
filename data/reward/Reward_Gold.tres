@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="RewardGrant" format=3]
+
+[ext_resource type="Script" path="res://data/reward/RewardGrant.gd" id="1_llos7"]
+
+[resource]
+script = ExtResource("1_llos7")
+display_name = "补给箱"

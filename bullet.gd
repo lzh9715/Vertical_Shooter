@@ -9,6 +9,7 @@ extends Area2D
 @export var pierce_amount := 1
 @export var is_explosive := false
 @export var explosion_radius := 80.0
+@export var explosion_damage := 2
 
 var pierced_enemies := [] # 记录已经打过的敌人，防止同一只怪被重复扣血
 
@@ -47,9 +48,12 @@ func _on_area_entered(area):
 func explode():
 	var enemies = get_tree().get_nodes_in_group("enemy")
 	for enemy in enemies:
+		# 本次直接命中的敌人已经单独结算过了，爆炸不再重复扣血
+		if enemy in pierced_enemies:
+			continue
 		if global_position.distance_to(enemy.global_position) <= explosion_radius:
 			if enemy.has_method("take_damage"):
-				enemy.take_damage(9999)   # ← 原来是 enemy.queue_free()
+				enemy.take_damage(explosion_damage)
 	
 	# 视觉反馈（可选）：在屏幕上画一个圈代表爆炸范围
 	var explosion_visual = Polygon2D.new()
@@ -62,8 +66,8 @@ func explode():
 	explosion_visual.global_position = global_position
 	get_parent().add_child(explosion_visual)
 	
-	# 0.1秒后销毁爆炸特效
-	get_tree().create_timer(0.1).timeout.connect(explosion_visual.queue_free)
+	# 0.1秒后销毁爆炸特效（跟随暂停）
+	get_tree().create_timer(0.1, false).timeout.connect(explosion_visual.queue_free)
 
 func _find_nearest_enemy():
 	var enemies = get_tree().get_nodes_in_group("enemy")

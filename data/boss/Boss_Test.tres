@@ -1,0 +1,39 @@
+[gd_resource type="Resource" script_class="BossData" format=3 uid="uid://cuomghm2ns3cn"]
+
+[ext_resource type="Script" uid="uid://h80j1kce6wyi" path="res://data/boss/BossPhaseData.gd" id="1_x7jx0"]
+[ext_resource type="Script" uid="uid://b2h5fshhoe76j" path="res://data/boss/BossData.gd" id="2_7divg"]
+[ext_resource type="Resource" uid="uid://8silhc8epon7" path="res://data/attacks/Attack_Elite_Gunner.tres" id="2_tck0g"]
+[ext_resource type="Resource" path="res://data/elite_movement/EliteMove_Hover_Gunner.tres" id="3_6f1kx"]
+[ext_resource type="Resource" uid="uid://7phn065emdpy" path="res://data/attacks/Attack_Elite_Suppressor.tres" id="4_1c6h0"]
+[ext_resource type="Resource" path="res://data/elite_movement/EliteMove_Hover_Suppressor.tres" id="5_nhkb6"]
+[ext_resource type="Resource" uid="uid://buxik3esb52n8" path="res://data/attacks/Attack_Mob_D.tres" id="6_lovhr"]
+[ext_resource type="PackedScene" uid="uid://boo4e6e74uqiu" path="res://scenes/boss/base_boss.tscn" id="7_vwe5j"]
+
+[sub_resource type="Resource" id="Resource_m0kry"]
+script = ExtResource("1_x7jx0")
+movement = ExtResource("3_6f1kx")
+attack = ExtResource("2_tck0g")
+metadata/_custom_type_script = "uid://h80j1kce6wyi"
+
+[sub_resource type="Resource" id="Resource_jms27"]
+script = ExtResource("1_x7jx0")
+hp_threshold = 0.6
+movement = ExtResource("5_nhkb6")
+attack = ExtResource("4_1c6h0")
+metadata/_custom_type_script = "uid://h80j1kce6wyi"
+
+[sub_resource type="Resource" id="Resource_xv202"]
+script = ExtResource("1_x7jx0")
+hp_threshold = 0.3
+movement = ExtResource("3_6f1kx")
+attack = ExtResource("6_lovhr")
+metadata/_custom_type_script = "uid://h80j1kce6wyi"
+
+[resource]
+script = ExtResource("2_7divg")
+display_name = "测试守卫"
+scene = ExtResource("7_vwe5j")
+max_hp = 800
+visual_scale = 1.6
+phases = Array[ExtResource("1_x7jx0")]([SubResource("Resource_m0kry"), SubResource("Resource_jms27"), SubResource("Resource_xv202")])
+metadata/_custom_type_script = "uid://b2h5fshhoe76j"

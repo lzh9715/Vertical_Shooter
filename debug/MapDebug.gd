@@ -26,7 +26,7 @@ func _make_config() -> LevelConfig:
 	return config
 
 func _print_map(map: MapData) -> void:
-	print("========== 地图  seed=%d  层数=%d  节点数=%d ==========" % [map.seed, map.max_layer() + 1, map.nodes.size()])
+	print("========== 地图  seed=%d  层数=%d  节点数=%d ==========" % [map.map_seed, map.max_layer() + 1, map.nodes.size()])
 	for layer in range(map.max_layer() + 1):
 		var row := map.nodes_in_layer(layer)
 		var line := "L%d (%d只)：" % [layer, row.size()]

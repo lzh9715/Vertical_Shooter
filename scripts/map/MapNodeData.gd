@@ -1,7 +1,7 @@
 extends Resource
 class_name MapNodeData
 
-enum NodeType { START, BATTLE, ELITE, SHOP, EVENT, BOSS }
+enum NodeType { START, BATTLE, ELITE, SHOP, EVENT, BOSS, REWARD }
 
 @export var id: int = -1
 @export var layer: int = 0

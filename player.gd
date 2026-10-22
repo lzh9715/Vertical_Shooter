@@ -11,6 +11,9 @@ signal hp_changed(current: int, max_hp: int)   # HUD 自己订阅，玩家不需
 var current_hp := 3
 var is_invincible := false # 是否无敌
 
+var _stolen_spell: SpellData
+var _steal_left := 0.0
+
 @onready var shoot_timer: Timer = $ShootTimer
 @onready var hurtbox: Area2D = $Hurtbox
 
@@ -24,8 +27,13 @@ func _ready():
 	shoot_timer.timeout.connect(_on_shoot_timer_timeout)
 	hp_changed.emit(current_hp, max_hp)
 
+	EventBus.steal_spell_requested.connect(_on_steal_spell)
+	EventBus.steal_cancelled.connect(_return_stolen_spell)
 
-func _physics_process(_delta):
+
+func _physics_process(delta):
+	_tick_steal(delta)          # 新加，见第②步
+
 	var direction := Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	velocity = direction * speed
 	move_and_slide()
@@ -53,6 +61,7 @@ func _on_shoot_timer_timeout():
 		bullet.pierce_amount = current_spell.pierce_amount
 		bullet.is_explosive = current_spell.is_explosive
 		bullet.explosion_radius = current_spell.explosion_radius 
+		bullet.explosion_damage = current_spell.explosion_damage
 		
 		get_parent().add_child(bullet)
 		bullet.global_position = global_position - Vector2(0, 20)
@@ -70,13 +79,23 @@ func _on_shoot_timer_timeout():
 
 # 👇 新增受击逻辑
 func _on_hurtbox_area_entered(area):
-	# 如果撞到的是敌人，并且自己不是无敌状态
+	# 敌方子弹：先销毁子弹，再按无敌状态决定是否扣血
+	if area.is_in_group("enemy_bullet"):
+		var dmg: int = 1
+		if "damage" in area:
+			dmg = int(area.damage)
+		area.queue_free()
+		if not is_invincible:
+			take_damage(dmg)
+		return
+
+	# 撞到敌人本体
 	if area.is_in_group("enemy") and not is_invincible:
 		take_damage()
 
 
-func take_damage():
-	current_hp -= 1
+func take_damage(amount: int = 1):
+	current_hp -= amount
 	GameFlow.hp = current_hp
 	hp_changed.emit(current_hp, max_hp)
 
@@ -97,3 +116,32 @@ func take_damage():
 	await get_tree().create_timer(1.2, false).timeout
 	modulate.a = 1.0
 	is_invincible = false
+
+
+func _on_steal_spell(duration: float) -> void:
+	if current_spell == null or _stolen_spell != null:
+		return
+
+	_stolen_spell = current_spell
+	current_spell = null
+	GameFlow.spell = null
+	_steal_left = maxf(duration, 1.0)
+	EventBus.spell_stolen.emit(_stolen_spell)
+
+func _tick_steal(delta: float) -> void:
+	if _stolen_spell == null:
+		return
+
+	_steal_left -= delta
+	if _steal_left <= 0.0:
+		_return_stolen_spell()
+
+func _return_stolen_spell() -> void:
+	if _stolen_spell == null:
+		return
+
+	current_spell = _stolen_spell
+	GameFlow.spell = _stolen_spell
+	EventBus.spell_returned.emit(_stolen_spell)
+	_stolen_spell = null
+	_steal_left = 0.0

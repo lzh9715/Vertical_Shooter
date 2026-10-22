@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="EventPickpocket" format=3]
+
+[ext_resource type="Resource" path="res://data/boss/Boss_Pickpocket.tres" id="1_qljip"]
+[ext_resource type="Script" path="res://data/event/EventOption.gd" id="2_ux2jd"]
+[ext_resource type="Script" path="res://data/event/EventPickpocket.gd" id="3_kgiig"]
+
+[resource]
+script = ExtResource("3_kgiig")
+boss = ExtResource("1_qljip")
+title = "扒手"
+body = "一个黑影从你身边擦过，你的钱袋轻了一些。"

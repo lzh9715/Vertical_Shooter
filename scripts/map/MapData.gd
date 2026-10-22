@@ -4,7 +4,7 @@ class_name MapData
 @export var nodes: Array[MapNodeData] = []
 @export var start_id: int = 0
 @export var boss_id: int = 0
-@export var seed: int = 0
+@export var map_seed: int = 0
 
 func get_node_data(node_id: int) -> MapNodeData:
 	if node_id < 0 or node_id >= nodes.size():

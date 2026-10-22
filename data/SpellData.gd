@@ -15,3 +15,4 @@ class_name SpellData
 @export var pierce_amount: int = 3         # 穿透几次（打中几个怪）
 @export var is_explosive: bool = false     # 是否爆炸
 @export var explosion_radius: float = 80.0 # 爆炸半径
+@export var explosion_damage: int = 2      # 爆炸对范围内每个敌人的伤害
