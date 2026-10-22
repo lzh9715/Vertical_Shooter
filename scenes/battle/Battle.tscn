@@ -8,6 +8,7 @@
 [ext_resource type="Script" uid="uid://dyy1ypg53wmuj" path="res://scripts/EnemySpawner.gd" id="15_sbc7h"]
 [ext_resource type="Resource" uid="uid://biqolq4lyjw36" path="res://data/Difficulty_Default.tres" id="16_6o4vi"]
 [ext_resource type="Script" uid="uid://d00dio2xlf2ck" path="res://scripts/battle/BattleRunner.gd" id="17_d2pdu"]
+[ext_resource type="PackedScene" path="res://scenes/ui/PauseMenu.tscn" id="20_pause"]
 
 [node name="Main" type="Node2D" unique_id=399607641]
 script = ExtResource("1_g3qtk")
@@ -60,3 +61,5 @@ difficulty = ExtResource("16_6o4vi")
 [node name="BattleRunner" type="Node" parent="." unique_id=1019166911 node_paths=PackedStringArray("spawner")]
 script = ExtResource("17_d2pdu")
 spawner = NodePath("../Spawner")
+
+[node name="PauseMenu" parent="." instance=ExtResource("20_pause")]

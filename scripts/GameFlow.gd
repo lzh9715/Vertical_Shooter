@@ -13,6 +13,7 @@ const SHOP_SCENE := "res://scenes/shop/ShopView.tscn"
 const RESULT_SCENE := "res://scenes/ui/ResultScreen.tscn"
 const REWARD_SCENE := "res://scenes/ui/RewardView.tscn"
 const EVENT_SCENE := "res://scenes/ui/EventView.tscn"
+const MAIN_MENU_SCENE := "res://scenes/ui/MainMenu.tscn"
 
 var level: LevelConfig
 var map: MapData
@@ -89,7 +90,7 @@ func enter_node(node: MapNodeData) -> void:
 
 ## 节点打完
 func finish_node() -> void:
-	get_tree().paused = false            # 从商店出来时可能还处于暂停
+	get_tree().paused = false            # 确保离开战斗/商店时不会停留在暂停状态
 
 	if current_node == null:
 		get_tree().change_scene_to_file(MAP_SCENE)
@@ -140,6 +141,26 @@ func reset_stats() -> void:
 	hp = max_hp
 	spell = null
 	stats_changed.emit()
+
+## 返回主菜单时立即清空本局运行状态（保留 last_result 供展示）
+func reset_run() -> void:
+	get_tree().paused = false
+
+	map = null
+	current_node = null
+	current_reward = null
+	current_event = null
+	event_context.clear()
+	_used_events.clear()
+	_reward_modifiers.clear()
+	cleared.clear()
+	frontier.clear()
+
+	reset_stats()
+
+func go_main_menu() -> void:
+	reset_run()
+	get_tree().change_scene_to_file(MAIN_MENU_SCENE)
 
 func add_gold(amount: int) -> void:
 	gold = maxi(gold + amount, 0)

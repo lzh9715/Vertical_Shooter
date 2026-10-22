@@ -46,11 +46,7 @@ func _ready() -> void:
 		generate_offers()
 	refresh_ui()
 
-## 商店可见时，ESC = 关闭（由使用方决定关闭后做什么）
-func _unhandled_input(event: InputEvent) -> void:
-	if visible and event.is_action_pressed("ui_cancel"):
-		closed.emit()
-		get_viewport().set_input_as_handled()
+## 商店不再响应 Esc 关闭，避免误触；只能点「离开商店」按钮。
 
 func open() -> void:
 	btn_resume.text = close_button_text

@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://b1yv3c6hepkqt"]
 
 [ext_resource type="Script" uid="uid://cqnwls7pimmd6" path="res://scenes/map/MapView.gd" id="1_xnhjo"]
+[ext_resource type="PackedScene" path="res://scenes/ui/PauseMenu.tscn" id="2_pause"]
 
 [node name="MapView" type="Control" unique_id=1886520298]
 layout_mode = 3
@@ -35,3 +36,5 @@ offset_right = 40.0
 offset_bottom = 23.0
 text = "测试
 "
+
+[node name="PauseMenu" parent="." instance=ExtResource("2_pause")]

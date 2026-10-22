@@ -1,0 +1,66 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/ui/LevelSelect.gd" id="1_select"]
+[ext_resource type="Script" path="res://scripts/map/LevelConfig.gd" id="2_lc"]
+[ext_resource type="Resource" path="res://data/Level_01.tres" id="3_level"]
+
+[node name="LevelSelect" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_select")
+levels = Array[ExtResource("2_lc")]([ExtResource("3_level")])
+
+[node name="Background" type="ColorRect" parent="."]
+show_behind_parent = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.0588235, 0.0588235, 0.0901961, 1)
+
+[node name="BtnBack" type="Button" parent="."]
+custom_minimum_size = Vector2(120, 50)
+layout_mode = 1
+anchors_preset = 0
+offset_left = 30.0
+offset_top = 30.0
+offset_right = 150.0
+offset_bottom = 80.0
+theme_override_font_sizes/font_size = 24
+text = "返回"
+
+[node name="Title" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 40.0
+offset_bottom = 100.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 44
+text = "选择关卡"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Center" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 90.0
+offset_bottom = -30.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="Center"]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="Cards" type="VBoxContainer" parent="Center/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 20

@@ -59,4 +59,4 @@ text = "再来一局"
 custom_minimum_size = Vector2(0, 66)
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
-text = "退出游戏"
+text = "返回主菜单"

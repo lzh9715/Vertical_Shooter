@@ -10,7 +10,7 @@ extends Control
 func _ready() -> void:
 	get_tree().paused = false
 	btn_restart.pressed.connect(_on_restart)
-	btn_quit.pressed.connect(_on_quit)
+	btn_quit.pressed.connect(_on_main_menu)
 	_apply(GameFlow.last_result)
 
 func _apply(result: Dictionary) -> void:
@@ -33,5 +33,5 @@ func _apply(result: Dictionary) -> void:
 func _on_restart() -> void:
 	GameFlow.restart_after_result()
 
-func _on_quit() -> void:
-	get_tree().quit()
+func _on_main_menu() -> void:
+	GameFlow.go_main_menu()
