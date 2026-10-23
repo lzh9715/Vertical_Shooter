@@ -18,8 +18,8 @@ interval = 0.04
 repeat = 10
 group_interval = 0.35
 enemy_data = ExtResource("2_m8lrc")
-anchor = Vector2(1.2, 0)
-direction = "Right_To_Left"
+anchor = Vector2(0.65, -1.2)
+direction = "Top_To_Bottom"
 
 [sub_resource type="Resource" id="Resource_e8rjn"]
 script = ExtResource("1_4knwc")

@@ -16,7 +16,7 @@ func spawn(world_position: Vector2, amount: int, color := Color.WHITE) -> void:
 
 	var label := Label.new()
 	label.text = str(amount)
-	label.add_theme_font_size_override("font_size", 22)
+	label.add_theme_font_size_override("font_size", 36)
 	label.add_theme_color_override("font_color", color)
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	label.z_index = 100

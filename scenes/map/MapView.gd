@@ -1,14 +1,14 @@
 extends Control
 
 const LEVEL_PATH := "res://data/Level_01.tres"
-const NODE_RADIUS := 22.0
-const MARGIN := Vector2(70, 110)
+const NODE_RADIUS := 48.0
+const MARGIN := Vector2(140, 110)
 
 # 连线样式：二次贝塞尔弧线 + 虚线
 const CURVE_SAMPLES := 20
 const CURVE_BOW := 0.10          # 弯曲程度（相对两点距离）
-const DASH_LENGTH := 9.0
-const GAP_LENGTH := 7.0
+const DASH_LENGTH := 16.0
+const GAP_LENGTH := 12.0
 
 const TYPE_LABEL := {
 	MapNodeData.NodeType.START: "起",
@@ -36,6 +36,7 @@ const TYPE_COLOR := {
 func _ready() -> void:
 	get_tree().paused = false
 	AudioManager.play_music(&"map")
+	tooltip_label.add_theme_font_size_override("font_size", 32)
 	if GameFlow.map == null:
 		var level: LevelConfig = load(LEVEL_PATH)
 		GameFlow.start_run(level)
@@ -57,6 +58,7 @@ func _build() -> void:
 		b.position = _screen_pos(n) - Vector2(NODE_RADIUS, NODE_RADIUS)
 		b.disabled = not GameFlow.is_node_available(n)
 		b.add_theme_color_override("font_color", TYPE_COLOR.get(n.type, Color.WHITE))
+		b.add_theme_font_size_override("font_size", 36)
 
 		if GameFlow.cleared.has(n.id):
 			b.modulate = Color(1, 1, 1, 0.35)
@@ -100,7 +102,7 @@ func _draw() -> void:
 			if target == null:
 				continue
 			var color := Color(0.95, 0.82, 0.4, 0.95) if GameFlow.cleared.has(n.id) else Color(0.45, 0.47, 0.58, 0.95)
-			_draw_dashed_curve(from, _screen_pos(target), color, 2.5, n.id * 73856093 + nid * 19349663)
+			_draw_dashed_curve(from, _screen_pos(target), color, 5.0, n.id * 73856093 + nid * 19349663)
 
 ## 画一条「轻微弯曲的虚线」：二次贝塞尔 + 沿弧长切出的虚线段
 ## edge_seed 用来决定每条边自己的弯曲方向/幅度/前后偏移，保证重绘时稳定（不会闪烁）

@@ -39,8 +39,8 @@ func _add_option_button(opt: EventOption) -> void:
 
 	button.text = opt.label if reason == "" else "%s（%s）" % [opt.label, reason]
 	button.disabled = reason != ""
-	button.custom_minimum_size = Vector2(0, 56)
-	button.add_theme_font_size_override("font_size", 24)
+	button.custom_minimum_size = Vector2(0, 90)
+	button.add_theme_font_size_override("font_size", 36)
 	button.pressed.connect(_on_option_pressed.bind(opt))
 	options_box.add_child(button)
 

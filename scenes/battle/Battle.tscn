@@ -29,25 +29,27 @@ position = Vector2(1280, 720)
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=968548100]
 
 [node name="Label" type="Label" parent="CanvasLayer" unique_id=209205065]
-offset_left = 1.0
-offset_top = 49.0
-offset_right = 125.0
-offset_bottom = 104.0
-theme_override_font_sizes/font_size = 40
+offset_left = 40.0
+offset_top = 30.0
+offset_right = 640.0
+offset_bottom = 90.0
+theme_override_font_sizes/font_size = 48
 text = "得分：0"
 
 [node name="GoldLabel" type="Label" parent="CanvasLayer" unique_id=481701930]
-offset_right = 40.0
-offset_bottom = 23.0
-theme_override_font_sizes/font_size = 40
+offset_left = 40.0
+offset_top = 110.0
+offset_right = 640.0
+offset_bottom = 170.0
+theme_override_font_sizes/font_size = 48
 text = "金币：0"
 
 [node name="HpLabel" type="Label" parent="CanvasLayer" unique_id=452583444]
-offset_left = 13.0
-offset_top = 1196.0
-offset_right = 185.0
-offset_bottom = 1265.0
-theme_override_font_sizes/font_size = 50
+offset_left = 40.0
+offset_top = 1320.0
+offset_right = 700.0
+offset_bottom = 1380.0
+theme_override_font_sizes/font_size = 48
 text = "HP: 3/3"
 
 [node name="Spawner" type="Node" parent="." unique_id=9712878]

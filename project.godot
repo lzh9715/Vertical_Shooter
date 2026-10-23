@@ -70,16 +70,17 @@ move_down={
 2d_physics/layer_2="player_bullet"
 2d_physics/layer_3="enemy"
 
-[physics]
-
-3d/physics_engine="Jolt Physics"
-
 [logging]
 
 file_logging/enable_file_logging=true
 file_logging/max_log_files=5
 
+[physics]
+
+3d/physics_engine="Jolt Physics"
+
 [rendering]
+
 rendering_device/driver.windows="d3d12"
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"

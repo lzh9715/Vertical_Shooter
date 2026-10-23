@@ -48,4 +48,5 @@ func _direction_angle() -> float:
 	match direction:
 		"Right_To_Left": return PI
 		"Left_To_Right": return 0.0
+		"Top_To_Bottom": return PI * 0.5
 		_: return PI      # 横版默认向左
