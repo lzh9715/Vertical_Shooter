@@ -87,6 +87,8 @@ func _update_elite_motion(delta: float) -> void:
 
 	var off := Vector2.ZERO
 	if elite_movement != null:
-		off = elite_movement.offset_at(_drift_time) * s
+		var raw := elite_movement.offset_at(_drift_time)
+		# 横版：精英落位后只做上下移动，把原来的横向幅度映射到 y 轴
+		off = Vector2(0.0, (raw.x + raw.y) * s)
 
 	global_position = _hover_point + off
