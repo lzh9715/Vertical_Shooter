@@ -18,13 +18,13 @@ config/icon="res://icon.svg"
 
 [autoload]
 
-GameFlow="*uid://clvix6f16v14p"
-EventBus="*uid://b58kio3wnwmld"
-Settings="*uid://dlrg1h7ehc2xk"
-AudioManager="*res://scripts/AudioManager.gd"
-Diagnostics="*res://scripts/Diagnostics.gd"
-DamageNumbers="*res://scripts/DamageNumbers.gd"
-SceneTransition="*res://scripts/SceneTransition.gd"
+GameFlow="*res://scripts/core/GameFlow.gd"
+EventBus="*res://scripts/core/EventBus.gd"
+Settings="*res://scripts/core/Settings.gd"
+AudioManager="*res://scripts/core/AudioManager.gd"
+Diagnostics="*res://scripts/core/Diagnostics.gd"
+DamageNumbers="*res://scripts/core/DamageNumbers.gd"
+SceneTransition="*res://scripts/core/SceneTransition.gd"
 
 [display]
 

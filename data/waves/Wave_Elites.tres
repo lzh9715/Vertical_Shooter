@@ -1,0 +1,36 @@
+[gd_resource type="Resource" script_class="WaveData" format=3 uid="uid://bqfpgikejj53i"]
+
+[ext_resource type="Script" uid="uid://ys7eld55hqog" path="res://data/core/WaveEntry.gd" id="1_q861l"]
+[ext_resource type="Resource" path="res://data/enemies/Enemy_Elite_Gunner.tres" id="2_03xpv"]
+[ext_resource type="Script" uid="uid://6wp4d30kylxh" path="res://data/core/WaveData.gd" id="2_c0yh7"]
+[ext_resource type="Script" uid="uid://b243fk7jdlvh2" path="res://data/core/QueueData.gd" id="3_52g5e"]
+[ext_resource type="Resource" path="res://data/enemies/Enemy_Elite_Suppressor.tres" id="4_rw8na"]
+
+[sub_resource type="Resource" id="Resource_52g5e"]
+script = ExtResource("3_52g5e")
+count = 1
+enemy_data = ExtResource("2_03xpv")
+metadata/_custom_type_script = "uid://b243fk7jdlvh2"
+
+[sub_resource type="Resource" id="Resource_p6egm"]
+script = ExtResource("1_q861l")
+spawn = SubResource("Resource_52g5e")
+metadata/_custom_type_script = "uid://ys7eld55hqog"
+
+[sub_resource type="Resource" id="Resource_rw8na"]
+script = ExtResource("3_52g5e")
+count = 1
+enemy_data = ExtResource("4_rw8na")
+metadata/_custom_type_script = "uid://b243fk7jdlvh2"
+
+[sub_resource type="Resource" id="Resource_03xpv"]
+script = ExtResource("1_q861l")
+spawn = SubResource("Resource_rw8na")
+delay = 1.5
+metadata/_custom_type_script = "uid://ys7eld55hqog"
+
+[resource]
+script = ExtResource("2_c0yh7")
+entries = Array[ExtResource("1_q861l")]([SubResource("Resource_p6egm"), SubResource("Resource_03xpv")])
+gap_after = 2.0
+metadata/_custom_type_script = "uid://6wp4d30kylxh"

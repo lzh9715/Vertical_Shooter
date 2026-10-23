@@ -1,6 +1,6 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://scripts/elite.gd" id="1_elite"]
+[ext_resource type="Script" path="res://scripts/enemies/Elite.gd" id="1_elite"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_elite"]
 size = Vector2(30, 30)

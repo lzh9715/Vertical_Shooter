@@ -1,9 +1,9 @@
 [gd_resource type="Resource" script_class="EnemyAttackPattern" format=3 uid="uid://7phn065emdpy"]
 
-[ext_resource type="Script" uid="uid://c8c01nn8pfqai" path="res://data/bullet/EnemyAttackPattern.gd" id="1_rb4ar"]
-[ext_resource type="Script" uid="uid://dox3e2spp8fvl" path="res://data/bullet/AttackStep.gd" id="2_sq177"]
-[ext_resource type="Resource" path="res://data/bullets/BulletSpread_Basic.tres" id="3_wt6tp"]
-[ext_resource type="Resource" path="res://data/bullets/BulletHeavy_Basic.tres" id="4_mg4ta"]
+[ext_resource type="Script" uid="uid://c8c01nn8pfqai" path="res://data/bullet_patterns/EnemyAttackPattern.gd" id="1_rb4ar"]
+[ext_resource type="Script" uid="uid://dox3e2spp8fvl" path="res://data/bullet_patterns/AttackStep.gd" id="2_sq177"]
+[ext_resource type="Resource" path="res://data/bullet_templates/BulletSpread_Basic.tres" id="3_wt6tp"]
+[ext_resource type="Resource" path="res://data/bullet_templates/BulletHeavy_Basic.tres" id="4_mg4ta"]
 
 [sub_resource type="Resource" id="Resource_wt6tp"]
 script = ExtResource("2_sq177")

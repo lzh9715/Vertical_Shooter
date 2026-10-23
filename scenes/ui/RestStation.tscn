@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://drfupdb3piv8q"]
 
-[ext_resource type="Script" uid="uid://cw4rgurlivt0d" path="res://scripts/ui/RestStation.gd" id="1_vsh66"]
+[ext_resource type="Script" uid="uid://cw4rgurlivt0d" path="res://scenes/ui/RestStation.gd" id="1_vsh66"]
 
 [node name="RestStationUI" type="CanvasLayer" unique_id=414769861]
 visible = false

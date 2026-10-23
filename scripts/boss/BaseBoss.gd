@@ -181,7 +181,7 @@ func _fire(volley: EnemyBulletPattern) -> void:
 
 	var scene := volley.bullet_scene
 	if scene == null:
-		scene = preload("res://enemy_bullet.tscn")
+		scene = preload("res://scenes/enemies/enemy_bullet.tscn")
 
 	for dir in volley.build_directions(aim):
 		var b = scene.instantiate()

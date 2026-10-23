@@ -1,7 +1,0 @@
-[gd_resource type="Resource" script_class="DifficultyProfile" format=3 uid="uid://biqolq4lyjw36"]
-
-[ext_resource type="Script" uid="uid://c0v35vkqnc38k" path="res://data/DifficultyProfile.gd" id="1_lpy3d"]
-
-[resource]
-script = ExtResource("1_lpy3d")
-metadata/_custom_type_script = "uid://c0v35vkqnc38k"

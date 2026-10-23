@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://462hhv1t3d2u"]
+
+[ext_resource type="Script" uid="uid://bs1k2fbrjlf4v" path="res://data/spells/SpellData.gd" id="1_hy1vl"]
+
+[resource]
+script = ExtResource("1_hy1vl")
+display_name = "爆炸法杖"
+description = "范围伤害"
+price = 120
+is_explosive = true
+explosion_radius = 100.0
+explosion_damage = 3
+metadata/_custom_type_script = "uid://bs1k2fbrjlf4v"

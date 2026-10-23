@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://bm1hwyw4lccle"]
 
-[ext_resource type="Script" uid="uid://bogrc0hflsn4s" path="res://scripts/ui/BossHealthBar.gd" id="1_v8qyo"]
+[ext_resource type="Script" uid="uid://bogrc0hflsn4s" path="res://scenes/ui/BossHealthBar.gd" id="1_v8qyo"]
 
 [node name="BossHealthBar" type="CanvasLayer" unique_id=1404937232]
 script = ExtResource("1_v8qyo")

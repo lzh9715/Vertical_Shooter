@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://huekrp52bich"]
+
+[ext_resource type="Script" uid="uid://bs1k2fbrjlf4v" path="res://data/spells/SpellData.gd" id="1_2ns3x"]
+
+[resource]
+script = ExtResource("1_2ns3x")
+display_name = "穿透法杖"
+description = "贯穿至多五个敌人
+"
+price = 80
+is_piercing = true
+pierce_amount = 5
+metadata/_custom_type_script = "uid://bs1k2fbrjlf4v"

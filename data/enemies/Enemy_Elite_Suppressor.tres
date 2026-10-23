@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Resource" path="res://data/attacks/Attack_Elite_Suppressor.tres" id="1_hsieb"]
+[ext_resource type="Script" path="res://data/core/EnemyData.gd" id="1_iapas"]
+[ext_resource type="Resource" path="res://data/elite_movement/EliteMove_Hover_Suppressor.tres" id="2_jmua4"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/elite.tscn" id="2_vlouu"]
+
+[resource]
+script = ExtResource("1_iapas")
+tier = 1
+scene = ExtResource("2_vlouu")
+max_hp = 60
+speed = 55.0
+score = 420
+gold = 160
+despawn_margin = 380.0
+visual_scale = 2.0
+attack = ExtResource("1_hsieb")
+elite_movement = ExtResource("2_jmua4")
+elite_lane_offset = 110.0
+metadata/_custom_type_script = "uid://dwcgj366c6xq6"

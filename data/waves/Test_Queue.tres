@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="QueueData" format=3 uid="uid://bkysbbmvo7v5y"]
+
+[ext_resource type="Resource" uid="uid://bmqqioc5su1my" path="res://data/enemies/Enemy_Mob_A.tres" id="1_0qft0"]
+[ext_resource type="Script" uid="uid://b243fk7jdlvh2" path="res://data/core/QueueData.gd" id="2_0qft0"]
+[ext_resource type="Script" uid="uid://hkkdrebbq0v3" path="res://data/movement/MoveZigzag.gd" id="2_2hpyr"]
+
+[sub_resource type="Resource" id="Resource_6act0"]
+script = ExtResource("2_2hpyr")
+metadata/_custom_type_script = "uid://hkkdrebbq0v3"
+
+[resource]
+script = ExtResource("2_0qft0")
+enemy_data = ExtResource("1_0qft0")
+anchor = Vector2(0.65, -1.2)
+direction = "Top_To_Bottom"
+movement = SubResource("Resource_6act0")
+metadata/_custom_type_script = "uid://b243fk7jdlvh2"

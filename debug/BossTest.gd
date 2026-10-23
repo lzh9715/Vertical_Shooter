@@ -7,9 +7,9 @@ func _ready() -> void:
 	var data: BossData = load(BOSS_DATA)
 
 	# 给玩家一把法杖，方便观察“被偷/归还”
-	GameFlow.spell = load("res://data/Spell_Single.tres")
+	GameFlow.spell = load("res://data/spells/Spell_Single.tres")
 
-	var player = load("res://player.tscn").instantiate()
+	var player = load("res://scenes/player/player.tscn").instantiate()
 	add_child(player)
 	player.global_position = Vector2(300, 1080)
 	player.current_spell = GameFlow.spell

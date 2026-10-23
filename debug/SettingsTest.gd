@@ -4,7 +4,7 @@ func _ready() -> void:
 	print("总线：Music=", AudioServer.get_bus_index("Music"),
 		" SFX=", AudioServer.get_bus_index("SFX"))
 	print("初始：master=%.2f music=%.2f sfx=%.2f fullscreen=%s" % [
-		Settings.master, Settings.music, Settings.sfx, Settings.fullscreen])
+		Settings.master, Settings.music, Settings.sfx, Settings.is_fullscreen()])
 
 	Settings.set_master(0.3)
 	Settings.set_music(0.5)

@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="BulletSpread" format=3]
+
+[ext_resource type="Script" path="res://data/bullet_patterns/BulletSpread.gd" id="1_mii68"]
+
+[resource]
+script = ExtResource("1_mii68")
+speed = 170.0
+interval = 2.4
+first_delay = 1.2
