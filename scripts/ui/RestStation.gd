@@ -23,7 +23,6 @@ var offers: Array[Dictionary] = []
 var pricing: ShopPricing
 
 func _ready() -> void:
-	process_mode = Node.PROCESS_MODE_ALWAYS
 	btn_resume.text = close_button_text
 
 	btn_slot1.pressed.connect(func(): buy_slot(0))

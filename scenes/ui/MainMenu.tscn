@@ -1,9 +1,10 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://bkek2pynfahh8"]
 
-[ext_resource type="Script" path="res://scenes/ui/MainMenu.gd" id="1_menu"]
+[ext_resource type="Script" uid="uid://c4l371tlnbnfo" path="res://scenes/ui/MainMenu.gd" id="1_menu"]
 [ext_resource type="PackedScene" path="res://scenes/ui/ConfirmDialog.tscn" id="2_dialog"]
+[ext_resource type="PackedScene" uid="uid://bq63xatmfhajd" path="res://scenes/ui/SettingsPanel.tscn" id="3_settings"]
 
-[node name="MainMenu" type="Control"]
+[node name="MainMenu" type="Control" unique_id=646939806]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -12,7 +13,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_menu")
 
-[node name="Background" type="ColorRect" parent="."]
+[node name="Background" type="ColorRect" parent="." unique_id=1297599499]
 show_behind_parent = true
 layout_mode = 1
 anchors_preset = 15
@@ -22,7 +23,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.0588235, 0.0588235, 0.0901961, 1)
 
-[node name="Title" type="Label" parent="."]
+[node name="Title" type="Label" parent="." unique_id=683457072]
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
@@ -34,7 +35,7 @@ text = "竖版飞行射击测试"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Menu" type="VBoxContainer" parent="."]
+[node name="Menu" type="VBoxContainer" parent="." unique_id=652415320]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -42,19 +43,26 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -200.0
-offset_top = -38.0
+offset_top = -90.0
 offset_right = 200.0
-offset_bottom = 38.0
+offset_bottom = 90.0
 grow_horizontal = 2
 grow_vertical = 2
+offset_transform_enabled = true
 
-[node name="BtnLevel" type="Button" parent="Menu"]
+[node name="BtnLevel" type="Button" parent="Menu" unique_id=1408014908]
 custom_minimum_size = Vector2(400, 76)
 layout_mode = 2
 theme_override_font_sizes/font_size = 32
 text = "关卡模式"
 
-[node name="BtnExit" type="Button" parent="."]
+[node name="BtnSettings" type="Button" parent="Menu" unique_id=888013346]
+custom_minimum_size = Vector2(400, 76)
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "设置"
+
+[node name="BtnExit" type="Button" parent="." unique_id=540763561]
 layout_mode = 1
 anchors_preset = 3
 anchor_left = 1.0
@@ -70,4 +78,7 @@ grow_vertical = 0
 theme_override_font_sizes/font_size = 24
 text = "退出游戏"
 
-[node name="ConfirmDialog" parent="." instance=ExtResource("2_dialog")]
+[node name="ConfirmDialog" parent="." unique_id=2140270014 instance=ExtResource("2_dialog")]
+layout_mode = 1
+
+[node name="SettingsPanel" parent="." unique_id=1628229813 instance=ExtResource("3_settings")]

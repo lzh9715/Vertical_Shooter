@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://cglejfn3gammq"]
+
+[ext_resource type="Script" uid="uid://ws0mcct8cvg6" path="res://debug/SettingsTest.gd" id="1_xidsu"]
+
+[node name="Node" type="Node" unique_id=392955005]
+script = ExtResource("1_xidsu")

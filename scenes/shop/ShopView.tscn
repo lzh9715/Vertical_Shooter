@@ -2,6 +2,7 @@
 
 [ext_resource type="PackedScene" uid="uid://drfupdb3piv8q" path="res://scenes/ui/RestStation.tscn" id="1_4h0le"]
 [ext_resource type="Script" uid="uid://ci8yt8kuiuf55" path="res://scenes/shop/ShopView.gd" id="2_shopv"]
+[ext_resource type="PackedScene" path="res://scenes/ui/PauseMenu.tscn" id="3_pause"]
 
 [node name="ShopView" type="Control" unique_id=1991682824]
 layout_mode = 3
@@ -22,3 +23,5 @@ grow_vertical = 2
 color = Color(0.101960786, 0.08627451, 0.1254902, 1)
 
 [node name="RestStation" parent="." unique_id=414769861 instance=ExtResource("1_4h0le")]
+
+[node name="PauseMenu" parent="." instance=ExtResource("3_pause")]

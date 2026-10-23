@@ -3,7 +3,6 @@
 [ext_resource type="Script" uid="uid://cw4rgurlivt0d" path="res://scripts/ui/RestStation.gd" id="1_vsh66"]
 
 [node name="RestStationUI" type="CanvasLayer" unique_id=414769861]
-process_mode = 3
 visible = false
 script = ExtResource("1_vsh66")
 
