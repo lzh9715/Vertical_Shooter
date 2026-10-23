@@ -5,7 +5,7 @@ class_name QueueData
 @export var spacing_time: float = 0.2
 
 func spawn(spawner) -> void:
-	var start := ScreenUtil.from_anchor(anchor) + offset_px * ScreenUtil.scale_factor()
+	var start := ScreenUtil.world_from_anchor(anchor) + offset_px * ScreenUtil.scale_factor()
 
 	for i in range(count):
 		var enemy = spawner.create_enemy(enemy_data)

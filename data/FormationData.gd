@@ -17,7 +17,7 @@ func spawn(spawner) -> void:
 		push_warning("FormationData 缺 shape")
 		return
 
-	var center := ScreenUtil.from_anchor(anchor) + offset_px * ScreenUtil.scale_factor()
+	var center := ScreenUtil.world_from_anchor(anchor) + offset_px * ScreenUtil.scale_factor()
 	var scale := ScreenUtil.scale_factor()
 	var offsets := shape.build_offsets(count, spacing)
 
@@ -46,6 +46,6 @@ func spawn(spawner) -> void:
 
 func _direction_angle() -> float:
 	match direction:
-		"Left_To_Right": return 0.0
 		"Right_To_Left": return PI
-		_: return PI * 0.5      # Top_To_Bottom
+		"Left_To_Right": return 0.0
+		_: return PI      # 横版默认向左

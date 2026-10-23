@@ -94,27 +94,6 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "垂直同步"
 
-[node name="ControlLabel" type="Label" parent="Center/Panel/Margin/VBox" unique_id=611031378]
-layout_mode = 2
-theme_override_font_sizes/font_size = 24
-text = "操作方式"
-
-[node name="ControlOption" type="OptionButton" parent="Center/Panel/Margin/VBox" unique_id=611031379]
-custom_minimum_size = Vector2(0, 44)
-layout_mode = 2
-theme_override_font_sizes/font_size = 22
-
-[node name="FollowLabel" type="Label" parent="Center/Panel/Margin/VBox" unique_id=611031380]
-layout_mode = 2
-theme_override_font_sizes/font_size = 24
-
-[node name="FollowSlider" type="HSlider" parent="Center/Panel/Margin/VBox" unique_id=611031381]
-layout_mode = 2
-min_value = 200.0
-max_value = 2400.0
-step = 50.0
-value = 900.0
-
 [node name="DiagButton" type="Button" parent="Center/Panel/Margin/VBox" unique_id=611031382]
 custom_minimum_size = Vector2(0, 48)
 layout_mode = 2

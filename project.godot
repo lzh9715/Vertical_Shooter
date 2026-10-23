@@ -28,8 +28,8 @@ SceneTransition="*res://scripts/SceneTransition.gd"
 
 [display]
 
-window/size/viewport_width=720
-window/size/viewport_height=1280
+window/size/viewport_width=2560
+window/size/viewport_height=1440
 window/stretch/mode="canvas_items"
 
 [global_group]

@@ -7,12 +7,12 @@ extends "res://enemy.gd"
 ##   EliteMoveHover / EliteMoveZigzag / EliteMovePulse / EliteMoveStill
 ## 新增移动方式只需要新建一个 EliteMovement 子类。
 
-@export var hover_height := 260.0      # 悬停高度（720 基准下的 y）
+@export var hover_height := 1920.0     # 横版：悬停点的 x 坐标（原竖版为 y）
 @export var enter_speed_mult := 2.0    # 入场速度倍数
 @export var elite_movement: EliteMovement
 @export var randomize_phase := true   # 同类精英同时出场时错开轨迹
-@export var hover_x_jitter := 15.0    # 悬停点的小幅随机抖动
-@export var lane_spacing := 300.0     # 同一队精英之间的横向间距
+@export var hover_x_jitter := 15.0    # 悬停点的小幅随机抖动（现在作用于 y）
+@export var lane_spacing := 300.0     # 同一队精英之间的纵向间距
 
 var _entering := true
 var _hover_point := Vector2.ZERO
@@ -56,6 +56,7 @@ func _rebuild_hover_point() -> void:
 
 	# 同一队里有多只时按序号分车道（居中对齐）；
 	# 单独一只时用 EnemyData 里配置的固定偏移。
+	# 横版：车道沿 y 轴分布。
 	var lane_offset := 0.0
 	if _lane_count > 1:
 		lane_offset = (float(_lane_index) - float(_lane_count - 1) * 0.5) * lane_spacing
@@ -63,7 +64,7 @@ func _rebuild_hover_point() -> void:
 		lane_offset = _base_lane_offset
 
 	var jitter := randf_range(-hover_x_jitter, hover_x_jitter) * s
-	_hover_point = Vector2(start_position.x + lane_offset * s + jitter, hover_height * s) + offset
+	_hover_point = Vector2(hover_height * s, start_position.y + lane_offset * s + jitter) + offset
 
 func _physics_process(delta: float) -> void:
 	elapsed_time += delta

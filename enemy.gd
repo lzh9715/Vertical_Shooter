@@ -6,7 +6,7 @@ const DEFAULT_BULLET := preload("res://enemy_bullet.tscn")
 
 @export var movement: MovementPattern
 @export var speed := 200.0
-@export var direction := "Top_To_Bottom"
+@export var direction := "Right_To_Left"
 @export var despawn_margin := 300.0
 
 @export_group("数值")
@@ -73,15 +73,15 @@ func _apply_motion() -> void:
 	)
 
 func _check_bounds() -> void:
-	var bounds := Rect2(Vector2.ZERO, ScreenUtil.size()).grow(despawn_margin)
+	var bounds := Rect2(Vector2.ZERO, ScreenUtil.world_size()).grow(despawn_margin)
 	if not bounds.has_point(global_position):
 		queue_free()
 
 func _direction_vector() -> Vector2:
 	match direction:
-		"Left_To_Right": return Vector2.RIGHT
 		"Right_To_Left": return Vector2.LEFT
-		_: return Vector2.DOWN
+		"Left_To_Right": return Vector2.RIGHT
+		_: return Vector2.LEFT
 
 # ---------- 攻击序列 ----------
 
@@ -142,12 +142,12 @@ func _advance_step() -> void:
 	_attack_running = false
 
 func _fire_volley(volley: EnemyBulletPattern) -> void:
-	var aim := Vector2.DOWN
+	var aim := Vector2.LEFT
 	var target := get_tree().get_first_node_in_group("player")
 	if target != null:
 		aim = target.global_position - global_position
 		if aim == Vector2.ZERO:
-			aim = Vector2.DOWN
+			aim = Vector2.LEFT
 
 	var scene := volley.bullet_scene
 	if scene == null:

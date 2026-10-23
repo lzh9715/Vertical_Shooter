@@ -11,13 +11,13 @@ func _ready() -> void:
 
 	var player = load("res://player.tscn").instantiate()
 	add_child(player)
-	player.global_position = Vector2(360, 1100)
+	player.global_position = Vector2(300, 1080)
 	player.current_spell = GameFlow.spell
 
 	# 生成 Boss（先赋 data，再入树，_ready 会 apply_data）
 	var boss = data.scene.instantiate()
 	boss.data = data
-	boss.position = Vector2(360, -100)
+	boss.position = Vector2(2800, 720)
 	add_child(boss)
 	# 仅测试用：缩短冷却、概率拉满
 	boss.steal_cooldown = 4.0

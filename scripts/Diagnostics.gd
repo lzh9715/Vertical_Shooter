@@ -16,10 +16,6 @@ func get_report() -> String:
 		Settings.resolution.x, Settings.resolution.y,
 		"开" if Settings.vsync else "关",
 	])
-	lines.append("操作: %s  跟随速度: %d" % [
-		"鼠标跟随" if Settings.control_mode == Settings.ControlMode.MOUSE_FOLLOW else "键盘",
-		roundi(Settings.mouse_follow_speed),
-	])
 	lines.append("--- 日志尾部 ---")
 	lines.append(_read_tail(LOG_PATH, 12000))
 

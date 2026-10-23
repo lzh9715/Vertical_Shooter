@@ -6,6 +6,6 @@ class_name BulletAimed
 func build_directions(aim: Vector2) -> Array[Vector2]:
 	var dir := aim.normalized()
 	if dir == Vector2.ZERO:
-		dir = Vector2.DOWN
+		dir = Vector2.LEFT
 	var out: Array[Vector2] = [dir]
 	return out

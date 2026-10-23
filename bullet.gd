@@ -14,6 +14,7 @@ extends Area2D
 var pierced_enemies := [] # 记录已经打过的敌人，防止同一只怪被重复扣血
 
 func _ready():
+	add_to_group("player_bullet")
 	area_entered.connect(_on_area_entered)
 
 func _physics_process(delta):
@@ -21,12 +22,13 @@ func _physics_process(delta):
 		var target = _find_nearest_enemy()
 		if target:
 			var target_direction = (target.global_position - global_position).normalized()
-			var target_angle = target_direction.angle() + PI / 2
+			var target_angle = target_direction.angle()
 			rotation = lerp_angle(rotation, target_angle, turn_speed * delta)
 
-	position += Vector2.UP.rotated(rotation) * speed * delta
-	
-	if global_position.y < -200 or global_position.y > 1500 or global_position.x < -200 or global_position.x > 900:
+	position += Vector2.RIGHT.rotated(rotation) * speed * delta
+
+	var bounds := Rect2(Vector2.ZERO, ScreenUtil.world_size()).grow(300.0)
+	if not bounds.has_point(global_position):
 		queue_free()
 
 func _on_area_entered(area):

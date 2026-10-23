@@ -32,21 +32,15 @@ func _ready():
 
 
 func _physics_process(delta):
-	_tick_steal(delta)          # 新加，见第②步
+	_tick_steal(delta)
 
-	if Settings.control_mode == Settings.ControlMode.MOUSE_FOLLOW:
-		var target := get_global_mouse_position()
-		global_position = global_position.move_toward(
-			target, Settings.mouse_follow_speed * delta
-		)
-		velocity = Vector2.ZERO
-	else:
-		var direction := Input.get_vector("move_left", "move_right", "move_up", "move_down")
-		velocity = direction * speed
-		move_and_slide()
+	var direction := Input.get_vector("move_left", "move_right", "move_up", "move_down")
+	velocity = direction * speed
+	move_and_slide()
 
-	position.x = clamp(position.x, 20, 700)
-	position.y = clamp(position.y, 20, 1260)
+	var world := ScreenUtil.world_size()
+	position.x = clamp(position.x, 40, world.x - 40)
+	position.y = clamp(position.y, 40, world.y - 40)
 
 # 当计时器倒计时结束时，自动调用这个函数
 
@@ -72,7 +66,7 @@ func _on_shoot_timer_timeout():
 		bullet.explosion_damage = current_spell.explosion_damage
 		
 		get_parent().add_child(bullet)
-		bullet.global_position = global_position - Vector2(0, 20)
+		bullet.global_position = global_position + Vector2(40, 0)
 		
 		# 处理散射角度
 		# 计算角度偏移，让它是以正上方为中心扇形散开

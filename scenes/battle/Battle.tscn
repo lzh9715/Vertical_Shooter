@@ -14,21 +14,17 @@
 script = ExtResource("1_g3qtk")
 test_waves = Array[ExtResource("11_lo8qj")]([ExtResource("3_kos6x")])
 
-[node name="ColorRect" type="ColorRect" parent="." unique_id=951383898]
-z_index = -1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_right = 720.0
-offset_bottom = 1280.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(0, 0, 0, 0.7921569)
-metadata/_edit_use_anchors_ = true
+[node name="Background" type="Polygon2D" parent="."]
+z_index = -10
+polygon = PackedVector2Array(0, 0, 2560, 0, 2560, 2160, 0, 2160)
+color = Color(0.0352941, 0.0352941, 0.0588235, 1)
 
 [node name="player" parent="." unique_id=1088136196 instance=ExtResource("13_k4nrn")]
-position = Vector2(360, 1000)
+position = Vector2(300, 1080)
 current_spell = ExtResource("5_kos6x")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(1280, 720)
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=968548100]
 

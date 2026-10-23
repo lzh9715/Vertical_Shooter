@@ -4,7 +4,7 @@ extends Area2D
 
 @export var speed := 220.0
 @export var damage := 1
-@export var direction := Vector2.DOWN
+@export var direction := Vector2.LEFT
 @export var tint := Color(1, 0.85, 0.3, 1)
 @export var radius := 7.0
 @export var texture: Texture2D
@@ -34,6 +34,6 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	position += direction * speed * delta
 
-	var bounds := Rect2(Vector2.ZERO, ScreenUtil.size()).grow(120.0)
+	var bounds := Rect2(Vector2.ZERO, ScreenUtil.world_size()).grow(160.0)
 	if not bounds.has_point(global_position):
 		queue_free()

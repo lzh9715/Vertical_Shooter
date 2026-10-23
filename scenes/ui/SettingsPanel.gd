@@ -10,9 +10,6 @@ extends CanvasLayer
 @onready var resolution_label: Label = $Center/Panel/Margin/VBox/ResolutionLabel
 @onready var resolution_option: OptionButton = $Center/Panel/Margin/VBox/ResolutionOption
 @onready var vsync_check: CheckButton = $Center/Panel/Margin/VBox/VsyncCheck
-@onready var control_option: OptionButton = $Center/Panel/Margin/VBox/ControlOption
-@onready var follow_label: Label = $Center/Panel/Margin/VBox/FollowLabel
-@onready var follow_slider: HSlider = $Center/Panel/Margin/VBox/FollowSlider
 @onready var diag_label: Label = $Center/Panel/Margin/VBox/DiagLabel
 @onready var diag_button: Button = $Center/Panel/Margin/VBox/DiagButton
 @onready var btn_reset: Button = $Center/Panel/Margin/VBox/Buttons/BtnReset
@@ -34,8 +31,6 @@ func _ready() -> void:
 	window_option.item_selected.connect(_on_window_selected)
 	resolution_option.item_selected.connect(_on_resolution_selected)
 	vsync_check.toggled.connect(_on_vsync_toggled)
-	control_option.item_selected.connect(_on_control_selected)
-	follow_slider.value_changed.connect(_on_follow_changed)
 	diag_button.pressed.connect(_on_copy_diagnostics)
 
 	btn_reset.pressed.connect(_on_reset)
@@ -62,10 +57,6 @@ func _fill_options() -> void:
 	window_option.clear()
 	window_option.add_item("窗口", Settings.WindowMode.WINDOWED)
 	window_option.add_item("全屏", Settings.WindowMode.FULLSCREEN)
-
-	control_option.clear()
-	control_option.add_item("键盘", Settings.ControlMode.KEYBOARD)
-	control_option.add_item("鼠标跟随", Settings.ControlMode.MOUSE_FOLLOW)
 
 	_refresh_size_options()
 
@@ -98,17 +89,12 @@ func _sync_from_settings() -> void:
 
 	vsync_check.set_pressed_no_signal(Settings.vsync)
 
-	control_option.select(Settings.control_mode)
-	follow_slider.set_value_no_signal(Settings.mouse_follow_speed)
-	follow_slider.editable = Settings.control_mode == Settings.ControlMode.MOUSE_FOLLOW
-
 	_update_labels()
 
 func _update_labels() -> void:
 	master_label.text = "主音量：%d%%" % roundi(master_slider.value)
 	music_label.text = "音乐：%d%%" % roundi(music_slider.value)
 	sfx_label.text = "音效：%d%%" % roundi(sfx_slider.value)
-	follow_label.text = "跟随速度：%d" % roundi(follow_slider.value)
 
 	if Settings.is_fullscreen():
 		var screen := DisplayServer.screen_get_size(DisplayServer.window_get_current_screen())
@@ -151,16 +137,6 @@ func _on_resolution_selected(index: int) -> void:
 
 func _on_vsync_toggled(on: bool) -> void:
 	Settings.set_vsync(on)
-
-# ---------- 操作 ----------
-
-func _on_control_selected(index: int) -> void:
-	Settings.set_control_mode(index)
-	follow_slider.editable = index == Settings.ControlMode.MOUSE_FOLLOW
-
-func _on_follow_changed(value: float) -> void:
-	Settings.set_mouse_follow_speed(value)
-	_update_labels()
 
 # ---------- 诊断 ----------
 

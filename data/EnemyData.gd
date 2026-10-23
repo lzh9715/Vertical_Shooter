@@ -21,5 +21,5 @@ class_name EnemyData
 
 @export_group("精英")
 @export var elite_movement: EliteMovement   # 战斗阶段的移动方式（留空 = 停在悬停点）
-@export var elite_hover_height := 260.0     # 悬停高度（720 基准）
-@export var elite_lane_offset := 0.0        # 固定的横向车道偏移（不同精英可以左右分开）
+@export var elite_hover_height := 1920.0    # 横版：悬停点的 x 坐标
+@export var elite_lane_offset := 0.0        # 固定的纵向车道偏移（不同精英可以上下分开）

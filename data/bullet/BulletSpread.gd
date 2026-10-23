@@ -9,7 +9,7 @@ class_name BulletSpread
 func build_directions(aim: Vector2) -> Array[Vector2]:
 	var base := aim.normalized()
 	if base == Vector2.ZERO:
-		base = Vector2.DOWN
+		base = Vector2.LEFT
 
 	var out: Array[Vector2] = []
 	if count <= 1:

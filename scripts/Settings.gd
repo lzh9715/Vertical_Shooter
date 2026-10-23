@@ -3,16 +3,15 @@ extends Node
 
 const PATH := "user://settings.cfg"
 
-const DESIGN_SIZE := Vector2i(720, 1280)
+const DESIGN_SIZE := Vector2i(2560, 1440)
 
 const WINDOW_PRESETS: Array[Vector2i] = [
-	Vector2i(720, 1280),
-	Vector2i(1080, 1920),
-	Vector2i(1440, 2560),
+	Vector2i(2560, 1440),
+	Vector2i(1920, 1080),
+	Vector2i(1280, 720),
 ]
 
 enum WindowMode { WINDOWED, FULLSCREEN }
-enum ControlMode { KEYBOARD, MOUSE_FOLLOW }
 
 # 0.0 ~ 1.0 的线性音量
 var master := 1.0
@@ -21,12 +20,8 @@ var sfx := 0.9
 
 # 显示
 var window_mode: int = WindowMode.WINDOWED
-var resolution: Vector2i = Vector2i(720, 1280)
+var resolution: Vector2i = Vector2i(2560, 1440)
 var vsync := true
-
-# 操作
-var control_mode: int = ControlMode.KEYBOARD
-var mouse_follow_speed := 900.0
 
 func _ready() -> void:
 	_ensure_bus("Music")
@@ -56,12 +51,10 @@ func load_settings() -> void:
 	)
 	vsync = bool(cfg.get_value("display", "vsync", vsync))
 
-	control_mode = int(cfg.get_value("input", "control_mode", control_mode))
-	mouse_follow_speed = float(cfg.get_value("input", "mouse_follow_speed", mouse_follow_speed))
-
-	# 屏幕变小/换显示器时，旧尺寸可能放不下
+	# 屏幕变小/换显示器时，旧尺寸可能放不下；旧竖版配置也一并迁移
 	var usable := get_usable_screen_size()
-	if resolution.x > usable.x or resolution.y > usable.y \
+	if resolution.x < resolution.y \
+		or resolution.x > usable.x or resolution.y > usable.y \
 		or resolution.x < 200 or resolution.y < 200:
 		resolution = get_default_window_size()
 
@@ -75,9 +68,6 @@ func save_settings() -> void:
 	cfg.set_value("display", "resolution_x", resolution.x)
 	cfg.set_value("display", "resolution_y", resolution.y)
 	cfg.set_value("display", "vsync", vsync)
-
-	cfg.set_value("input", "control_mode", control_mode)
-	cfg.set_value("input", "mouse_follow_speed", mouse_follow_speed)
 
 	cfg.save(PATH)
 
@@ -123,14 +113,6 @@ func set_vsync(on: bool) -> void:
 	)
 	save_settings()
 
-func set_control_mode(mode: int) -> void:
-	control_mode = mode
-	save_settings()
-
-func set_mouse_follow_speed(value: float) -> void:
-	mouse_follow_speed = clampf(value, 200.0, 2400.0)
-	save_settings()
-
 func is_fullscreen() -> bool:
 	return window_mode == WindowMode.FULLSCREEN
 
@@ -159,7 +141,7 @@ static func compute_fit_size(usable: Vector2i) -> Vector2i:
 		roundi(DESIGN_SIZE.y * scale)
 	)
 
-## 默认窗口：720×1280 放得下就用它，否则用适应屏幕
+## 默认窗口：设计尺寸放得下就用它，否则用适应屏幕
 func get_default_window_size() -> Vector2i:
 	var usable := get_usable_screen_size()
 	if DESIGN_SIZE.x <= usable.x and DESIGN_SIZE.y <= usable.y:
@@ -228,9 +210,6 @@ func reset_defaults() -> void:
 	window_mode = WindowMode.WINDOWED
 	resolution = get_default_window_size()
 	vsync = true
-
-	control_mode = ControlMode.KEYBOARD
-	mouse_follow_speed = 900.0
 
 	apply_all()
 	save_settings()

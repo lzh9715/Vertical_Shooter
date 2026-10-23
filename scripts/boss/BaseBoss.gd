@@ -24,7 +24,7 @@ var _state := "enter"
 var _enter_t := 0.0
 var _enter_duration := 1.5
 var _from := Vector2.ZERO
-var _hover := Vector2(360, 240)
+var _hover := Vector2(1920, 720)
 var _drift_t := 0.0
 
 var _attack_timer := 0.0
@@ -172,7 +172,7 @@ func _fire(volley: EnemyBulletPattern) -> void:
 	if volley == null:
 		return
 
-	var aim := Vector2.DOWN
+	var aim := Vector2.LEFT
 	var player := get_tree().get_first_node_in_group("player")
 	if player != null:
 		aim = player.global_position - global_position

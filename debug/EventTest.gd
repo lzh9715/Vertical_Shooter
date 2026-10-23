@@ -7,7 +7,7 @@ func _ready() -> void:
 
 	var player = load("res://player.tscn").instantiate()
 	add_child(player)
-	player.global_position = Vector2(360, 1000)
+	player.global_position = Vector2(300, 1080)
 
 	# 给玩家一把法杖（正常流程里由商店/关卡给）
 	player.current_spell = load("res://data/Spell_Single.tres")

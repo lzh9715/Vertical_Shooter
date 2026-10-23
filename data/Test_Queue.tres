@@ -11,7 +11,7 @@ metadata/_custom_type_script = "uid://hkkdrebbq0v3"
 [resource]
 script = ExtResource("2_0qft0")
 enemy_data = ExtResource("1_0qft0")
-anchor = Vector2(-1.28, -0.06)
+anchor = Vector2(-1.2, -0.06)
 direction = "Left_To_Right"
 movement = SubResource("Resource_6act0")
 metadata/_custom_type_script = "uid://b243fk7jdlvh2"

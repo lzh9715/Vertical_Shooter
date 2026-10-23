@@ -11,6 +11,8 @@ var _event_timer_label: Label
 @onready var score_label: Label = $CanvasLayer/Label
 @onready var gold_label: Label = $CanvasLayer/GoldLabel
 @onready var hp_label: Label = $CanvasLayer/HpLabel
+@onready var camera: Camera2D = $Camera2D
+@onready var player_node: Node2D = $player
 
 func _ready() -> void:
 	get_tree().paused = false
@@ -59,7 +61,7 @@ func _start_boss_fight() -> void:
 	var s := ScreenUtil.scale_factor()
 	var boss = boss_data.scene.instantiate()
 	boss.data = boss_data
-	boss.position = Vector2(360, -120) * s
+	boss.position = Vector2(2800, 720) * s
 	add_child(boss)
 
 	var bar = BOSS_BAR_SCENE.instantiate()
@@ -112,7 +114,7 @@ func _start_event_battle(battle: EventBattle) -> void:
 	var s := ScreenUtil.scale_factor()
 	var boss = boss_data.scene.instantiate()
 	boss.data = boss_data
-	boss.position = Vector2(360, -120) * s
+	boss.position = Vector2(2800, 720) * s
 	add_child(boss)
 
 	var bar = BOSS_BAR_SCENE.instantiate()
@@ -130,7 +132,19 @@ func _start_event_battle(battle: EventBattle) -> void:
 	_event_timer_label.text = "剩余 %d 秒" % int(ceil(_event_time_left))
 	$CanvasLayer.add_child(_event_timer_label)
 
+func _update_camera() -> void:
+	if camera == null or player_node == null:
+		return
+
+	var y_range := ScreenUtil.camera_y_range()
+	camera.position = Vector2(
+		ScreenUtil.size().x * 0.5,
+		clampf(player_node.global_position.y, y_range.x, y_range.y)
+	)
+
 func _process(delta: float) -> void:
+	_update_camera()
+
 	if not _event_active:
 		return
 
