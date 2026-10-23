@@ -14,6 +14,7 @@ var _event_timer_label: Label
 
 func _ready() -> void:
 	get_tree().paused = false
+	AudioManager.play_music(&"battle")
 
 	GameFlow.stats_changed.connect(_refresh_hud)
 	_refresh_hud()

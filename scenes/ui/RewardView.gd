@@ -8,6 +8,7 @@ extends Control
 
 func _ready() -> void:
 	get_tree().paused = false
+	AudioManager.play_music(&"event")
 	btn_claim.pressed.connect(_on_claim)
 
 	var reward := GameFlow.current_reward
@@ -21,4 +22,5 @@ func _on_claim() -> void:
 	var reward := GameFlow.current_reward
 	if reward != null:
 		reward.enter()
+	AudioManager.play_sfx(&"reward")
 	GameFlow.finish_node()

@@ -11,6 +11,7 @@ config_version=5
 [application]
 
 config/name="竖版飞行射击"
+config/version="0.1.0"
 run/main_scene="res://scenes/ui/MainMenu.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
@@ -20,6 +21,10 @@ config/icon="res://icon.svg"
 GameFlow="*uid://clvix6f16v14p"
 EventBus="*uid://b58kio3wnwmld"
 Settings="*uid://dlrg1h7ehc2xk"
+AudioManager="*res://scripts/AudioManager.gd"
+Diagnostics="*res://scripts/Diagnostics.gd"
+DamageNumbers="*res://scripts/DamageNumbers.gd"
+SceneTransition="*res://scripts/SceneTransition.gd"
 
 [display]
 
@@ -69,8 +74,12 @@ move_down={
 
 3d/physics_engine="Jolt Physics"
 
-[rendering]
+[logging]
 
+file_logging/enable_file_logging=true
+file_logging/max_log_files=5
+
+[rendering]
 rendering_device/driver.windows="d3d12"
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"

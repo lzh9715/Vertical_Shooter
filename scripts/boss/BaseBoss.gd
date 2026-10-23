@@ -113,6 +113,7 @@ func _update_phase() -> void:
 	phase_index = target
 	_apply_phase()
 	phase_changed.emit(phase_index, phases.size())
+	AudioManager.play_sfx(&"boss_phase")
 
 	_transitioning = true
 	invincible = true
@@ -198,6 +199,8 @@ func take_damage(amount: int) -> void:
 
 	hp = maxi(hp - amount, 0)
 	hp_changed.emit(hp, max_hp)
+	DamageNumbers.spawn(global_position, amount, Color(1.0, 0.85, 0.4))
+	AudioManager.play_sfx(&"boss_hit", -5.0)
 	_flash()
 
 	if hp <= 0:
@@ -222,6 +225,7 @@ func _die() -> void:
 		_stealing = false
 		EventBus.steal_cancelled.emit()     # 立刻归还
 
+	AudioManager.play_sfx(&"boss_die")
 	boss_died.emit()
 	queue_free()
 

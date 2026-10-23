@@ -34,9 +34,17 @@ func _ready():
 func _physics_process(delta):
 	_tick_steal(delta)          # 新加，见第②步
 
-	var direction := Input.get_vector("move_left", "move_right", "move_up", "move_down")
-	velocity = direction * speed
-	move_and_slide()
+	if Settings.control_mode == Settings.ControlMode.MOUSE_FOLLOW:
+		var target := get_global_mouse_position()
+		global_position = global_position.move_toward(
+			target, Settings.mouse_follow_speed * delta
+		)
+		velocity = Vector2.ZERO
+	else:
+		var direction := Input.get_vector("move_left", "move_right", "move_up", "move_down")
+		velocity = direction * speed
+		move_and_slide()
+
 	position.x = clamp(position.x, 20, 700)
 	position.y = clamp(position.y, 20, 1260)
 
@@ -77,6 +85,8 @@ func _on_shoot_timer_timeout():
 		# 让子弹旋转
 		bullet.rotation = angle_offset
 
+	AudioManager.play_sfx(&"shoot", -6.0)
+
 # 👇 新增受击逻辑
 func _on_hurtbox_area_entered(area):
 	# 敌方子弹：先销毁子弹，再按无敌状态决定是否扣血
@@ -95,6 +105,7 @@ func _on_hurtbox_area_entered(area):
 
 
 func take_damage(amount: int = 1):
+	AudioManager.play_sfx(&"player_hit")
 	current_hp -= amount
 	GameFlow.hp = current_hp
 	hp_changed.emit(current_hp, max_hp)

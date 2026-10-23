@@ -69,21 +69,21 @@ func enter_node(node: MapNodeData) -> void:
 
 	match node.type:
 		MapNodeData.NodeType.BATTLE, MapNodeData.NodeType.ELITE, MapNodeData.NodeType.BOSS:
-			get_tree().change_scene_to_file(BATTLE_SCENE)
+			SceneTransition.change_scene(BATTLE_SCENE)
 		MapNodeData.NodeType.SHOP:
-			get_tree().change_scene_to_file(SHOP_SCENE)
+			SceneTransition.change_scene(SHOP_SCENE)
 		MapNodeData.NodeType.REWARD:
 			current_reward = _pick_reward()
 			if current_reward is RewardBattle:
-				get_tree().change_scene_to_file(BATTLE_SCENE)
+				SceneTransition.change_scene(BATTLE_SCENE)
 			else:
-				get_tree().change_scene_to_file(REWARD_SCENE)
+				SceneTransition.change_scene(REWARD_SCENE)
 		MapNodeData.NodeType.EVENT:
 			current_event = _pick_event()
 			if current_event == null:
 				finish_node()
 			else:
-				get_tree().change_scene_to_file(EVENT_SCENE)
+				SceneTransition.change_scene(EVENT_SCENE)
 		_:
 			# 未实现的节点类型：直接通过
 			finish_node()
@@ -93,7 +93,7 @@ func finish_node() -> void:
 	get_tree().paused = false            # 确保离开战斗/商店时不会停留在暂停状态
 
 	if current_node == null:
-		get_tree().change_scene_to_file(MAP_SCENE)
+		SceneTransition.change_scene(MAP_SCENE)
 		return
 
 	var finished := current_node
@@ -108,7 +108,7 @@ func finish_node() -> void:
 	if finished.type == MapNodeData.NodeType.BOSS:
 		end_run(true)                    # 通关
 	else:
-		get_tree().change_scene_to_file(MAP_SCENE)
+		SceneTransition.change_scene(MAP_SCENE)
 
 ## 战斗场景调用：按节点类型和 wave_count，从池子里抽出一组波次
 func build_waves(node: MapNodeData) -> Array[WaveData]:
@@ -160,7 +160,7 @@ func reset_run() -> void:
 
 func go_main_menu() -> void:
 	reset_run()
-	get_tree().change_scene_to_file(MAIN_MENU_SCENE)
+	SceneTransition.change_scene(MAIN_MENU_SCENE)
 
 func add_gold(amount: int) -> void:
 	gold = maxi(gold + amount, 0)
@@ -200,17 +200,17 @@ func end_run(victory: bool = false) -> void:
 	event_context.clear()
 	frontier.clear()
 
-	# 可能从物理回调（玩家受击）里调用，直接切场景会移除碰撞体 → 必须延迟
-	get_tree().call_deferred("change_scene_to_file", RESULT_SCENE)
+	# 淡出需要时间，不会在物理回调里立刻移除碰撞体
+	SceneTransition.change_scene(RESULT_SCENE)
 
 ## 结算界面点“再来一局”
 func restart_after_result() -> void:
 	if level == null:
-		get_tree().change_scene_to_file(MAP_SCENE)
+		SceneTransition.change_scene(MAP_SCENE)
 		return
 
 	start_run(level)
-	get_tree().change_scene_to_file(MAP_SCENE)
+	SceneTransition.change_scene(MAP_SCENE)
 
 func _next_ids_of(node_id: int) -> Array[int]:
 	var out: Array[int] = []

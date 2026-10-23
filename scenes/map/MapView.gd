@@ -35,6 +35,7 @@ const TYPE_COLOR := {
 
 func _ready() -> void:
 	get_tree().paused = false
+	AudioManager.play_music(&"map")
 	if GameFlow.map == null:
 		var level: LevelConfig = load(LEVEL_PATH)
 		GameFlow.start_run(level)

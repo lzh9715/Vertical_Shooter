@@ -1,12 +1,9 @@
 extends CanvasLayer
 class_name RestStation
 
-## 商店面板。价格与「是否售出」都存在本组件的 offers 里，
-## 不写回 SpellData 资源，所以重复商品、跨商店、跨局都不会串价。
+## 商店面板（纯 UI）。生成报价、购买、刷新都由 ShopSession 负责。
 
 signal closed
-
-const SLOT_COUNT := 3
 
 @export var close_button_text := "继续战斗"
 
@@ -18,9 +15,8 @@ const SLOT_COUNT := 3
 @onready var gold_label: Label = $VBoxContainer/ShopGoldLabel
 @onready var desc_label: Label = $DescLabel
 
-# 每个槽位的报价：{ "spell": SpellData, "price": int, "sold": bool }
-var offers: Array[Dictionary] = []
-var pricing: ShopPricing
+var session: ShopSession
+var _left := false
 
 func _ready() -> void:
 	btn_resume.text = close_button_text
@@ -29,7 +25,7 @@ func _ready() -> void:
 	btn_slot2.pressed.connect(func(): buy_slot(1))
 	btn_slot3.pressed.connect(func(): buy_slot(2))
 	btn_refresh.pressed.connect(refresh_shop)
-	btn_resume.pressed.connect(func(): closed.emit())
+	btn_resume.pressed.connect(_on_leave)
 
 	btn_slot1.mouse_entered.connect(func(): show_tooltip(0))
 	btn_slot1.mouse_exited.connect(hide_tooltip)
@@ -38,108 +34,77 @@ func _ready() -> void:
 	btn_slot3.mouse_entered.connect(func(): show_tooltip(2))
 	btn_slot3.mouse_exited.connect(hide_tooltip)
 
-	pricing = GameFlow.get_pricing()
 	GameFlow.stats_changed.connect(refresh_ui)
 
-	if offers.is_empty():
-		generate_offers()
+	session = ShopSession.new(GameFlow.get_pricing())
+	session.generate()
 	refresh_ui()
 
 ## 商店不再响应 Esc 关闭，避免误触；只能点「离开商店」按钮。
-
 func open() -> void:
 	btn_resume.text = close_button_text
 	visible = true
-	if offers.is_empty():
-		generate_offers()
+
+	if session == null:
+		session = ShopSession.new(GameFlow.get_pricing())
+	if session.offers.is_empty():
+		session.generate()
 	refresh_ui()
 
 func close() -> void:
 	visible = false
 
-## 重新铺货：每个槽位独立抽，允许抽到重复法杖
-func generate_offers() -> void:
-	offers.clear()
-
-	var pool := GameFlow.get_spell_pool()
-	if pool.is_empty():
+## 所有离开路径统一走这里，保证只发一次 closed
+func _on_leave() -> void:
+	if _left:
 		return
-
-	for i in range(SLOT_COUNT):
-		var spell: SpellData = pool[randi_range(0, pool.size() - 1)]
-		offers.append({
-			"spell": spell,
-			"price": pricing.roll_price(),
-			"sold": false,
-		})
+	_left = true
+	closed.emit()
 
 func buy_slot(index: int) -> void:
-	if index < 0 or index >= offers.size():
-		return
-
-	var offer: Dictionary = offers[index]
-	if offer["sold"]:
-		return
-
-	if not GameFlow.spend_gold(offer["price"]):
-		return
-
-	offer["sold"] = true                 # 只标记本槽位售罄，刷新时才补货
-	GameFlow.spell = offer["spell"]
-
-	# 如果当前正在战斗中，立刻换装（商店房间时玩家不存在，跳过）
-	var player := get_tree().get_first_node_in_group("player")
-	if player != null:
-		player.current_spell = offer["spell"]
-
-	refresh_ui()
+	if session != null and session.buy(index):
+		AudioManager.play_sfx(&"buy")
+		refresh_ui()
 
 func refresh_shop() -> void:
-	if GameFlow.get_spell_pool().is_empty():
-		return
-
-	if not GameFlow.spend_gold(10):
-		return
-
-	generate_offers()
-	refresh_ui()
+	if session != null and session.refresh():
+		refresh_ui()
 
 func refresh_ui() -> void:
 	gold_label.text = "当前金币: %d" % GameFlow.gold
 
 	var buttons := [btn_slot1, btn_slot2, btn_slot3]
-	for i in range(SLOT_COUNT):
-		if i >= offers.size():
+	for i in range(buttons.size()):
+		if session == null or i >= session.offers.size():
 			buttons[i].text = "空槽位"
 			buttons[i].disabled = true
 			continue
 
-		var offer: Dictionary = offers[i]
-		if offer["sold"]:
+		var offer: ShopOffer = session.offers[i]
+		if offer.sold:
 			buttons[i].text = "已售出"
 			buttons[i].disabled = true
 			continue
 
-		var spell: SpellData = offer["spell"]
-		var spell_name := spell.display_name
-		if spell_name == "" or spell_name == "未命名法杖":
-			spell_name = "神秘法杖"
+		var affordable := session.can_afford(offer)
+		var text := "%s (%d金币)" % [offer.item.display_name, offer.price]
+		if not affordable:
+			text += "（金币不足）"
 
-		buttons[i].text = "%s (%d金币)" % [spell_name, offer["price"]]
-		buttons[i].disabled = false
+		buttons[i].text = text
+		buttons[i].disabled = not affordable
 
 func show_tooltip(index: int) -> void:
-	if index < 0 or index >= offers.size():
+	if session == null or index < 0 or index >= session.offers.size():
 		return
 
-	var offer: Dictionary = offers[index]
-	if offer["sold"]:
+	var offer: ShopOffer = session.offers[index]
+	if offer.sold:
 		return
 
-	var spell: SpellData = offer["spell"]
-	desc_label.text = spell.description
+	desc_label.text = offer.item.description
 	desc_label.modulate = Color(1, 1, 1, 1)
 
 func hide_tooltip() -> void:
-	desc_label.text = "将鼠标悬停在法杖上查看说明"
+	desc_label.text = "将鼠标悬停在商品上查看说明"
 	desc_label.modulate = Color(1, 1, 1, 0.5)

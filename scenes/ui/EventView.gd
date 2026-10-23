@@ -14,6 +14,7 @@ var _resolved := false
 
 func _ready() -> void:
 	get_tree().paused = false
+	AudioManager.play_music(&"event")
 	btn_continue.pressed.connect(_on_continue)
 	result_label.visible = false
 	btn_continue.visible = false
@@ -58,7 +59,7 @@ func _on_option_pressed(opt: EventOption) -> void:
 	# 战斗事件：把上下文交给战斗场景
 	if outcome.battle != null:
 		GameFlow.event_context["battle"] = outcome.battle
-		get_tree().change_scene_to_file(GameFlow.BATTLE_SCENE)
+		SceneTransition.change_scene(GameFlow.BATTLE_SCENE)
 		return
 
 	outcome.apply()

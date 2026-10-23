@@ -46,6 +46,7 @@ func _on_area_entered(area):
 			queue_free()
 
 func explode():
+	AudioManager.play_sfx(&"explosion")
 	var enemies = get_tree().get_nodes_in_group("enemy")
 	for enemy in enemies:
 		# 本次直接命中的敌人已经单独结算过了，爆炸不再重复扣血

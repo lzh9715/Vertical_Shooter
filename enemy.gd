@@ -45,9 +45,11 @@ func _ready() -> void:
 	_begin_attack()
 
 func take_damage(amount: int) -> void:
+	DamageNumbers.spawn(global_position, amount)
 	hp -= amount
 	if hp > 0:
 		return
+	AudioManager.play_sfx(&"enemy_die")
 	died.emit(score_reward, gold_reward)
 	queue_free()
 

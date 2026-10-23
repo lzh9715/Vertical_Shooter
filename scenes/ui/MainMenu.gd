@@ -7,16 +7,19 @@ const LEVEL_SELECT_SCENE := "res://scenes/ui/LevelSelect.tscn"
 @onready var btn_exit: Button = $BtnExit
 @onready var dialog: Control = $ConfirmDialog
 @onready var settings_panel: CanvasLayer = $SettingsPanel
+@onready var version_label: Label = $VersionLabel
 
 func _ready() -> void:
 	get_tree().paused = false
+	AudioManager.play_music(&"menu")
+	version_label.text = "v" + str(ProjectSettings.get_setting("application/config/version", "0.0.0"))
 	btn_level.pressed.connect(_on_level_pressed)
 	btn_settings.pressed.connect(settings_panel.open)
 	btn_exit.pressed.connect(_on_exit_pressed)
 	dialog.confirmed.connect(_on_exit_confirmed)
 
 func _on_level_pressed() -> void:
-	get_tree().change_scene_to_file(LEVEL_SELECT_SCENE)
+	SceneTransition.change_scene(LEVEL_SELECT_SCENE)
 
 func _on_exit_pressed() -> void:
 	dialog.ask("确定退出游戏吗？")

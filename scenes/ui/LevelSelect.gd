@@ -58,7 +58,7 @@ func _add_card(level: LevelConfig) -> void:
 
 func _on_enter(level: LevelConfig) -> void:
 	GameFlow.start_run(level)
-	get_tree().change_scene_to_file(GameFlow.MAP_SCENE)
+	SceneTransition.change_scene(GameFlow.MAP_SCENE)
 
 func _on_back() -> void:
-	get_tree().change_scene_to_file(MAIN_MENU_SCENE)
+	SceneTransition.change_scene(MAIN_MENU_SCENE)
