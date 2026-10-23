@@ -11,6 +11,15 @@ extends Area2D
 @export var explosion_radius := 80.0
 @export var explosion_damage := 2
 
+## 离开视野后的宽限时间（追踪弹可以在这段时间内折返）
+@export var offscreen_grace := 0.5
+## 硬寿命，防止追踪弹长期绕场
+@export var max_lifetime := 5.0
+@export var view_margin := 120.0
+
+var _lifetime := 0.0
+var _offscreen_time := 0.0
+
 var pierced_enemies := [] # 记录已经打过的敌人，防止同一只怪被重复扣血
 
 func _ready():
@@ -18,6 +27,11 @@ func _ready():
 	area_entered.connect(_on_area_entered)
 
 func _physics_process(delta):
+	_lifetime += delta
+	if _lifetime >= max_lifetime:
+		queue_free()
+		return
+
 	if is_homing:
 		var target = _find_nearest_enemy()
 		if target:
@@ -29,6 +43,29 @@ func _physics_process(delta):
 
 	var bounds := Rect2(Vector2.ZERO, ScreenUtil.world_size()).grow(300.0)
 	if not bounds.has_point(global_position):
+		queue_free()
+		return
+
+	_update_view_lifetime(delta)
+
+func _update_view_lifetime(delta: float) -> void:
+	var camera := get_viewport().get_camera_2d()
+	var inside := false
+
+	if camera != null:
+		var size := get_viewport().get_visible_rect().size
+		var center := camera.get_screen_center_position()
+		var view_rect := Rect2(center - size * 0.5, size).grow(view_margin)
+		inside = view_rect.has_point(global_position)
+	else:
+		inside = Rect2(Vector2.ZERO, ScreenUtil.world_size()).grow(view_margin).has_point(global_position)
+
+	if inside:
+		_offscreen_time = 0.0
+		return
+
+	_offscreen_time += delta
+	if _offscreen_time >= offscreen_grace:
 		queue_free()
 
 func _on_area_entered(area):

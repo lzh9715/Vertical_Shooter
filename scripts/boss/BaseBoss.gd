@@ -139,7 +139,9 @@ func _tick_move(delta: float) -> void:
 	_drift_t += delta
 	var off := Vector2.ZERO
 	if phases[phase_index].movement != null:
-		off = phases[phase_index].movement.offset_at(_drift_t) * ScreenUtil.scale_factor()
+		var raw := phases[phase_index].movement.offset_at(_drift_t)
+		# 横版：Boss 落位后只做上下移动，把横向幅度映射到 y 轴
+		off = Vector2(0.0, raw.x + raw.y) * ScreenUtil.scale_factor()
 
 	global_position = _hover + off
 

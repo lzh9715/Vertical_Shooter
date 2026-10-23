@@ -74,8 +74,8 @@ func _on_boss_died() -> void:
 	GameFlow.finish_node()
 
 func _refresh_hud() -> void:
-	score_label.text = "Score: %d" % GameFlow.score
-	gold_label.text = "金币: %d" % GameFlow.gold
+	score_label.text = "分数：%d" % GameFlow.score
+	gold_label.text = "金币：%d" % GameFlow.gold
 
 func _on_enemy_died(score_gain: int, gold_gain: int) -> void:
 	var reward := GameFlow.current_reward as RewardBattle
