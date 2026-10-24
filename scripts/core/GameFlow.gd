@@ -322,27 +322,28 @@ func _seed_starter_inventory() -> void:
 	var robes := ItemCatalog.robes()
 	var accessories := ItemCatalog.accessories()
 
-	# 法术卡全部先放背包，方便测试装配
-	for card in cards:
-		inventory.add_card(card, 1)
-
 	# 备用宝石 / 装备
 	inventory.add(ItemInstance.create(gems[2]))
 	inventory.add(ItemCatalog.make_instance(hats[0]))
 	inventory.add(ItemCatalog.make_instance(robes[0]))
 	inventory.add(ItemCatalog.make_instance(accessories[0]))
 
-	# 两把已装备法杖：A 宝石/杖身，B 宝石/杖身；卡槽为空，等玩家装配
+	# 两把已装备法杖：默认各装一组卡，保证开局可以射击
 	var wand0 := WandInstance.create(
 		ItemInstance.create(bodies[0]),
 		ItemInstance.create(gems[0])
 	)
+	wand0.add_card(cards[0])  # 单发
+	wand0.add_card(cards[1])  # 散射
+	wand0.add_card(cards[2])  # 追踪
 	equipment.equip_wand(0, wand0)
 
 	var wand1 := WandInstance.create(
 		ItemInstance.create(bodies[1]),
 		ItemInstance.create(gems[1])
 	)
+	wand1.add_card(cards[3])  # 穿透
+	wand1.add_card(cards[4])  # 爆裂
 	equipment.equip_wand(1, wand1)
 
 	equipment.equip_item(ItemCatalog.make_instance(hats[0]))

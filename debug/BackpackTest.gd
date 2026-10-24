@@ -28,6 +28,7 @@ func _ready() -> void:
 	_hint.text = "测试：1 填满背包  2 填满并制造溢出  3 清空溢出  4 重置物品 | 点击法杖切换编辑，编辑法术打开卡槽 | B 开关背包"
 	layer.add_child(_hint)
 
+	_add_test_cards()
 	_map.backpack.open()
 
 func _input(event: InputEvent) -> void:
@@ -46,7 +47,13 @@ func _input(event: InputEvent) -> void:
 			_map.backpack._refresh()
 		KEY_4:
 			GameFlow._seed_starter_inventory()
+			_add_test_cards()
 			_map.backpack._refresh()
+
+func _add_test_cards() -> void:
+	var inv := GameFlow.get_inventory()
+	for card in ItemCatalog.cards():
+		inv.add_card(card, 1)
 
 func _fill_normal() -> void:
 	var inv := GameFlow.get_inventory()

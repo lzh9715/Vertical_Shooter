@@ -6,20 +6,6 @@ extends Node
 
 func _ready() -> void:
 	GameFlow.start_run(load("res://data/Level_01.tres"))
-	var inv: GridInventory = GameFlow.get_inventory()
-	var wand0: WandInstance = GameFlow.get_equipment().wand_slots[0]
-	var wand1: WandInstance = GameFlow.get_equipment().wand_slots[1]
-
-	var card_defs: Array[ItemDefinition] = []
-	for i in range(inv.cells.size()):
-		if inv.cells[i] is ItemStack and inv.cells[i].definition.is_card():
-			card_defs.append(inv.cells[i].definition)
-
-	for i in range(card_defs.size()):
-		if i < 3:
-			wand0.add_card(card_defs[i])
-		else:
-			wand1.add_card(card_defs[i])
 
 	var battle = load("res://scenes/battle/Battle.tscn").instantiate()
 	var waves: Array[WaveData] = [load("res://data/waves/Test_Wave.tres")]
