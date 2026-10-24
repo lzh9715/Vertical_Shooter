@@ -7,8 +7,11 @@
 [resource]
 script = ExtResource("1_ndoc3")
 scene = ExtResource("2_5y0vi")
-max_hp = 6
+max_hp = 40
 speed = 130.0
+attack_power = 8.0
+defense = 2.0
+damage_reduction = 0.0
 score = 25
 gold = 10
 attack = ExtResource("1_6hhmj")

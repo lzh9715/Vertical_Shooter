@@ -62,6 +62,15 @@ theme_override_font_sizes/font_size = 36
 text = "法杖 1/2  [Q]"
 horizontal_alignment = 1
 
+[node name="ManaLabel" type="Label" parent="CanvasLayer" unique_id=452583446]
+offset_left = 980.0
+offset_top = 1240.0
+offset_right = 1580.0
+offset_bottom = 1300.0
+theme_override_font_sizes/font_size = 36
+text = "法力：100/100"
+horizontal_alignment = 1
+
 [node name="Spawner" type="Node" parent="." unique_id=9712878]
 script = ExtResource("15_sbc7h")
 difficulty = ExtResource("16_6o4vi")

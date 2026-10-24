@@ -58,6 +58,12 @@ text = "法术卡装配"
 layout_mode = 2
 size_flags_horizontal = 3
 
+[node name="BtnClear" type="Button" parent="Center/Panel/Margin/VBox/Header"]
+custom_minimum_size = Vector2(150, 56)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "清空法术"
+
 [node name="BtnClose" type="Button" parent="Center/Panel/Margin/VBox/Header"]
 custom_minimum_size = Vector2(150, 56)
 layout_mode = 2
@@ -84,6 +90,27 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "从下方背包拖入 / 拖出；每次施法消耗一张，按槽位顺序循环"
 horizontal_alignment = 1
+
+[node name="WarningsBox" type="VBoxContainer" parent="Center/Panel/Margin/VBox"]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="WarningsTitle" type="Label" parent="Center/Panel/Margin/VBox/WarningsBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "配装警告"
+
+[node name="WarningsScroll" type="ScrollContainer" parent="Center/Panel/Margin/VBox/WarningsBox"]
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 1
+
+[node name="WarningsVBox" type="VBoxContainer" parent="Center/Panel/Margin/VBox/WarningsBox/WarningsScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
 
 [node name="BagTitle" type="Label" parent="Center/Panel/Margin/VBox"]
 layout_mode = 2

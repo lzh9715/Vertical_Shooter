@@ -9,8 +9,11 @@
 script = ExtResource("1_vwdon")
 tier = 1
 scene = ExtResource("2_p7bbw")
-max_hp = 45
+max_hp = 180
 speed = 70.0
+attack_power = 12.0
+defense = 4.0
+damage_reduction = 0.1
 score = 300
 gold = 120
 despawn_margin = 350.0

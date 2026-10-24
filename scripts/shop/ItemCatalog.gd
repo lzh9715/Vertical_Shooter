@@ -15,6 +15,13 @@ static func cards() -> Array[ItemDefinition]:
 	_ensure()
 	return _cards
 
+static func find_card(id: StringName) -> ItemDefinition:
+	_ensure()
+	for card in _cards:
+		if card.id == id:
+			return card
+	return null
+
 static func gems() -> Array[ItemDefinition]:
 	_ensure()
 	return _gems
@@ -98,19 +105,73 @@ static func _ensure() -> void:
 	if not _cards.is_empty():
 		return
 
-	_cards = [
-		_make_def(&"card_single", "单发卡", ItemDefinition.Category.SPELL_CARD, 3, 15),
-		_make_def(&"card_spread", "散射卡", ItemDefinition.Category.SPELL_CARD, 3, 25),
-		_make_def(&"card_homing", "追踪卡", ItemDefinition.Category.SPELL_CARD, 3, 40),
-		_make_def(&"card_pierce", "穿透卡", ItemDefinition.Category.SPELL_CARD, 3, 35),
-		_make_def(&"card_boom", "爆裂卡", ItemDefinition.Category.SPELL_CARD, 3, 50),
-	]
+	var single := _make_def(&"card_single", "单发卡", ItemDefinition.Category.SPELL_CARD, 3, 15)
+	single.spell_kind = ItemDefinition.SpellKind.ATTACK
+	single.mana_cost = 4
+	single.base_damage = 10
+	single.projectile_count = 1
+	single.projectile_speed = 800.0
+	single.cast_interval = 0.18
+	single.base_value = 15
+
+	var spread := _make_def(&"card_spread", "散射卡", ItemDefinition.Category.SPELL_CARD, 3, 25)
+	spread.spell_kind = ItemDefinition.SpellKind.ATTACK
+	spread.mana_cost = 8
+	spread.base_damage = 6
+	spread.projectile_count = 3
+	spread.spread_angle = 15.0
+	spread.projectile_speed = 700.0
+	spread.cast_interval = 0.20
+	spread.base_value = 25
+
+	var homing := _make_def(&"card_homing", "追踪模块", ItemDefinition.Category.SPELL_CARD, 3, 40)
+	homing.spell_kind = ItemDefinition.SpellKind.MODULE
+	homing.effect_type = ItemDefinition.EffectType.HOMING
+	homing.mana_cost = 6
+	homing.cast_interval = 0.02
+	homing.base_value = 40
+
+	var pierce := _make_def(&"card_pierce", "穿透模块", ItemDefinition.Category.SPELL_CARD, 3, 35)
+	pierce.spell_kind = ItemDefinition.SpellKind.MODULE
+	pierce.effect_type = ItemDefinition.EffectType.PIERCE
+	pierce.effect_value = 3.0
+	pierce.mana_cost = 8
+	pierce.cast_interval = 0.04
+	pierce.base_value = 35
+
+	var boom := _make_def(&"card_boom", "爆炸模块", ItemDefinition.Category.SPELL_CARD, 3, 50)
+	boom.spell_kind = ItemDefinition.SpellKind.MODULE
+	boom.effect_type = ItemDefinition.EffectType.EXPLOSION
+	boom.effect_value = 32.0
+	boom.effect_radius = 100.0
+	boom.mana_cost = 18
+	boom.cast_interval = 0.12
+	boom.base_value = 50
+
+	var damage := _make_def(&"module_damage", "增伤模块", ItemDefinition.Category.SPELL_CARD, 3, 30)
+	damage.spell_kind = ItemDefinition.SpellKind.MODULE
+	damage.effect_type = ItemDefinition.EffectType.DAMAGE
+	damage.effect_value = 6.0
+	damage.mana_cost = 8
+	damage.cast_interval = 0.03
+	damage.base_value = 30
+
+	var double_cast := _make_def(&"module_double", "双重施法", ItemDefinition.Category.SPELL_CARD, 3, 40)
+	double_cast.spell_kind = ItemDefinition.SpellKind.MODULE
+	double_cast.effect_type = ItemDefinition.EffectType.MULTICAST
+	double_cast.multicast_count = 2
+	double_cast.mana_cost = 2
+	double_cast.cast_interval = 0.02
+	double_cast.base_value = 40
+
+	_cards = [single, spread, homing, pierce, boom, damage, double_cast]
 
 	_gems = [
 		_make_def(&"gem_a", "测试宝石 A", ItemDefinition.Category.GEM, 1, 80, 3),
 		_make_def(&"gem_b", "测试宝石 B", ItemDefinition.Category.GEM, 1, 120, 5),
 		_make_def(&"gem_c", "测试宝石 C", ItemDefinition.Category.GEM, 1, 160, 7),
 	]
+	_gems[2].cast_mode = ItemDefinition.CastMode.SHUFFLED
 
 	_bodies = [
 		_make_def(&"body_a", "测试杖身 A", ItemDefinition.Category.STAFF_BODY, 1, 90, 0, 3),

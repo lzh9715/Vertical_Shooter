@@ -16,6 +16,9 @@ signal boss_died
 var display_name := "Boss"
 var max_hp := 600
 var hp := 0
+var attack_power := 16.0
+var defense := 8.0
+var damage_reduction := 0.1
 var phases: Array[BossPhaseData] = []
 var phase_index := -1
 var invincible := false
@@ -66,6 +69,9 @@ func apply_data(d: BossData) -> void:
 	display_name = copy.display_name
 	max_hp = copy.max_hp
 	hp = max_hp
+	attack_power = copy.attack_power
+	defense = copy.defense
+	damage_reduction = copy.damage_reduction
 	phases = copy.phases
 	_enter_duration = copy.enter_duration
 	_hover = copy.hover_position
@@ -187,7 +193,7 @@ func _fire(volley: EnemyBulletPattern) -> void:
 		var b = scene.instantiate()
 		b.direction = dir
 		b.speed = volley.speed * ScreenUtil.scale_factor()
-		b.damage = volley.damage
+		b.damage = attack_power + volley.damage
 		b.tint = volley.tint
 		b.radius = volley.radius
 		get_parent().add_child(b)
@@ -198,6 +204,10 @@ func _fire(volley: EnemyBulletPattern) -> void:
 func take_damage(amount: int) -> void:
 	if invincible or _state == "dead":
 		return
+
+	var after_defense := maxf(float(amount) - defense, 1.0)
+	var final_damage := maxi(1, roundi(after_defense * (1.0 - damage_reduction)))
+	amount = final_damage
 
 	hp = maxi(hp - amount, 0)
 	hp_changed.emit(hp, max_hp)

@@ -24,8 +24,11 @@ var rng := RandomNumberGenerator.new()
 # —— 一局冒险的运行状态（跨场景保留）——
 var gold := 5000
 var score := 0
-var hp := 3
-var max_hp := 3
+var hp := 100.0
+var max_hp := 100.0
+var mana := 100.0
+var max_mana := 100.0
+var mana_regen := 35.0
 var spell: SpellData
 var inventory: GridInventory
 var equipment: PlayerEquipment
@@ -140,8 +143,10 @@ func is_node_available(node: MapNodeData) -> bool:
 func reset_stats() -> void:
 	gold = 5000
 	score = 0
-	max_hp = 3
+	max_hp = 100.0
 	hp = max_hp
+	mana = 100.0
+	max_mana = 100.0
 	spell = null
 	stats_changed.emit()
 
@@ -193,6 +198,8 @@ func end_run(victory: bool = false) -> void:
 		"gold": gold,
 		"hp": hp,
 		"max_hp": max_hp,
+		"mana": mana,
+		"max_mana": max_mana,
 		"nodes": cleared.size(),
 	}
 
@@ -260,19 +267,32 @@ func get_reward_multiplier() -> float:
 		total *= float(m)
 	return clampf(total, 0.1, 10.0)
 
-func heal(amount: int) -> void:
-	hp = mini(hp + amount, max_hp)
+func heal(amount: float) -> void:
+	hp = minf(hp + amount, max_hp)
 	stats_changed.emit()
 
 ## 事件用：改变当前血量（最低保留 1，避免事件直接致死）
-func change_hp(delta: int) -> void:
-	hp = clampi(hp + delta, 1, max_hp)
+func change_hp(delta: float) -> void:
+	hp = clampf(hp + delta, 1.0, max_hp)
 	stats_changed.emit()
 
 ## 事件用：改变最大生命（最低 1，当前血量跟随上限）
-func change_max_hp(delta: int) -> void:
-	max_hp = maxi(1, max_hp + delta)
-	hp = mini(hp, max_hp)
+func change_max_hp(delta: float) -> void:
+	max_hp = maxf(1.0, max_hp + delta)
+	hp = minf(hp, max_hp)
+	stats_changed.emit()
+
+func spend_mana(amount: float) -> bool:
+	if amount <= 0.0:
+		return true
+	if mana < amount:
+		return false
+	mana -= amount
+	stats_changed.emit()
+	return true
+
+func restore_mana(amount: float) -> void:
+	mana = minf(max_mana, mana + maxf(amount, 0.0))
 	stats_changed.emit()
 
 # ---------- 事件 ----------
@@ -315,7 +335,6 @@ func _seed_starter_inventory() -> void:
 	inventory = GridInventory.new()
 	equipment = PlayerEquipment.new()
 
-	var cards := ItemCatalog.cards()
 	var gems := ItemCatalog.gems()
 	var bodies := ItemCatalog.bodies()
 	var hats := ItemCatalog.hats()
@@ -333,17 +352,20 @@ func _seed_starter_inventory() -> void:
 		ItemInstance.create(bodies[0]),
 		ItemInstance.create(gems[0])
 	)
-	wand0.add_card(cards[0])  # 单发
-	wand0.add_card(cards[1])  # 散射
-	wand0.add_card(cards[2])  # 追踪
+	wand0.add_card(ItemCatalog.find_card(&"card_homing"))
+	wand0.add_card(ItemCatalog.find_card(&"card_pierce"))
+	wand0.add_card(ItemCatalog.find_card(&"card_single"))
 	equipment.equip_wand(0, wand0)
 
 	var wand1 := WandInstance.create(
 		ItemInstance.create(bodies[1]),
 		ItemInstance.create(gems[1])
 	)
-	wand1.add_card(cards[3])  # 穿透
-	wand1.add_card(cards[4])  # 爆裂
+	wand1.add_card(ItemCatalog.find_card(&"module_damage"))
+	wand1.add_card(ItemCatalog.find_card(&"card_boom"))
+	wand1.add_card(ItemCatalog.find_card(&"card_single"))
+	wand1.add_card(ItemCatalog.find_card(&"card_spread"))
+	wand1.add_card(ItemCatalog.find_card(&"card_single"))
 	equipment.equip_wand(1, wand1)
 
 	equipment.equip_item(ItemCatalog.make_instance(hats[0]))

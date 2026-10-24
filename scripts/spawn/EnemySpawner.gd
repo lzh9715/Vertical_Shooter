@@ -37,6 +37,9 @@ func create_enemy(data: EnemyData):
 
 	var enemy = data.scene.instantiate()
 	enemy.max_hp = maxi(1, roundi(data.max_hp * hp_mult))
+	enemy.attack_power = data.attack_power
+	enemy.defense = data.defense
+	enemy.damage_reduction = data.damage_reduction
 	enemy.speed = data.speed * speed_mult * ScreenUtil.scale_factor()
 	enemy.score_reward = roundi(data.score * reward_mult)
 	enemy.gold_reward = roundi(data.gold * reward_mult)

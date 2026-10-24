@@ -12,8 +12,12 @@ const BAG_BG := Color(0.28, 0.28, 0.31, 1.0)
 
 @onready var title: Label = $Center/Panel/Margin/VBox/Header/Title
 @onready var btn_close: Button = $Center/Panel/Margin/VBox/Header/BtnClose
+@onready var btn_clear: Button = $Center/Panel/Margin/VBox/Header/BtnClear
 @onready var slots_box: HBoxContainer = $Center/Panel/Margin/VBox/SlotsScroll/SlotsBox
 @onready var bag_grid: GridContainer = $Center/Panel/Margin/VBox/BagScroll/BagGrid
+@onready var bag_scroll: ScrollContainer = $Center/Panel/Margin/VBox/BagScroll
+@onready var warnings_box: VBoxContainer = $Center/Panel/Margin/VBox/WarningsBox
+@onready var warnings_list: VBoxContainer = $Center/Panel/Margin/VBox/WarningsBox/WarningsScroll/WarningsVBox
 
 var _wand: WandInstance
 var _wand_index := 0
@@ -29,10 +33,24 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	visible = false
 	btn_close.pressed.connect(close)
+	btn_clear.pressed.connect(_clear_cards)
+
+func _clear_cards() -> void:
+	if _wand == null:
+		return
+
+	var inventory := GameFlow.get_inventory()
+	for card in _wand.cards:
+		if card != null:
+			inventory.add_card(card, 1)
+	_wand.cards.clear()
+	_wand.ensure_slots()
+	_refresh()
 
 func open(wand: WandInstance, wand_index: int) -> void:
 	_wand = wand
 	_wand_index = wand_index
+	_wand.ensure_slots()
 	visible = true
 	_build_slots()
 	_refresh()
@@ -58,7 +76,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _process(_delta: float) -> void:
 	if _drag_panel != null:
-		_drag_panel.global_position = get_viewport().get_mouse_position() - _drag_panel.size * 0.5
+		_drag_panel.global_position = get_global_mouse_position() - _drag_panel.size * 0.5
 
 # ---------- 构建 ----------
 
@@ -71,6 +89,7 @@ func _build_slots() -> void:
 	if _wand == null:
 		return
 
+	_wand.ensure_slots()
 	for i in range(_wand.max_cards()):
 		var slot := _make_slot(i, SLOT_SIZE)
 		slots_box.add_child(slot)
@@ -148,6 +167,7 @@ func _refresh() -> void:
 	if _wand == null:
 		return
 
+	_wand.ensure_slots()
 	title.text = "法术卡装配 - 法杖 %d" % [_wand_index + 1]
 
 	for i in range(_slot_panels.size()):
@@ -160,9 +180,10 @@ func _refresh() -> void:
 		index_label.text = str(i + 1)
 		count_label.text = ""
 
-		if i < _wand.cards.size():
+		var card: ItemDefinition = _wand.cards[i] if i < _wand.cards.size() else null
+		if card != null:
 			bg.color = SLOT_BG
-			name_label.text = _wand.cards[i].display_name
+			name_label.text = card.display_name
 		else:
 			bg.color = Color(0.15, 0.16, 0.19, 1.0)
 			name_label.text = "空槽"
@@ -193,6 +214,8 @@ func _refresh() -> void:
 		name_label.text = item.definition.display_name
 		count_label.text = str(item.count) if item.count > 1 else ""
 
+	_refresh_warnings()
+
 # ---------- 拖拽 ----------
 
 func _on_slot_input(event: InputEvent, panel: Panel) -> void:
@@ -215,7 +238,7 @@ func _start_drag(panel: Panel) -> void:
 	var inv := GameFlow.get_inventory()
 
 	if kind == "card_slot":
-		if index >= _wand.cards.size():
+		if index >= _wand.cards.size() or _wand.cards[index] == null:
 			return
 		_drag_card = _wand.remove_card(index)
 		_drag_origin = {"kind": "card_slot", "index": index}
@@ -259,16 +282,27 @@ func _create_drag_visual() -> void:
 func _drop_at_mouse() -> void:
 	var target := _target_under_mouse()
 	if target == null:
-		_restore_drag()
+		# 法术卡面板里没有其他丢弃区：拖出到任何非槽位位置都安全回背包
+		_drop_to_bag()
 		return
 
 	var kind: String = target.get_meta("kind")
 	if kind == "card_slot":
-		if not _wand.insert_card(int(target.get_meta("index")), _drag_card):
-			_restore_drag()
-			return
+		var slot_index := int(target.get_meta("index"))
+		if not _wand.insert_card(slot_index, _drag_card):
+			# 槽位已满时，拖到具体槽位直接替换该槽卡牌
+			if slot_index >= 0 and slot_index < _wand.cards.size():
+				var old_card: ItemDefinition = _wand.cards[slot_index]
+				_wand.cards[slot_index] = _drag_card
+				if _drag_origin.get("kind", "") == "card_slot":
+					_wand.cards[int(_drag_origin.index)] = old_card
+				else:
+					GameFlow.get_inventory().add_card(old_card, 1)
+			else:
+				_restore_drag()
+				return
 	elif kind == "bag":
-		GameFlow.get_inventory().add_card(_drag_card, 1)
+		_drop_to_bag()
 	else:
 		_restore_drag()
 		return
@@ -276,8 +310,16 @@ func _drop_at_mouse() -> void:
 	GameFlow.get_inventory().auto_transfer()
 	_finish_drag()
 
+func _is_over_bag_area() -> bool:
+	return bag_scroll != null and bag_scroll.get_global_rect().has_point(get_global_mouse_position())
+
+func _drop_to_bag() -> void:
+	GameFlow.get_inventory().add_card(_drag_card, 1)
+	GameFlow.get_inventory().auto_transfer()
+	_finish_drag()
+
 func _target_under_mouse() -> Panel:
-	var mouse := get_viewport().get_mouse_position()
+	var mouse := get_global_mouse_position()
 	for panel in _targets:
 		if panel.is_visible_in_tree() and panel.get_global_rect().has_point(mouse):
 			return panel
@@ -306,3 +348,91 @@ func _cancel_drag() -> void:
 		_drag_panel = null
 	_drag_card = null
 	_drag_origin = {}
+
+# ---------- 配装警告 ----------
+
+func _is_shuffled() -> bool:
+	return (
+		_wand != null
+		and _wand.gem != null
+		and _wand.gem.definition != null
+		and _wand.gem.definition.cast_mode == ItemDefinition.CastMode.SHUFFLED
+	)
+
+func _refresh_warnings() -> void:
+	for child in warnings_list.get_children():
+		warnings_list.remove_child(child)
+		child.queue_free()
+
+	if _wand == null:
+		warnings_box.visible = false
+		return
+
+	var warnings: Array[String] = []
+	var seen := {}
+
+	if _is_shuffled():
+		_add_unique(warnings, seen, "⚠ 乱序法杖不会透支生命，无法支付的组合会降级或跳过")
+
+	var blocks := CastSimulator.build_blocks(_wand.cards)
+	if blocks.is_empty():
+		_add_unique(warnings, seen, "⚠ 当前法杖没有法术卡")
+	else:
+		var has_attack := false
+		for block in blocks:
+			for card in block:
+				if card != null and card.is_attack():
+					has_attack = true
+		if not has_attack:
+			_add_unique(warnings, seen, "⚠ 当前配装没有可发射弹体")
+
+		if not _is_shuffled():
+			var staff_interval := 0.0
+			if _wand.body != null and _wand.body.definition != null:
+				staff_interval = _wand.body.definition.cast_interval
+
+			var index := 0
+			while index < blocks.size():
+				var result := CastSimulator.simulate_action(
+					blocks,
+					index,
+					GameFlow.max_mana,
+					GameFlow.max_mana,
+					GameFlow.hp,
+					staff_interval,
+					true
+				)
+				var indices: Array = result.get("indices", [])
+				if indices.is_empty():
+					break
+
+				var block_number := int(indices[0]) + 1
+				if result.status == "overdraft":
+					_add_unique(
+						warnings,
+						seen,
+						"⚠ 施法块 %d 需要透支 %.1f 生命" % [block_number, result.hp_cost]
+					)
+				elif result.status == "degrade":
+					_add_unique(
+						warnings,
+						seen,
+						"⚠ 施法块 %d 无法安全释放，战斗中会跳过" % block_number
+					)
+
+				index = int(indices[indices.size() - 1]) + 1
+
+	warnings_box.visible = not warnings.is_empty()
+	for text in warnings:
+		var label := Label.new()
+		label.text = text
+		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		label.add_theme_font_size_override("font_size", 18)
+		label.add_theme_color_override("font_color", Color(1.0, 0.72, 0.35))
+		warnings_list.add_child(label)
+
+func _add_unique(warnings: Array[String], seen: Dictionary, text: String) -> void:
+	if seen.has(text):
+		return
+	seen[text] = true
+	warnings.append(text)

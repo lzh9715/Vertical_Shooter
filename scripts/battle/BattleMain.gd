@@ -12,6 +12,7 @@ var _event_timer_label: Label
 @onready var gold_label: Label = $CanvasLayer/GoldLabel
 @onready var hp_label: Label = $CanvasLayer/HpLabel
 @onready var wand_label: Label = $CanvasLayer/WandLabel
+@onready var mana_label: Label = $CanvasLayer/ManaLabel
 @onready var camera: Camera2D = $Camera2D
 @onready var player_node: Node2D = $player
 
@@ -104,8 +105,8 @@ func _on_battle_finished() -> void:
 	else:
 		print("战斗结束：全部波次已清空（调试模式）")
 
-func update_hp_ui(current: int, max_val: int) -> void:
-	hp_label.text = "HP: %d/%d" % [current, max_val]
+func update_hp_ui(current: float, max_val: float) -> void:
+	hp_label.text = "HP: %d/%d" % [ceili(current), ceili(max_val)]
 
 # ---------- 事件限时战斗 ----------
 
@@ -149,6 +150,7 @@ func _update_camera() -> void:
 	)
 
 func _process(delta: float) -> void:
+	mana_label.text = "法力：%d/%d" % [ceili(GameFlow.mana), ceili(GameFlow.max_mana)]
 	_update_camera()
 
 	if not _event_active:

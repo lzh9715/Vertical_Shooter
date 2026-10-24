@@ -11,6 +11,9 @@ const DEFAULT_BULLET := preload("res://scenes/enemies/enemy_bullet.tscn")
 
 @export_group("数值")
 @export var max_hp := 1
+@export var attack_power := 8.0
+@export var defense := 0.0
+@export_range(0.0, 0.8, 0.01) var damage_reduction := 0.0
 @export var score_reward := 10
 @export var gold_reward := 5
 
@@ -44,9 +47,12 @@ func _ready() -> void:
 	_apply_motion()
 	_begin_attack()
 
-func take_damage(amount: int) -> void:
-	DamageNumbers.spawn(global_position, amount)
-	hp -= amount
+func take_damage(amount: float) -> void:
+	var after_defense := maxf(amount - defense, 1.0)
+	var final_damage := maxf(after_defense * (1.0 - damage_reduction), 1.0)
+	var dealt := maxi(1, roundi(final_damage))
+	DamageNumbers.spawn(global_position, dealt)
+	hp -= dealt
 	if hp > 0:
 		return
 	AudioManager.play_sfx(&"enemy_die")
@@ -158,7 +164,7 @@ func _fire_volley(volley: EnemyBulletPattern) -> void:
 		var bullet = scene.instantiate()
 		bullet.direction = dir
 		bullet.speed = volley.speed * ScreenUtil.scale_factor()
-		bullet.damage = volley.damage
+		bullet.damage = attack_power + volley.damage
 		bullet.tint = volley.tint
 		bullet.radius = volley.radius
 		bullet.texture = volley.texture

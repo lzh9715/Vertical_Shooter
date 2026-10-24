@@ -9,8 +9,11 @@
 script = ExtResource("1_iapas")
 tier = 1
 scene = ExtResource("2_vlouu")
-max_hp = 60
+max_hp = 220
 speed = 55.0
+attack_power = 14.0
+defense = 5.0
+damage_reduction = 0.1
 score = 420
 gold = 160
 despawn_margin = 380.0

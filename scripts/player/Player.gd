@@ -1,18 +1,21 @@
 extends CharacterBody2D
 
-signal hp_changed(current: int, max_hp: int)   # HUD 自己订阅，玩家不需要知道谁在显示血量
+signal hp_changed(current: float, max_hp: float)   # HUD 自己订阅，玩家不需要知道谁在显示血量
 
 @export var speed := 400.0
 @export var bullet_scene: PackedScene # 这个变量用来在编辑器里装子弹场景
 @export var current_spell: SpellData # 玩家当前装备的法术
 
 # 👇 新增血量相关变量
-@export var max_hp := 3
-var current_hp := 3
+@export var max_hp := 100.0
+var current_hp := 100.0
 var is_invincible := false # 是否无敌
 
 var _stolen_spell: SpellData
 var _steal_left := 0.0
+var _wand_runtimes: Dictionary = {}
+var _legacy_cooldown := 0.0
+var _iframe_generation := 0
 
 @onready var shoot_timer: Timer = $ShootTimer
 @onready var hurtbox: Area2D = $Hurtbox
@@ -24,7 +27,7 @@ func _ready():
 		current_spell = GameFlow.spell
 
 	hurtbox.area_entered.connect(_on_hurtbox_area_entered)
-	shoot_timer.timeout.connect(_on_shoot_timer_timeout)
+	shoot_timer.stop()
 	hp_changed.emit(current_hp, max_hp)
 
 	EventBus.steal_spell_requested.connect(_on_steal_spell)
@@ -34,6 +37,8 @@ func _ready():
 
 func _physics_process(delta):
 	_tick_steal(delta)
+	_regen_mana(delta)
+	_tick_cast(delta)
 
 	var direction := Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	velocity = direction * speed
@@ -42,6 +47,138 @@ func _physics_process(delta):
 	var world := ScreenUtil.world_size()
 	position.x = clamp(position.x, 40, world.x - 40)
 	position.y = clamp(position.y, 40, world.y - 40)
+
+func _regen_mana(delta: float) -> void:
+	if GameFlow.mana < GameFlow.max_mana:
+		GameFlow.mana = minf(GameFlow.max_mana, GameFlow.mana + GameFlow.mana_regen * delta)
+
+func _tick_cast(delta: float) -> void:
+	var wand := GameFlow.get_equipment().active_wand()
+	if wand == null or wand.body == null:
+		_tick_legacy(delta)
+		return
+
+	var runtime := _runtime_for(wand)
+	runtime.tick(delta)
+
+	var plan := runtime.attempt(current_hp)
+	if plan.status == "wait":
+		return
+
+	if plan.status == "skip":
+		runtime.commit(plan)
+		return
+
+	if plan.hp_cost > 0.0:
+		if not apply_overdraft(plan.hp_cost):
+			return
+
+	runtime.commit(plan)
+	_fire_plan(plan)
+
+func _runtime_for(wand: WandInstance) -> WandCastRuntime:
+	if not _wand_runtimes.has(wand):
+		_wand_runtimes[wand] = WandCastRuntime.new(wand)
+	return _wand_runtimes[wand]
+
+func _tick_legacy(delta: float) -> void:
+	_legacy_cooldown = maxf(_legacy_cooldown - delta, 0.0)
+	if _legacy_cooldown > 0.0 or current_spell == null:
+		return
+	_shoot_legacy_spell(current_spell)
+	_legacy_cooldown = 0.2
+
+func _fire_plan(plan: Dictionary) -> void:
+	var body_bonus := 0
+	var wand := GameFlow.get_equipment().active_wand()
+	if wand != null and wand.body != null:
+		body_bonus = wand.body.definition.damage_bonus
+
+	var action_blocks: Array = plan.get("action_blocks", [])
+	if action_blocks.is_empty():
+		return
+
+	var fired := false
+	for block in action_blocks:
+		var modifiers := _block_modifiers(block)
+		for card in block:
+			if card == null or not card.is_attack():
+				continue
+			var effect := _card_effect(card)
+			_apply_module_effects(effect, modifiers)
+			_fire_volley(effect, body_bonus)
+			fired = true
+
+	if not fired:
+		# 全模块施法：法力已经提交，不生成弹体
+		AudioManager.play_sfx(&"shoot", -12.0)
+
+func _block_modifiers(block: Array) -> Dictionary:
+	var modifiers := {
+		"homing": false,
+		"piercing": false,
+		"pierce": 1,
+		"explosive": false,
+		"radius": 0.0,
+		"explosion_damage": 0.0,
+		"damage_bonus": 0.0,
+	}
+
+	for card in block:
+		if card == null or not card.is_module():
+			continue
+		match card.effect_type:
+			ItemDefinition.EffectType.HOMING:
+				modifiers.homing = true
+			ItemDefinition.EffectType.PIERCE:
+				modifiers.piercing = true
+				modifiers.pierce = maxi(int(card.effect_value), 1)
+			ItemDefinition.EffectType.EXPLOSION:
+				modifiers.explosive = true
+				modifiers.radius = card.effect_radius
+				modifiers.explosion_damage += card.effect_value
+			ItemDefinition.EffectType.DAMAGE:
+				modifiers.damage_bonus += card.effect_value
+
+	return modifiers
+
+func _apply_module_effects(effect: Dictionary, modifiers: Dictionary) -> void:
+	effect.damage += modifiers.damage_bonus
+	if modifiers.homing:
+		effect.homing = true
+	if modifiers.piercing:
+		effect.piercing = true
+		effect.pierce = modifiers.pierce
+	if modifiers.explosive:
+		effect.explosive = true
+		effect.radius = modifiers.radius
+		effect.explosion_damage = modifiers.explosion_damage
+
+func apply_overdraft(cost: float) -> bool:
+	if cost <= 0.0:
+		return true
+	if current_hp - cost <= 0.0:
+		return false
+
+	current_hp -= cost
+	GameFlow.hp = current_hp
+	hp_changed.emit(current_hp, max_hp)
+	_grant_invincibility()
+	return true
+
+func _grant_invincibility() -> void:
+	_iframe_generation += 1
+	var generation := _iframe_generation
+	is_invincible = true
+	var tween = create_tween()
+	tween.set_loops(6)
+	tween.tween_property(self, "modulate:a", 0.2, 0.1)
+	tween.tween_property(self, "modulate:a", 1.0, 0.1)
+	await get_tree().create_timer(1.2, false).timeout
+	if generation != _iframe_generation:
+		return
+	modulate.a = 1.0
+	is_invincible = false
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_Q:
@@ -80,6 +217,7 @@ func _shoot_legacy_spell(spell: SpellData) -> void:
 		"count": spell.bullet_count,
 		"spread": spell.spread_angle,
 		"speed": spell.bullet_speed,
+		"damage": 1,
 		"homing": spell.is_homing,
 		"piercing": spell.is_piercing,
 		"pierce": spell.pierce_amount,
@@ -91,30 +229,17 @@ func _shoot_legacy_spell(spell: SpellData) -> void:
 
 func _card_effect(card: ItemDefinition) -> Dictionary:
 	var effect := {
-		"count": 1,
-		"spread": 0.0,
-		"speed": 800.0,
+		"count": card.projectile_count,
+		"spread": card.spread_angle,
+		"speed": card.projectile_speed,
+		"damage": card.base_damage,
 		"homing": false,
 		"piercing": false,
 		"pierce": 1,
 		"explosive": false,
 		"radius": 0.0,
-		"explosion_damage": 0,
+		"explosion_damage": 0.0,
 	}
-
-	match card.id:
-		&"card_spread":
-			effect.count = 3
-			effect.spread = 15.0
-		&"card_homing":
-			effect.homing = true
-		&"card_pierce":
-			effect.piercing = true
-			effect.pierce = 3
-		&"card_boom":
-			effect.explosive = true
-			effect.radius = 100.0
-			effect.explosion_damage = 3
 
 	return effect
 
@@ -123,7 +248,7 @@ func _fire_volley(effect: Dictionary, body_bonus: int) -> void:
 	for i in range(count):
 		var bullet = bullet_scene.instantiate()
 		bullet.speed = effect.speed
-		bullet.damage = 1 + body_bonus
+		bullet.damage = int(effect.damage) + body_bonus
 		bullet.is_homing = effect.homing
 		bullet.is_piercing = effect.piercing
 		bullet.pierce_amount = effect.pierce
@@ -147,9 +272,9 @@ func _fire_volley(effect: Dictionary, body_bonus: int) -> void:
 func _on_hurtbox_area_entered(area):
 	# 敌方子弹：先销毁子弹，再按无敌状态决定是否扣血
 	if area.is_in_group("enemy_bullet"):
-		var dmg: int = 1
+		var dmg: float = 1.0
 		if "damage" in area:
-			dmg = int(area.damage)
+			dmg = float(area.damage)
 		area.queue_free()
 		if not is_invincible:
 			take_damage(dmg)
@@ -157,32 +282,23 @@ func _on_hurtbox_area_entered(area):
 
 	# 撞到敌人本体
 	if area.is_in_group("enemy") and not is_invincible:
-		take_damage()
+		var contact_damage := 1.0
+		if "attack_power" in area:
+			contact_damage = float(area.attack_power)
+		take_damage(contact_damage)
 
 
-func take_damage(amount: int = 1):
+func take_damage(amount: float = 1.0):
 	AudioManager.play_sfx(&"player_hit")
 	current_hp -= amount
 	GameFlow.hp = current_hp
 	hp_changed.emit(current_hp, max_hp)
 
-	if current_hp <= 0:
+	if current_hp <= 0.0:
 		GameFlow.end_run()
 		return
 
-	# 触发无敌闪烁
-	is_invincible = true
-
-	# 闪烁效果（用 Tween 改变透明度）
-	var tween = create_tween()
-	tween.set_loops(6) # 闪烁 6 次
-	tween.tween_property(self, "modulate:a", 0.2, 0.1)
-	tween.tween_property(self, "modulate:a", 1.0, 0.1)
-
-	# 1.2 秒后解除无敌，恢复透明度
-	await get_tree().create_timer(1.2, false).timeout
-	modulate.a = 1.0
-	is_invincible = false
+	_grant_invincibility()
 
 
 func _on_steal_spell(duration: float) -> void:

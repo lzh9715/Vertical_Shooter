@@ -78,7 +78,9 @@ debug/        手动调试场景（BossTest、EventTest、MapDebug、SettingsTes
 ## 调试场景
 
 - `debug/BackpackTest.tscn`：背包拖拽/溢出/垃圾桶体验
+- `debug/SpellTest.tscn`：法术测试场，木桩会按精英落位后的方式上下移动
 - `debug/WandBattleTest.tscn`：法杖卡组自动射击与 Q 切换测试
+- `debug/CastSimTest.tscn`：法力账本、多重施法与透支模拟测试
 - `debug/BossTest.tscn`：Boss 阶段与偷取
 - `debug/EventTest.tscn`：事件选项
 - `debug/MapDebug.tscn`：地图生成压力测试

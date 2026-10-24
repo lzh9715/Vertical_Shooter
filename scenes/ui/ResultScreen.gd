@@ -19,9 +19,9 @@ func _apply(result: Dictionary) -> void:
 	title_label.text = "通关！" if victory else "阵亡"
 	title_label.modulate = Color(1.0, 0.85, 0.35) if victory else Color(1.0, 0.45, 0.45)
 
-	var hp: int = int(result.get("hp", 0))
-	var max_hp: int = int(result.get("max_hp", 0))
-	var hp_text := "%d / %d" % [hp, max_hp] if max_hp > 0 else str(hp)
+	var hp: float = float(result.get("hp", 0.0))
+	var max_hp: float = float(result.get("max_hp", 0.0))
+	var hp_text := "%d / %d" % [ceili(hp), ceili(max_hp)] if max_hp > 0.0 else str(ceili(hp))
 
 	stats_label.text = "得分：%d\n金币：%d\n到达节点：%d\n剩余血量：%s" % [
 		int(result.get("score", 0)),
