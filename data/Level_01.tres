@@ -5,12 +5,6 @@
 [ext_resource type="Script" uid="uid://dsu6mm8yyovve" path="res://scripts/map/LevelConfig.gd" id="2_3mr8q"]
 [ext_resource type="Resource" uid="uid://bat1ik28shbwl" path="res://data/waves/Test_Wave.tres" id="2_bvlip"]
 [ext_resource type="Resource" uid="uid://bqfpgikejj53i" path="res://data/waves/Wave_Elites.tres" id="3_ytolh"]
-[ext_resource type="Script" uid="uid://bs1k2fbrjlf4v" path="res://data/spells/SpellData.gd" id="4_dibk7"]
-[ext_resource type="Resource" uid="uid://462hhv1t3d2u" path="res://data/spells/Spell_Boom.tres" id="5_ytolh"]
-[ext_resource type="Resource" uid="uid://g1galv7uuqfr" path="res://data/spells/Spell_Homing.tres" id="6_cygu7"]
-[ext_resource type="Resource" uid="uid://huekrp52bich" path="res://data/spells/Spell_Pierce.tres" id="7_1fvy8"]
-[ext_resource type="Resource" uid="uid://b1cu2nogbsw5v" path="res://data/spells/Spell_Single.tres" id="8_fjksp"]
-[ext_resource type="Resource" uid="uid://bk5ecnuq8vggg" path="res://data/spells/Spell_Spread.tres" id="9_jjqte"]
 [ext_resource type="Script" uid="uid://v88mbjisl7en" path="res://data/reward/RewardData.gd" id="10_reward"]
 [ext_resource type="Resource" path="res://data/reward/Reward_Gold.tres" id="11_rgold"]
 [ext_resource type="Resource" path="res://data/reward/Reward_MobRush.tres" id="12_rbattle"]
@@ -25,7 +19,6 @@ display_name = "第一关"
 randomize_map = true
 mob_pool = Array[ExtResource("1_c27c6")]([ExtResource("2_bvlip"), ExtResource("2_bvlip"), ExtResource("2_bvlip")])
 elite_pool = Array[ExtResource("1_c27c6")]([ExtResource("3_ytolh")])
-spell_pool = Array[ExtResource("4_dibk7")]([ExtResource("5_ytolh"), ExtResource("6_cygu7"), ExtResource("7_1fvy8"), ExtResource("8_fjksp"), ExtResource("9_jjqte")])
 boss = ExtResource("1_cygu7")
 reward_pool = Array[ExtResource("10_reward")]([ExtResource("11_rgold"), ExtResource("12_rbattle")])
 event_pool = Array[ExtResource("13_event")]([ExtResource("14_elucky"), ExtResource("15_epick"), ExtResource("16_etrade")])

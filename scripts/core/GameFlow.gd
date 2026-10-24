@@ -228,11 +228,6 @@ func _next_ids_of(node_id: int) -> Array[int]:
 		out.append(id)
 	return out
 
-func get_spell_pool() -> Array[SpellData]:
-	if level == null:
-		return []
-	return level.spell_pool
-
 ## 商店定价：level 没配就用一份默认的（20~150，倍率 1.0）
 func get_pricing() -> ShopPricing:
 	if pricing == null:
@@ -320,70 +315,36 @@ func _seed_starter_inventory() -> void:
 	inventory = GridInventory.new()
 	equipment = PlayerEquipment.new()
 
-	var single := _make_def(&"card_single", "单发卡", ItemDefinition.Category.SPELL_CARD, 3, 15)
-	var spread := _make_def(&"card_spread", "散射卡", ItemDefinition.Category.SPELL_CARD, 3, 25)
-	var homing := _make_def(&"card_homing", "追踪卡", ItemDefinition.Category.SPELL_CARD, 3, 40)
-	var pierce := _make_def(&"card_pierce", "穿透卡", ItemDefinition.Category.SPELL_CARD, 3, 35)
-	var boom := _make_def(&"card_boom", "爆裂卡", ItemDefinition.Category.SPELL_CARD, 3, 50)
-
-	var gem_a := _make_def(&"gem_a", "测试宝石 A", ItemDefinition.Category.GEM, 1, 80)
-	gem_a.gem_slots = 3
-	var gem_b := _make_def(&"gem_b", "测试宝石 B", ItemDefinition.Category.GEM, 1, 120)
-	gem_b.gem_slots = 5
-	var gem_c := _make_def(&"gem_c", "测试宝石 C", ItemDefinition.Category.GEM, 1, 160)
-	gem_c.gem_slots = 7
-
-	var body_a := _make_def(&"body_a", "测试杖身 A", ItemDefinition.Category.STAFF_BODY, 1, 90, 3)
-	var body_b := _make_def(&"body_b", "测试杖身 B", ItemDefinition.Category.STAFF_BODY, 1, 120, 5)
-
-	var hat_def := _make_def(&"hat_apprentice", "学徒帽", ItemDefinition.Category.HAT, 1, 80)
-	var robe_def := _make_def(&"robe_apprentice", "学徒袍", ItemDefinition.Category.ROBE, 1, 90)
-	var acc_def := _make_def(&"acc_charm", "拾取护符", ItemDefinition.Category.ACCESSORY, 1, 70)
+	var cards := ItemCatalog.cards()
+	var gems := ItemCatalog.gems()
+	var bodies := ItemCatalog.bodies()
+	var hats := ItemCatalog.hats()
+	var robes := ItemCatalog.robes()
+	var accessories := ItemCatalog.accessories()
 
 	# 法术卡全部先放背包，方便测试装配
-	inventory.add_card(single, 1)
-	inventory.add_card(spread, 1)
-	inventory.add_card(homing, 1)
-	inventory.add_card(pierce, 1)
-	inventory.add_card(boom, 1)
+	for card in cards:
+		inventory.add_card(card, 1)
 
-	# 备用宝石
-	inventory.add(ItemInstance.create(gem_c))
-	inventory.add(ItemInstance.create(hat_def, [_make_affix("法力", &"max_mana", 10, 15)]))
-	inventory.add(ItemInstance.create(robe_def, [_make_affix("生命", &"max_hp", 1, 15)]))
-	inventory.add(ItemInstance.create(acc_def, [_make_affix("拾取", &"pickup_radius", 0.15, 10)]))
+	# 备用宝石 / 装备
+	inventory.add(ItemInstance.create(gems[2]))
+	inventory.add(ItemCatalog.make_instance(hats[0]))
+	inventory.add(ItemCatalog.make_instance(robes[0]))
+	inventory.add(ItemCatalog.make_instance(accessories[0]))
 
 	# 两把已装备法杖：A 宝石/杖身，B 宝石/杖身；卡槽为空，等玩家装配
 	var wand0 := WandInstance.create(
-		ItemInstance.create(body_a),
-		ItemInstance.create(gem_a)
+		ItemInstance.create(bodies[0]),
+		ItemInstance.create(gems[0])
 	)
 	equipment.equip_wand(0, wand0)
 
 	var wand1 := WandInstance.create(
-		ItemInstance.create(body_b),
-		ItemInstance.create(gem_b)
+		ItemInstance.create(bodies[1]),
+		ItemInstance.create(gems[1])
 	)
 	equipment.equip_wand(1, wand1)
 
-	equipment.equip_item(ItemInstance.create(hat_def, [_make_affix("法力", &"max_mana", 10, 15)]))
-	equipment.equip_item(ItemInstance.create(robe_def, [_make_affix("生命", &"max_hp", 1, 15)]))
-	equipment.equip_item(ItemInstance.create(acc_def, [_make_affix("拾取", &"pickup_radius", 0.15, 10)]))
-
-func _make_def(id: StringName, name: String, category: int, stack_limit: int, price: int, damage := 0) -> ItemDefinition:
-	var def := ItemDefinition.new()
-	def.id = id
-	def.display_name = name
-	def.category = category
-	def.stack_limit = stack_limit
-	def.base_price = price
-	def.damage_bonus = damage
-	return def
-
-func _make_affix(name: String, stat: StringName, amount: float, value_bonus: int) -> ItemAffix:
-	var affix := ItemAffix.new()
-	affix.display_name = name
-	affix.stat = stat
-	affix.amount = amount
-	affix.value_bonus = value_bonus
-	return affix
+	equipment.equip_item(ItemCatalog.make_instance(hats[0]))
+	equipment.equip_item(ItemCatalog.make_instance(robes[0]))
+	equipment.equip_item(ItemCatalog.make_instance(accessories[0]))

@@ -10,7 +10,7 @@ class_name EventTrade
 @export var hp_gain := 2
 @export var max_hp_step := 1
 
-const KINDS := ["hp", "max_hp", "gold", "spell"]
+const KINDS := ["hp", "max_hp", "gold"]
 
 func build_options() -> Array[EventOption]:
 	var opts: Array[EventOption] = []
@@ -56,9 +56,6 @@ func _make_option(lose_kind: String, gain_kind: String) -> EventOption:
 			var amount := _gold_amount()
 			opt.cost_gold = amount
 			lose_text = "失去 %d 金币" % amount
-		"spell":
-			opt.cost_spell = true
-			lose_text = "失去当前法杖"
 
 	var gain_text := ""
 	match gain_kind:
@@ -72,12 +69,6 @@ func _make_option(lose_kind: String, gain_kind: String) -> EventOption:
 			var amount := _gold_amount()
 			outcome.gold = amount
 			gain_text = "获得 %d 金币" % amount
-		"spell":
-			var pool := GameFlow.get_spell_pool()
-			if pool.is_empty():
-				return null
-			outcome.grant_spell = pool[randi_range(0, pool.size() - 1)]
-			gain_text = "获得一把法杖"
 
 	opt.label = "%s → %s" % [lose_text, gain_text]
 	outcome.text = "交易完成：%s，%s。" % [lose_text, gain_text]

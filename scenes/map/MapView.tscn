@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://cqnwls7pimmd6" path="res://scenes/map/MapView.gd" id="1_xnhjo"]
 [ext_resource type="PackedScene" path="res://scenes/ui/PauseMenu.tscn" id="2_pause"]
 [ext_resource type="PackedScene" path="res://scenes/backpack/BackpackView.tscn" id="3_backpack"]
+[ext_resource type="PackedScene" path="res://scenes/ui/ConfirmDialog.tscn" id="4_confirm"]
 
 [node name="MapView" type="Control" unique_id=1886520298]
 layout_mode = 3
@@ -52,3 +53,8 @@ theme_override_font_sizes/font_size = 34
 text = "背包 [B]"
 
 [node name="BackpackView" parent="." instance=ExtResource("3_backpack")]
+
+[node name="OverflowLayer" type="CanvasLayer" parent="."]
+layer = 100
+
+[node name="OverflowDialog" parent="OverflowLayer" instance=ExtResource("4_confirm")]

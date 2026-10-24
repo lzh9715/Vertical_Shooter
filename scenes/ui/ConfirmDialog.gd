@@ -5,6 +5,7 @@ extends Control
 
 signal confirmed
 signal cancelled
+signal dismissed
 
 @onready var message_label: Label = $Center/Panel/Margin/VBox/Message
 @onready var btn_yes: Button = $Center/Panel/Margin/VBox/Buttons/BtnYes
@@ -18,7 +19,21 @@ func _ready() -> void:
 func ask(text: String) -> void:
 	message_label.text = text
 	visible = true
-	btn_no.grab_focus()
+	if btn_no.visible:
+		btn_no.grab_focus()
+	else:
+		btn_yes.grab_focus()
+
+func ask_single(text: String, yes_text: String) -> void:
+	btn_yes.text = yes_text
+	btn_no.visible = false
+	ask(text)
+
+func ask_choice(text: String, yes_text: String, no_text: String) -> void:
+	btn_yes.text = yes_text
+	btn_no.text = no_text
+	btn_no.visible = true
+	ask(text)
 
 func _on_yes() -> void:
 	visible = false
@@ -32,5 +47,6 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not visible:
 		return
 	if event.is_action_pressed("ui_cancel"):
-		_on_no()
+		visible = false
+		dismissed.emit()
 		get_viewport().set_input_as_handled()

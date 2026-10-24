@@ -23,7 +23,6 @@ class_name LevelConfig
 @export var elite_pool: Array[WaveData] = []
 
 @export_group("商店")
-@export var spell_pool: Array[SpellData] = []
 @export var pricing: ShopPricing          # 留空则使用默认定价（20~150，倍率 1）
 
 @export_group("Boss")

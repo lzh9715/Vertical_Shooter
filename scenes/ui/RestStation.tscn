@@ -6,66 +6,79 @@
 visible = false
 script = ExtResource("1_vsh66")
 
-[node name="ColorRect" type="ColorRect" parent="." unique_id=479998277]
+[node name="ColorRect" type="ColorRect" parent="."]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0, 0, 0, 0.9372549)
+color = Color(0.08, 0.07, 0.11, 0.96)
 
-[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1302344467]
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -20.0
-offset_top = -20.0
-offset_right = 20.0
-offset_bottom = 20.0
+[node name="Center" type="CenterContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="ShopGoldLabel" type="Label" parent="VBoxContainer" unique_id=206450064]
+[node name="Panel" type="PanelContainer" parent="Center"]
+custom_minimum_size = Vector2(2000, 980)
 layout_mode = 2
-theme_override_font_sizes/font_size = 30
-text = "当前金币：0"
 
-[node name="Label" type="Label" parent="VBoxContainer" unique_id=796383117]
+[node name="Margin" type="MarginContainer" parent="Center/Panel"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 80
-text = "魔法休息站"
+theme_override_constants/margin_left = 32
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 32
+theme_override_constants/margin_bottom = 24
 
-[node name="Btn_Slot1" type="Button" parent="VBoxContainer" unique_id=1964535912]
+[node name="VBox" type="VBoxContainer" parent="Center/Panel/Margin"]
 layout_mode = 2
-text = "单发（免费）"
+theme_override_constants/separation = 14
 
-[node name="Btn_Slot2" type="Button" parent="VBoxContainer" unique_id=1988629727]
+[node name="Header" type="HBoxContainer" parent="Center/Panel/Margin/VBox"]
 layout_mode = 2
-text = "散射（50金币）"
+theme_override_constants/separation = 24
 
-[node name="Btn_Slot3" type="Button" parent="VBoxContainer" unique_id=874237222]
+[node name="Title" type="Label" parent="Center/Panel/Margin/VBox/Header"]
 layout_mode = 2
-text = "追踪（100金币）"
+theme_override_font_sizes/font_size = 56
+text = "魔法商店"
 
-[node name="Btn_Refresh" type="Button" parent="VBoxContainer" unique_id=143995037]
+[node name="Spacer" type="Control" parent="Center/Panel/Margin/VBox/Header"]
 layout_mode = 2
-text = "刷新"
+size_flags_horizontal = 3
 
-[node name="Btn_Resume" type="Button" parent="VBoxContainer" unique_id=15566333]
+[node name="Gold" type="Label" parent="Center/Panel/Margin/VBox/Header"]
 layout_mode = 2
-text = "继续战斗 (ESC)"
+theme_override_font_sizes/font_size = 32
+text = "金币：0"
 
-[node name="DescLabel" type="Label" parent="." unique_id=1820086823]
-custom_minimum_size = Vector2(400, 60)
-offset_left = 160.0
-offset_top = 1000.0
-offset_right = 560.0
-offset_bottom = 1100.0
-size_flags_horizontal = 4
-theme_override_font_sizes/font_size = 15
-text = "将鼠标悬停在法杖上查看说明"
-horizontal_alignment = 1
+[node name="BtnLeave" type="Button" parent="Center/Panel/Margin/VBox/Header"]
+custom_minimum_size = Vector2(220, 60)
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+text = "离开商店"
+
+[node name="Rows" type="VBoxContainer" parent="Center/Panel/Margin/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+
+[node name="Footer" type="HBoxContainer" parent="Center/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="DescLabel" type="Label" parent="Center/Panel/Margin/VBox/Footer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 20
+text = "将鼠标悬停在商品上查看词条说明"
 vertical_alignment = 1
 autowrap_mode = 2
+
+[node name="BtnSell" type="Button" parent="Center/Panel/Margin/VBox/Footer"]
+custom_minimum_size = Vector2(220, 48)
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "出售物品"

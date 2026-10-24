@@ -34,12 +34,19 @@ const TYPE_COLOR := {
 @onready var tooltip_label: Label = $Tooltip/Label
 @onready var backpack: CanvasLayer = $BackpackView
 @onready var btn_backpack: Button = $UiLayer/BtnBackpack
+@onready var overflow_dialog: Control = $OverflowLayer/OverflowDialog
+
+var _overflow_warned := false
+var _overflow_stage := 0
+var _pending_node: MapNodeData
 
 func _ready() -> void:
 	get_tree().paused = false
 	AudioManager.play_music(&"map")
 	tooltip_label.add_theme_font_size_override("font_size", 32)
 	btn_backpack.pressed.connect(backpack.open)
+	overflow_dialog.confirmed.connect(_on_overflow_confirmed)
+	overflow_dialog.cancelled.connect(_on_overflow_cancelled)
 	if GameFlow.map == null:
 		var level: LevelConfig = load(LEVEL_PATH)
 		GameFlow.start_run(level)
@@ -165,7 +172,50 @@ func _screen_pos(n: MapNodeData) -> Vector2:
 	return MARGIN + Vector2(n.position.x, n.position.y) * usable
 
 func _on_node_pressed(n: MapNodeData) -> void:
-	GameFlow.enter_node(n)
+	var inventory := GameFlow.get_inventory()
+	if not inventory.has_overflow():
+		_overflow_warned = false
+		_overflow_stage = 0
+		_pending_node = null
+		GameFlow.enter_node(n)
+		return
+
+	_pending_node = n
+
+	if not _overflow_warned:
+		_overflow_warned = true
+		_overflow_stage = 1
+		overflow_dialog.ask_single(
+			"背包有溢出物品\n进入节点会丢失\n请先整理背包",
+			"整理背包"
+		)
+	else:
+		_overflow_stage = 2
+		overflow_dialog.ask_choice(
+			"背包仍有溢出物品\n进入节点会丢弃这些物品",
+			"整理背包",
+			"仍要进入（丢弃）"
+		)
+
+func _on_overflow_confirmed() -> void:
+	if _overflow_stage == 0:
+		return
+	overflow_dialog.visible = false
+	backpack.open()
+
+func _on_overflow_cancelled() -> void:
+	if _overflow_stage != 2:
+		return
+	if _pending_node == null:
+		return
+
+	overflow_dialog.visible = false
+	var node := _pending_node
+	_pending_node = null
+	_overflow_warned = false
+	_overflow_stage = 0
+	GameFlow.get_inventory().clear_overflow()
+	GameFlow.enter_node(node)
 
 func _show_tooltip(n: MapNodeData) -> void:
 	tooltip_label.text = "%s\n%s" % [n.display_name, _type_desc(n.type)]

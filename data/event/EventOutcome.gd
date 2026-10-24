@@ -10,7 +10,6 @@ class_name EventOutcome
 @export var hp := 0              # 正数回复，负数扣血
 @export var max_hp := 0          # 正数提升上限，负数降低
 @export var score := 0
-@export var grant_spell: SpellData
 
 @export_group("持续效果（本局）")
 @export var reward_modifier_source: StringName = &""
@@ -30,9 +29,6 @@ func apply() -> void:
 		GameFlow.change_max_hp(max_hp)
 	if score != 0:
 		GameFlow.add_score(score)
-
-	if grant_spell != null:
-		GameFlow.spell = grant_spell
 
 	if reward_multiplier != 1.0 and reward_modifier_source != &"":
 		GameFlow.add_reward_modifier(reward_modifier_source, reward_multiplier)
