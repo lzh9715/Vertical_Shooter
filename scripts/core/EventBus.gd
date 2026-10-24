@@ -9,5 +9,8 @@ signal steal_spell_requested(duration: float)
 signal spell_stolen(spell: SpellData)
 signal spell_returned(spell: SpellData)
 
+## 战斗中切换激活法杖
+signal wand_switched(index: int)
+
 ## Boss 死亡/战斗结束时，强制取消偷取
 signal steal_cancelled

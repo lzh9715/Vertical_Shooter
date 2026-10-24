@@ -8,6 +8,8 @@ var instance_id := 0
 var body: ItemInstance
 var gem: ItemInstance
 var cards: Array[ItemDefinition] = []
+## 每次施法消耗一张，按数组顺序循环
+var cast_index := 0
 
 static var _next_id := 0
 
@@ -59,6 +61,15 @@ func remove_card(index: int) -> ItemDefinition:
 	if index < 0 or index >= cards.size():
 		return null
 	return cards.pop_at(index)
+
+func next_card() -> ItemDefinition:
+	if cards.is_empty():
+		cast_index = 0
+		return null
+	cast_index = clampi(cast_index, 0, cards.size() - 1)
+	var card := cards[cast_index]
+	cast_index = (cast_index + 1) % cards.size()
+	return card
 
 ## 卸下宝石：宝石回背包，卡牌按规则回背包/溢出。
 ## 返回 { ok, reason, cards, overflowed }

@@ -1,0 +1,6 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://debug/WandBattleTest.gd" id="1_wb"]
+
+[node name="WandBattleTest" type="Node"]
+script = ExtResource("1_wb")

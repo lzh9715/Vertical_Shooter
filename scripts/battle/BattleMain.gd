@@ -11,6 +11,7 @@ var _event_timer_label: Label
 @onready var score_label: Label = $CanvasLayer/Label
 @onready var gold_label: Label = $CanvasLayer/GoldLabel
 @onready var hp_label: Label = $CanvasLayer/HpLabel
+@onready var wand_label: Label = $CanvasLayer/WandLabel
 @onready var camera: Camera2D = $Camera2D
 @onready var player_node: Node2D = $player
 
@@ -19,8 +20,10 @@ func _ready() -> void:
 	AudioManager.play_music(&"battle")
 
 	GameFlow.stats_changed.connect(_refresh_hud)
+	EventBus.wand_switched.connect(_on_wand_switched)
 	_refresh_hud()
 	update_hp_ui(GameFlow.hp, GameFlow.max_hp)
+	_on_wand_switched(GameFlow.get_equipment().active_wand_index)
 
 	var player := get_node_or_null("player")
 	if player != null and player.has_signal("hp_changed"):
@@ -76,6 +79,9 @@ func _on_boss_died() -> void:
 func _refresh_hud() -> void:
 	score_label.text = "分数：%d" % GameFlow.score
 	gold_label.text = "金币：%d" % GameFlow.gold
+
+func _on_wand_switched(index: int) -> void:
+	wand_label.text = "法杖 %d/2  [Q]" % [index + 1]
 
 func _on_enemy_died(score_gain: int, gold_gain: int) -> void:
 	var reward := GameFlow.current_reward as RewardBattle

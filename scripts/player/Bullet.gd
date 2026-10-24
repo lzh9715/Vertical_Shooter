@@ -1,6 +1,7 @@
 extends Area2D
 
 @export var speed := 800.0
+@export var damage := 1
 @export var is_homing := false
 @export var turn_speed := 5.0
 
@@ -77,7 +78,7 @@ func _on_area_entered(area):
 
 		# ← 原来这里是 area.queue_free()
 		if area.has_method("take_damage"):
-			area.take_damage(1)
+			area.take_damage(damage)
 
 		if is_piercing and pierced_enemies.size() < pierce_amount:
 			pass

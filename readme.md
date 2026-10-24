@@ -60,6 +60,7 @@ debug/        手动调试场景（BossTest、EventTest、MapDebug、SettingsTes
 - 地图打开背包：B 或右上角「背包」按钮
 - 战斗中不能打开背包
 - 背包右侧：点击法杖 1/2 切换编辑对象，点「编辑法术」打开法术卡装配面板
+- 战斗中按 Q 切换已装备的两把法杖
 
 ## 当前内容
 
@@ -74,6 +75,7 @@ debug/        手动调试场景（BossTest、EventTest、MapDebug、SettingsTes
 ## 调试场景
 
 - `debug/BackpackTest.tscn`：背包拖拽/溢出/垃圾桶体验
+- `debug/WandBattleTest.tscn`：法杖卡组自动射击与 Q 切换测试
 - `debug/BossTest.tscn`：Boss 阶段与偷取
 - `debug/EventTest.tscn`：事件选项
 - `debug/MapDebug.tscn`：地图生成压力测试

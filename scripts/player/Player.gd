@@ -29,6 +29,7 @@ func _ready():
 
 	EventBus.steal_spell_requested.connect(_on_steal_spell)
 	EventBus.steal_cancelled.connect(_return_stolen_spell)
+	EventBus.wand_switched.emit(GameFlow.get_equipment().active_wand_index)
 
 
 func _physics_process(delta):
@@ -42,41 +43,102 @@ func _physics_process(delta):
 	position.x = clamp(position.x, 40, world.x - 40)
 	position.y = clamp(position.y, 40, world.y - 40)
 
-# 当计时器倒计时结束时，自动调用这个函数
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_Q:
+		var eq := GameFlow.get_equipment()
+		var next_index := 1 - eq.active_wand_index
+		if eq.switch_wand(next_index):
+			EventBus.wand_switched.emit(next_index)
+			get_viewport().set_input_as_handled()
 
+# 当计时器倒计时结束时，自动调用这个函数
 func _on_shoot_timer_timeout():
-	# 如果没装备法杖或者子弹场景没拖，就退出
+	var wand := GameFlow.get_equipment().active_wand()
+	if wand != null:
+		_shoot_wand(wand)
+		return
+
+	# 没有装配法杖时，保留旧 SpellData 作为过渡
 	if current_spell == null or bullet_scene == null:
 		return
-	
-	# 核心逻辑：根据当前法杖的 bullet_count，循环生成子弹
-	for i in range(current_spell.bullet_count):
-		var bullet = bullet_scene.instantiate()
-		
-		# 把法杖的速度赋给子弹（需要子弹脚本里也有 speed 变量，你之前写过）
-		bullet.speed = current_spell.bullet_speed 
+	_shoot_legacy_spell(current_spell)
 
-		# 【新增这行】把法杖里的追踪开关赋给子弹
-		bullet.is_homing = current_spell.is_homing
-		# 在 bullet.is_homing = current_spell.is_homing 下面加上这几行：
-		bullet.is_piercing = current_spell.is_piercing
-		bullet.pierce_amount = current_spell.pierce_amount
-		bullet.is_explosive = current_spell.is_explosive
-		bullet.explosion_radius = current_spell.explosion_radius 
-		bullet.explosion_damage = current_spell.explosion_damage
-		
+func _shoot_wand(wand: WandInstance) -> void:
+	if wand.body == null or wand.cards.is_empty() or bullet_scene == null:
+		return
+
+	var card := wand.next_card()
+	if card == null:
+		return
+
+	var effect := _card_effect(card)
+	var body_bonus: int = wand.body.definition.damage_bonus
+	_fire_volley(effect, body_bonus)
+
+func _shoot_legacy_spell(spell: SpellData) -> void:
+	var effect := {
+		"count": spell.bullet_count,
+		"spread": spell.spread_angle,
+		"speed": spell.bullet_speed,
+		"homing": spell.is_homing,
+		"piercing": spell.is_piercing,
+		"pierce": spell.pierce_amount,
+		"explosive": spell.is_explosive,
+		"radius": spell.explosion_radius,
+		"explosion_damage": spell.explosion_damage,
+	}
+	_fire_volley(effect, 0)
+
+func _card_effect(card: ItemDefinition) -> Dictionary:
+	var effect := {
+		"count": 1,
+		"spread": 0.0,
+		"speed": 800.0,
+		"homing": false,
+		"piercing": false,
+		"pierce": 1,
+		"explosive": false,
+		"radius": 0.0,
+		"explosion_damage": 0,
+	}
+
+	match card.id:
+		&"card_spread":
+			effect.count = 3
+			effect.spread = 15.0
+		&"card_homing":
+			effect.homing = true
+		&"card_pierce":
+			effect.piercing = true
+			effect.pierce = 3
+		&"card_boom":
+			effect.explosive = true
+			effect.radius = 100.0
+			effect.explosion_damage = 3
+
+	return effect
+
+func _fire_volley(effect: Dictionary, body_bonus: int) -> void:
+	var count: int = effect.count
+	for i in range(count):
+		var bullet = bullet_scene.instantiate()
+		bullet.speed = effect.speed
+		bullet.damage = 1 + body_bonus
+		bullet.is_homing = effect.homing
+		bullet.is_piercing = effect.piercing
+		bullet.pierce_amount = effect.pierce
+		bullet.is_explosive = effect.explosive
+		bullet.explosion_radius = effect.radius
+		bullet.explosion_damage = int(effect.explosion_damage) + body_bonus
+
 		get_parent().add_child(bullet)
 		bullet.global_position = global_position + Vector2(40, 0)
-		
-		# 处理散射角度
-		# 计算角度偏移，让它是以正上方为中心扇形散开
-		var angle_offset = 0.0
-		if current_spell.bullet_count > 1:
-			# 比如3发，角度偏移就是 -15, 0, 15
-			var total_spread = current_spell.spread_angle * (current_spell.bullet_count - 1)
-			angle_offset = deg_to_rad(-total_spread / 2.0 + current_spell.spread_angle * i)
-		
-		# 让子弹旋转
+
+		var angle_offset := 0.0
+		if count > 1:
+			var total_spread: float = effect.spread * (count - 1)
+			angle_offset = deg_to_rad(-total_spread / 2.0 + effect.spread * i)
+
 		bullet.rotation = angle_offset
 
 	AudioManager.play_sfx(&"shoot", -6.0)
