@@ -27,6 +27,8 @@ var score := 0
 var hp := 3
 var max_hp := 3
 var spell: SpellData
+var inventory: GridInventory
+var equipment: PlayerEquipment
 var pricing: ShopPricing
 var last_result: Dictionary = {}       # 结算界面读取的上一局数据
 var current_reward: RewardData         # 当前奖励关
@@ -58,6 +60,7 @@ func start_run(config: LevelConfig, seed_value: int = 0) -> void:
 	_used_events.clear()
 	_reward_modifiers.clear()
 	reset_stats()
+	_seed_starter_inventory()
 	run_started.emit()
 
 ## 点击地图节点
@@ -153,6 +156,8 @@ func reset_run() -> void:
 	event_context.clear()
 	_used_events.clear()
 	_reward_modifiers.clear()
+	inventory = null
+	equipment = null
 	cleared.clear()
 	frontier.clear()
 
@@ -297,3 +302,87 @@ func _pick_event() -> EventData:
 	var picked := candidates[rng.randi_range(0, candidates.size() - 1)]
 	_used_events.append(picked.resource_path)
 	return picked
+
+# ---------- 背包 / 装备 ----------
+
+func get_inventory() -> GridInventory:
+	if inventory == null:
+		inventory = GridInventory.new()
+	return inventory
+
+func get_equipment() -> PlayerEquipment:
+	if equipment == null:
+		equipment = PlayerEquipment.new()
+	return equipment
+
+## 临时起始物资：接入掉落/商店后删除
+func _seed_starter_inventory() -> void:
+	inventory = GridInventory.new()
+	equipment = PlayerEquipment.new()
+
+	var bolt := _make_def(&"card_bolt", "魔弹卡", ItemDefinition.Category.SPELL_CARD, 3, 15)
+	var heavy := _make_def(&"card_heavy", "重弹卡", ItemDefinition.Category.SPELL_CARD, 3, 30)
+	var spread := _make_def(&"card_spread", "散射卡", ItemDefinition.Category.SPELL_CARD, 3, 25)
+	var pierce := _make_def(&"card_pierce", "穿透卡", ItemDefinition.Category.SPELL_CARD, 3, 35)
+	var homing := _make_def(&"card_homing", "追踪卡", ItemDefinition.Category.SPELL_CARD, 3, 40)
+	var boom := _make_def(&"card_boom", "爆裂卡", ItemDefinition.Category.SPELL_CARD, 3, 50)
+
+	var gem_def := _make_def(&"gem_apprentice", "学徒宝石", ItemDefinition.Category.GEM, 1, 120)
+	gem_def.gem_slots = 4
+	var body_def := _make_def(&"body_apprentice", "学徒杖身", ItemDefinition.Category.STAFF_BODY, 1, 100)
+	var hat_def := _make_def(&"hat_apprentice", "学徒帽", ItemDefinition.Category.HAT, 1, 80)
+	var robe_def := _make_def(&"robe_apprentice", "学徒袍", ItemDefinition.Category.ROBE, 1, 90)
+	var acc_def := _make_def(&"acc_charm", "拾取护符", ItemDefinition.Category.ACCESSORY, 1, 70)
+
+	# 背包里先放一些卡和备用装备
+	inventory.add_card(bolt, 3)
+	inventory.add_card(heavy, 2)
+	inventory.add_card(spread, 1)
+	inventory.add_card(pierce, 1)
+	inventory.add_card(homing, 2)
+	inventory.add_card(boom, 1)
+	inventory.add(ItemInstance.create(gem_def, [_make_affix("增幅", &"spell_power", 0.08, 20)]))
+	inventory.add(ItemInstance.create(body_def, [_make_affix("迅捷", &"cast_speed", 0.1, 15)]))
+	inventory.add(ItemInstance.create(hat_def, [_make_affix("法力", &"max_mana", 10, 15)]))
+	inventory.add(ItemInstance.create(robe_def, [_make_affix("生命", &"max_hp", 1, 15)]))
+	inventory.add(ItemInstance.create(acc_def, [_make_affix("拾取", &"pickup_radius", 0.15, 10)]))
+
+	# 两把已装备法杖
+	var wand0 := WandInstance.create(
+		ItemInstance.create(body_def),
+		ItemInstance.create(gem_def)
+	)
+	wand0.add_card(bolt)
+	wand0.add_card(bolt)
+	wand0.add_card(spread)
+	wand0.add_card(pierce)
+	equipment.equip_wand(0, wand0)
+
+	var wand1 := WandInstance.create(
+		ItemInstance.create(body_def),
+		ItemInstance.create(gem_def)
+	)
+	wand1.add_card(heavy)
+	wand1.add_card(homing)
+	equipment.equip_wand(1, wand1)
+
+	equipment.equip_item(ItemInstance.create(hat_def, [_make_affix("法力", &"max_mana", 10, 15)]))
+	equipment.equip_item(ItemInstance.create(robe_def, [_make_affix("生命", &"max_hp", 1, 15)]))
+	equipment.equip_item(ItemInstance.create(acc_def, [_make_affix("拾取", &"pickup_radius", 0.15, 10)]))
+
+func _make_def(id: StringName, name: String, category: int, stack_limit: int, price: int) -> ItemDefinition:
+	var def := ItemDefinition.new()
+	def.id = id
+	def.display_name = name
+	def.category = category
+	def.stack_limit = stack_limit
+	def.base_price = price
+	return def
+
+func _make_affix(name: String, stat: StringName, amount: float, value_bonus: int) -> ItemAffix:
+	var affix := ItemAffix.new()
+	affix.display_name = name
+	affix.stat = stat
+	affix.amount = amount
+	affix.value_bonus = value_bonus
+	return affix

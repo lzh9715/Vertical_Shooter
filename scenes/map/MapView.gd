@@ -32,16 +32,27 @@ const TYPE_COLOR := {
 
 @onready var tooltip: Panel = $Tooltip
 @onready var tooltip_label: Label = $Tooltip/Label
+@onready var backpack: CanvasLayer = $BackpackView
+@onready var btn_backpack: Button = $UiLayer/BtnBackpack
 
 func _ready() -> void:
 	get_tree().paused = false
 	AudioManager.play_music(&"map")
 	tooltip_label.add_theme_font_size_override("font_size", 32)
+	btn_backpack.pressed.connect(backpack.open)
 	if GameFlow.map == null:
 		var level: LevelConfig = load(LEVEL_PATH)
 		GameFlow.start_run(level)
 	_build()
 	resized.connect(_relayout)
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_B:
+		if backpack.visible:
+			backpack.close()
+		else:
+			backpack.open()
+		get_viewport().set_input_as_handled()
 
 func _build() -> void:
 	for child in get_children():

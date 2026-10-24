@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://cqnwls7pimmd6" path="res://scenes/map/MapView.gd" id="1_xnhjo"]
 [ext_resource type="PackedScene" path="res://scenes/ui/PauseMenu.tscn" id="2_pause"]
+[ext_resource type="PackedScene" path="res://scenes/backpack/BackpackView.tscn" id="3_backpack"]
 
 [node name="MapView" type="Control" unique_id=1886520298]
 layout_mode = 3
@@ -38,3 +39,16 @@ text = "测试
 "
 
 [node name="PauseMenu" parent="." instance=ExtResource("2_pause")]
+
+[node name="UiLayer" type="CanvasLayer" parent="."]
+layer = 20
+
+[node name="BtnBackpack" type="Button" parent="UiLayer"]
+offset_left = 2120.0
+offset_top = 40.0
+offset_right = 2480.0
+offset_bottom = 120.0
+theme_override_font_sizes/font_size = 34
+text = "背包 [B]"
+
+[node name="BackpackView" parent="." instance=ExtResource("3_backpack")]

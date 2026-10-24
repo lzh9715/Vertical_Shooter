@@ -1,0 +1,125 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/backpack/BackpackView.gd" id="1_backpack"]
+
+[node name="BackpackView" type="CanvasLayer"]
+process_mode = 3
+layer = 80
+visible = false
+script = ExtResource("1_backpack")
+
+[node name="Dim" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.78)
+
+[node name="Center" type="CenterContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="Center"]
+custom_minimum_size = Vector2(1900, 0)
+layout_mode = 2
+
+[node name="Margin" type="MarginContainer" parent="Center/Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 40
+theme_override_constants/margin_top = 32
+theme_override_constants/margin_right = 40
+theme_override_constants/margin_bottom = 32
+
+[node name="VBox" type="VBoxContainer" parent="Center/Panel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="Header" type="HBoxContainer" parent="Center/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="Title" type="Label" parent="Center/Panel/Margin/VBox/Header"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 56
+text = "背包"
+
+[node name="Spacer" type="Control" parent="Center/Panel/Margin/VBox/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Gold" type="Label" parent="Center/Panel/Margin/VBox/Header"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "金币：0"
+
+[node name="BtnClose" type="Button" parent="Center/Panel/Margin/VBox/Header"]
+custom_minimum_size = Vector2(140, 60)
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "关闭"
+
+[node name="Content" type="HBoxContainer" parent="Center/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 30
+
+[node name="GridBox" type="VBoxContainer" parent="Center/Panel/Margin/VBox/Content"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="GridTitle" type="Label" parent="Center/Panel/Margin/VBox/Content/GridBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "物品"
+
+[node name="Grid" type="GridContainer" parent="Center/Panel/Margin/VBox/Content/GridBox"]
+layout_mode = 2
+columns = 10
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 8
+
+[node name="Side" type="VBoxContainer" parent="Center/Panel/Margin/VBox/Content"]
+custom_minimum_size = Vector2(520, 0)
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="EquipTitle" type="Label" parent="Center/Panel/Margin/VBox/Content/Side"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "装备"
+
+[node name="EquipSlots" type="VBoxContainer" parent="Center/Panel/Margin/VBox/Content/Side"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="OverflowBox" type="HBoxContainer" parent="Center/Panel/Margin/VBox"]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="OverflowTitle" type="Label" parent="Center/Panel/Margin/VBox/OverflowBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "溢出"
+
+[node name="OverflowSlots" type="HBoxContainer" parent="Center/Panel/Margin/VBox/OverflowBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Footer" type="HBoxContainer" parent="Center/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="TrashSlot" type="Panel" parent="Center/Panel/Margin/VBox/Footer"]
+custom_minimum_size = Vector2(110, 110)
+layout_mode = 2
+
+[node name="Hint" type="Label" parent="Center/Panel/Margin/VBox/Footer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 24
+text = "左键拖整组，右键拖单个；拖到垃圾桶丢弃"
+vertical_alignment = 1

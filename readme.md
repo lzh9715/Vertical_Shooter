@@ -18,6 +18,7 @@ scenes/
   player/     玩家 / 玩家子弹
   map/        横版地图
   shop/       商店
+  backpack/   网格背包
   ui/         主菜单、暂停、设置、事件、奖励、结算等
 
 scripts/
@@ -29,8 +30,10 @@ scripts/
   map/        地图数据与生成器
   shop/       商店逻辑
   spawn/      出怪基类与 Spawner
+  inventory/  背包、法杖、装备数据模型
 
 data/
+  items/            物品定义与词条
   core/             敌人/波次/难度/定价等基础资源类
   enemies/          敌人数据
   waves/            波次与测试波次
@@ -54,18 +57,21 @@ debug/        手动调试场景（BossTest、EventTest、MapDebug、SettingsTes
 - 移动：WASD / 方向键
 - 射击：自动向右
 - 暂停：Esc
-- 鼠标跟随已移除
+- 地图打开背包：B 或右上角「背包」按钮
+- 战斗中不能打开背包
 
 ## 当前内容
 
 - 横版固定宽度 2560，世界高度 2160（摄像机上下跟随）
 - 小怪 / 精英 / Boss 框架
 - 奖励关、事件节点、商店、结算
+- 10×6 网格背包、拖拽、溢出格、垃圾桶、装备槽
 - 设置：窗口大小、全屏、垂直同步、音量
 - 场景淡入淡出、伤害数字、音频调用点
 
 ## 调试场景
 
+- `debug/BackpackTest.tscn`：背包拖拽/溢出/垃圾桶体验
 - `debug/BossTest.tscn`：Boss 阶段与偷取
 - `debug/EventTest.tscn`：事件选项
 - `debug/MapDebug.tscn`：地图生成压力测试
