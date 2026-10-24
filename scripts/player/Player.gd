@@ -16,6 +16,7 @@ var _steal_left := 0.0
 var _wand_runtimes: Dictionary = {}
 var _legacy_cooldown := 0.0
 var _iframe_generation := 0
+var _stats: EquipmentStats = EquipmentStats.new()
 
 @onready var shoot_timer: Timer = $ShootTimer
 @onready var hurtbox: Area2D = $Hurtbox
@@ -28,16 +29,34 @@ func _ready():
 
 	hurtbox.area_entered.connect(_on_hurtbox_area_entered)
 	shoot_timer.stop()
+	EventBus.loadout_changed.connect(_rebuild_stats)
+	_rebuild_stats()
 	hp_changed.emit(current_hp, max_hp)
 
 	EventBus.steal_spell_requested.connect(_on_steal_spell)
 	EventBus.steal_cancelled.connect(_return_stolen_spell)
 	EventBus.wand_switched.emit(GameFlow.get_equipment().active_wand_index)
 
+func _rebuild_stats() -> void:
+	_stats = EquipmentStats.compute(GameFlow.get_equipment())
+
+	max_hp = _stats.max_hp()
+	current_hp = minf(current_hp, max_hp)
+	GameFlow.max_hp = max_hp
+	GameFlow.hp = current_hp
+
+	GameFlow.max_mana = _stats.max_mana()
+	GameFlow.mana = minf(GameFlow.mana, GameFlow.max_mana)
+	GameFlow.mana_regen = _stats.mana_regen()
+	speed = _stats.move_speed()
+
+	hp_changed.emit(current_hp, max_hp)
+
 
 func _physics_process(delta):
 	_tick_steal(delta)
 	_regen_mana(delta)
+	_regen_hp(delta)
 	_tick_cast(delta)
 
 	var direction := Input.get_vector("move_left", "move_right", "move_up", "move_down")
@@ -51,6 +70,13 @@ func _physics_process(delta):
 func _regen_mana(delta: float) -> void:
 	if GameFlow.mana < GameFlow.max_mana:
 		GameFlow.mana = minf(GameFlow.max_mana, GameFlow.mana + GameFlow.mana_regen * delta)
+
+func _regen_hp(delta: float) -> void:
+	if current_hp >= max_hp:
+		return
+	current_hp = minf(max_hp, current_hp + _stats.hp_regen() * delta)
+	GameFlow.hp = current_hp
+	hp_changed.emit(current_hp, max_hp)
 
 func _tick_cast(delta: float) -> void:
 	var wand := GameFlow.get_equipment().active_wand()
@@ -73,6 +99,7 @@ func _tick_cast(delta: float) -> void:
 		if not apply_overdraft(plan.hp_cost):
 			return
 
+	plan.interval = maxf(0.0, plan.interval * _stats.cast_speed_multiplier())
 	runtime.commit(plan)
 	_fire_plan(plan)
 
@@ -245,16 +272,28 @@ func _card_effect(card: ItemDefinition) -> Dictionary:
 
 func _fire_volley(effect: Dictionary, body_bonus: int) -> void:
 	var count: int = effect.count
+	var base_damage: float = (
+		float(effect.damage) + float(body_bonus) + _stats.damage_flat
+	) * (1.0 + _stats.damage_pct)
+
 	for i in range(count):
 		var bullet = bullet_scene.instantiate()
 		bullet.speed = effect.speed
-		bullet.damage = int(effect.damage) + body_bonus
+
+		var crit := randf() < _stats.crit_chance()
+		var final_damage := base_damage * (_stats.crit_damage() if crit else 1.0)
+		bullet.damage = maxi(1, roundi(final_damage))
+
+		var explosion_base: float = (
+			float(effect.explosion_damage) + float(body_bonus) + _stats.damage_flat
+		) * (1.0 + _stats.damage_pct)
+		bullet.explosion_damage = maxi(0, roundi(explosion_base))
+
 		bullet.is_homing = effect.homing
 		bullet.is_piercing = effect.piercing
 		bullet.pierce_amount = effect.pierce
 		bullet.is_explosive = effect.explosive
 		bullet.explosion_radius = effect.radius
-		bullet.explosion_damage = int(effect.explosion_damage) + body_bonus
 
 		get_parent().add_child(bullet)
 		bullet.global_position = global_position + Vector2(40, 0)
@@ -290,7 +329,13 @@ func _on_hurtbox_area_entered(area):
 
 func take_damage(amount: float = 1.0):
 	AudioManager.play_sfx(&"player_hit")
-	current_hp -= amount
+
+	var effective := amount
+	if _stats != null:
+		effective = maxf(amount - _stats.defense(), 1.0)
+		effective *= (1.0 - _stats.damage_reduction())
+
+	current_hp -= effective
 	GameFlow.hp = current_hp
 	hp_changed.emit(current_hp, max_hp)
 

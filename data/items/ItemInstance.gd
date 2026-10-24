@@ -6,6 +6,7 @@ class_name ItemInstance
 var instance_id := 0
 var definition: ItemDefinition
 var affixes: Array[ItemAffix] = []
+var rarity := 0
 
 static var _next_id := 0
 
@@ -15,6 +16,7 @@ static func create(def: ItemDefinition, p_affixes: Array[ItemAffix] = []) -> Ite
 	item.instance_id = _next_id
 	item.definition = def
 	item.affixes = p_affixes
+	item.rarity = def.rarity if def != null else 0
 	return item
 
 func get_value() -> int:
@@ -26,5 +28,6 @@ func get_value() -> int:
 func describe_affixes() -> String:
 	var lines: Array[String] = []
 	for affix in affixes:
-		lines.append("%s +%.1f" % [affix.display_name, affix.amount])
+		var sign := "+" if affix.amount >= 0.0 else ""
+		lines.append("%s %s%.1f" % [affix.display_name, sign, affix.amount])
 	return " / ".join(lines)

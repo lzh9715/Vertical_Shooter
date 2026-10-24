@@ -391,13 +391,16 @@ func _refresh_warnings() -> void:
 			if _wand.body != null and _wand.body.definition != null:
 				staff_interval = _wand.body.definition.cast_interval
 
+			var stats := EquipmentStats.compute(GameFlow.get_equipment())
+			var max_mana := stats.max_mana()
+
 			var index := 0
 			while index < blocks.size():
 				var result := CastSimulator.simulate_action(
 					blocks,
 					index,
-					GameFlow.max_mana,
-					GameFlow.max_mana,
+					max_mana,
+					max_mana,
 					GameFlow.hp,
 					staff_interval,
 					true

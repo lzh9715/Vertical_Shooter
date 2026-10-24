@@ -28,6 +28,8 @@ func subtitle() -> String:
 	if is_card():
 		return "法术 · 1 张"
 	var parts: Array[String] = []
+	if instance != null:
+		parts.append(ItemCatalog.rarity_name(instance.rarity))
 	if definition.category == ItemDefinition.Category.GEM:
 		parts.append("%d 槽" % definition.gem_slots)
 	elif definition.category == ItemDefinition.Category.STAFF_BODY:
@@ -42,7 +44,8 @@ func description() -> String:
 	var lines: Array[String] = [definition.description if definition.description != "" else category_name()]
 	if instance != null:
 		for affix in instance.affixes:
-			lines.append("%s  %s +%.2f" % [affix.display_name, affix.stat, affix.amount])
+			var sign := "+" if affix.amount >= 0.0 else ""
+			lines.append("%s %s%.2f" % [affix.display_name, sign, affix.amount])
 	return "\n".join(lines)
 
 func current_value() -> int:

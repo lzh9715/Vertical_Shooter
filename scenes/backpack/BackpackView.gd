@@ -697,6 +697,7 @@ func _restore_drag() -> void:
 func _finish_drag() -> void:
 	_cancel_drag()
 	_refresh()
+	EventBus.loadout_changed.emit()
 
 func _cancel_drag() -> void:
 	if _drag_panel != null:

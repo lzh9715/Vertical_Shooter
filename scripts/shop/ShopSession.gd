@@ -108,10 +108,16 @@ func row_start(row: int) -> int:
 func _make_offer(definition: ItemDefinition) -> ShopOffer:
 	var instance: ItemInstance = null
 	if not definition.is_card():
-		instance = ItemCatalog.make_instance(definition)
+		var luck := EquipmentStats.compute(GameFlow.get_equipment()).luck
+		var rarity := ItemCatalog.roll_rarity(luck)
+		instance = ItemCatalog.make_instance(definition, rarity)
 
 	var base := instance.get_value() if instance != null else definition.base_price
-	var price := maxi(1, roundi(base * pricing.total_multiplier()))
+	var layer := 1
+	if GameFlow.current_node != null:
+		layer = maxi(GameFlow.current_node.layer, 1)
+	var difficulty_multiplier := 1.0 + float(layer - 1) * 0.1
+	var price := maxi(1, roundi(base * pricing.total_multiplier() * difficulty_multiplier))
 	return ShopOffer.new(definition, instance, price)
 
 func _pick(pool: Array[ItemDefinition]) -> ItemDefinition:

@@ -51,7 +51,8 @@ func _stats_text() -> String:
 	var damage: int = maxi(_dummy.max_hp - _dummy.hp, 0)
 	_peak_damage = maxi(_peak_damage, damage)
 	var wand_index: int = GameFlow.get_equipment().active_wand_index
-	return "法力：%d/%d    法杖：%d/2    木桩总伤害：%d    最高：%d" % [
+	return "HP：%d/%d    法力：%d/%d    法杖：%d/2    木桩总伤害：%d    最高：%d" % [
+		ceili(GameFlow.hp), ceili(GameFlow.max_hp),
 		ceili(GameFlow.mana), ceili(GameFlow.max_mana),
 		wand_index + 1, damage, _peak_damage,
 	]

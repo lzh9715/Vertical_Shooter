@@ -12,5 +12,8 @@ signal spell_returned(spell: SpellData)
 ## 战斗中切换激活法杖
 signal wand_switched(index: int)
 
+## 装备/宝石/杖身变化，玩家属性需要重算
+signal loadout_changed
+
 ## Boss 死亡/战斗结束时，强制取消偷取
 signal steal_cancelled

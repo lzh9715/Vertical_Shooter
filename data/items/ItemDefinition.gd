@@ -56,6 +56,7 @@ enum EffectType {
 @export var mana_discount := 0
 @export var cast_interval := 0.0
 @export var multicast_count := 0
+@export var max_equipped := 0   # 0 = 不限制；未来用于同名模块装备上限
 @export var base_value := 0
 @export var visual_scene: PackedScene
 
