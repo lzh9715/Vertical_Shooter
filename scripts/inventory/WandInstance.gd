@@ -35,6 +35,26 @@ func add_card(definition: ItemDefinition) -> bool:
 	cards.append(definition)
 	return true
 
+func insert_card(index: int, definition: ItemDefinition) -> bool:
+	if definition == null or not definition.is_card():
+		return false
+	if not can_add_card():
+		return false
+	var at := clampi(index, 0, cards.size())
+	cards.insert(at, definition)
+	return true
+
+func move_card(from_index: int, to_index: int) -> bool:
+	if from_index < 0 or from_index >= cards.size():
+		return false
+	if to_index < 0 or to_index >= cards.size():
+		return false
+	if from_index == to_index:
+		return false
+	var card: ItemDefinition = cards.pop_at(from_index)
+	cards.insert(to_index, card)
+	return true
+
 func remove_card(index: int) -> ItemDefinition:
 	if index < 0 or index >= cards.size():
 		return null

@@ -25,7 +25,7 @@ func _ready() -> void:
 	_hint.position = Vector2(30, 26)
 	_hint.add_theme_font_size_override("font_size", 24)
 	_hint.add_theme_color_override("font_color", Color(1.0, 0.85, 0.4))
-	_hint.text = "测试：1 填满背包  2 填满并制造溢出  3 清空溢出  4 重置物品    B 开关背包"
+	_hint.text = "测试：1 填满背包  2 填满并制造溢出  3 清空溢出  4 重置物品 | 点击法杖切换编辑，编辑法术打开卡槽 | B 开关背包"
 	layer.add_child(_hint)
 
 	_map.backpack.open()

@@ -13,17 +13,25 @@ const TRASH_BG := Color(0.16, 0.16, 0.19, 1.0)
 const EQUIP_BG := Color(0.22, 0.24, 0.30, 1.0)
 
 @onready var grid: GridContainer = $Center/Panel/Margin/VBox/Content/GridBox/Grid
+@onready var wand_tabs_box: HBoxContainer = $Center/Panel/Margin/VBox/Content/Side/WandTabs
+@onready var selected_label: Label = $Center/Panel/Margin/VBox/Content/Side/AssemblyPanel/VBox/Header/SelectedLabel
+@onready var body_slot: Panel = $Center/Panel/Margin/VBox/Content/Side/AssemblyPanel/VBox/Slots/BodySlot
+@onready var gem_slot: Panel = $Center/Panel/Margin/VBox/Content/Side/AssemblyPanel/VBox/Slots/GemSlot
+@onready var btn_edit_cards: Button = $Center/Panel/Margin/VBox/Content/Side/AssemblyPanel/VBox/Header/BtnEditCards
 @onready var equip_slots_box: VBoxContainer = $Center/Panel/Margin/VBox/Content/Side/EquipSlots
 @onready var overflow_box: HBoxContainer = $Center/Panel/Margin/VBox/OverflowBox
 @onready var overflow_slots_box: HBoxContainer = $Center/Panel/Margin/VBox/OverflowBox/OverflowSlots
 @onready var trash_slot: Panel = $Center/Panel/Margin/VBox/Footer/TrashSlot
 @onready var gold_label: Label = $Center/Panel/Margin/VBox/Header/Gold
 @onready var btn_close: Button = $Center/Panel/Margin/VBox/Header/BtnClose
+@onready var card_panel: Control = $CardAssemblyPanel
 
 var _grid_slots: Array[Panel] = []
 var _equip_slots: Array[Panel] = []
 var _overflow_slots: Array[Panel] = []
 var _all_slots: Array[Panel] = []
+var _wand_tabs: Array[Panel] = []
+var _edit_index := 0
 
 var _drag_item: Variant = null
 var _drag_origin: Dictionary = {}
@@ -39,10 +47,15 @@ func _ready() -> void:
 		grid.add_child(slot)
 		_grid_slots.append(slot)
 
-	for i in range(5):
-		var slot := _make_slot("equipment", i, EQUIP_SIZE)
+	for i in range(3):
+		var slot := _make_slot("equipment", i + 2, EQUIP_SIZE)
 		equip_slots_box.add_child(slot)
 		_equip_slots.append(slot)
+
+	_setup_assembly_slots()
+	_build_wand_tabs()
+	btn_edit_cards.pressed.connect(_open_card_panel)
+	card_panel.closed.connect(_refresh)
 
 	trash_slot.set_meta("kind", "trash")
 	trash_slot.set_meta("index", 0)
@@ -58,6 +71,8 @@ func _process(_delta: float) -> void:
 		_drag_panel.global_position = get_viewport().get_mouse_position() - _drag_panel.size * 0.5
 
 func _unhandled_input(event: InputEvent) -> void:
+	if visible and card_panel.visible:
+		return
 	if visible and event.is_action_pressed("ui_cancel"):
 		close()
 		get_viewport().set_input_as_handled()
@@ -73,7 +88,12 @@ func open() -> void:
 	visible = true
 
 func close() -> void:
-	_cancel_drag()
+	if _drag_item != null:
+		_restore_drag()
+	else:
+		_cancel_drag()
+	if card_panel != null and card_panel.visible:
+		card_panel.close()
 	visible = false
 
 func toggle() -> void:
@@ -129,6 +149,58 @@ func _add_slot_visuals(panel: Panel) -> void:
 	count_label.offset_right = -6
 	count_label.offset_bottom = -4
 
+func _setup_existing_slot(panel: Panel, kind: String, index: int) -> void:
+	panel.set_meta("kind", kind)
+	panel.set_meta("index", index)
+	panel.mouse_filter = Control.MOUSE_FILTER_STOP
+	panel.gui_input.connect(_on_slot_gui_input.bind(panel))
+	_add_slot_visuals(panel)
+	_all_slots.append(panel)
+
+func _setup_assembly_slots() -> void:
+	_setup_existing_slot(body_slot, "assembly", 0)
+	_setup_existing_slot(gem_slot, "assembly", 1)
+
+func _build_wand_tabs() -> void:
+	for i in range(2):
+		var tab := Panel.new()
+		tab.custom_minimum_size = Vector2(250, 62)
+		tab.mouse_filter = Control.MOUSE_FILTER_STOP
+		wand_tabs_box.add_child(tab)
+
+		var label := Label.new()
+		label.name = "Label"
+		label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		label.add_theme_font_size_override("font_size", 22)
+		tab.add_child(label)
+		label.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+
+		var overlay := ColorRect.new()
+		overlay.name = "Overlay"
+		overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		overlay.color = Color(0, 0, 0, 0.68)
+		tab.add_child(overlay)
+		overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+
+		tab.gui_input.connect(_on_wand_tab_input.bind(tab, i))
+		_wand_tabs.append(tab)
+
+func _on_wand_tab_input(event: InputEvent, tab: Panel, index: int) -> void:
+	if _drag_item != null:
+		return
+	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		_edit_index = index
+		_refresh()
+		get_viewport().set_input_as_handled()
+
+func _open_card_panel() -> void:
+	var wand := GameFlow.get_equipment().wand_slots[_edit_index]
+	if wand == null:
+		return
+	card_panel.open(wand, _edit_index)
+
 # ---------- 刷新 ----------
 
 func _refresh() -> void:
@@ -141,7 +213,8 @@ func _refresh() -> void:
 	_paint_slot(trash_slot, inv.trash, TRASH_BG)
 	if inv.trash == null:
 		trash_slot.get_node("Name").text = "垃圾桶"
-	_refresh_equipment()
+	_refresh_assembly()
+	_refresh_character_equipment()
 
 	gold_label.text = "金币：%d" % GameFlow.gold
 
@@ -178,31 +251,61 @@ func _paint_slot(slot: Panel, item, bg_color: Color) -> void:
 		name_label.text = item.definition.display_name
 		count_label.text = ""
 
-func _refresh_equipment() -> void:
+func _refresh_assembly() -> void:
 	var eq := GameFlow.get_equipment()
-	var texts: Array[String] = []
+	var wand: WandInstance = eq.wand_slots[_edit_index]
 
-	for i in range(2):
-		var wand: WandInstance = eq.wand_slots[i]
-		if wand == null:
-			texts.append("法杖 %d\n空" % [i + 1])
-		else:
-			var body_name := wand.body.definition.display_name if wand.body != null else "无杖身"
-			var gem_name := wand.gem.definition.display_name if wand.gem != null else "无宝石"
-			texts.append("法杖 %d\n%s / %s\n卡槽 %d/%d" % [
-				i + 1, body_name, gem_name, wand.cards.size(), wand.max_cards()
-			])
+	for i in range(_wand_tabs.size()):
+		var tab := _wand_tabs[i]
+		var label: Label = tab.get_node("Label")
+		var overlay: ColorRect = tab.get_node("Overlay")
+		label.text = "法杖 %d" % [i + 1]
+		overlay.visible = i != _edit_index
 
-	texts.append("巫师帽\n" + _equip_name(eq.hat))
-	texts.append("巫师袍\n" + _equip_name(eq.robe))
-	texts.append("配饰\n" + _equip_name(eq.accessory))
+	if wand == null:
+		selected_label.text = "当前：法杖 %d（空）" % [_edit_index + 1]
+		_paint_component(body_slot, null, "杖身")
+		_paint_component(gem_slot, null, "宝石")
+		return
+
+	selected_label.text = "当前：法杖 %d   战斗：法杖 %d" % [
+		_edit_index + 1, eq.active_wand_index + 1
+	]
+
+	_paint_component(body_slot, wand.body, "杖身")
+	_paint_component(gem_slot, wand.gem, "宝石")
+
+func _paint_component(panel: Panel, item: ItemInstance, empty_text: String) -> void:
+	var bg: ColorRect = panel.get_node("Bg")
+	var label: Label = panel.get_node("Name")
+	var count: Label = panel.get_node("Count")
+	count.text = ""
+
+	if item == null:
+		bg.color = Color(0.20, 0.20, 0.24, 1.0)
+		label.text = empty_text
+		return
+
+	bg.color = EQUIP_BG
+	if item.definition.category == ItemDefinition.Category.STAFF_BODY:
+		label.text = "%s\n+%d 伤害" % [item.definition.display_name, item.definition.damage_bonus]
+	elif item.definition.category == ItemDefinition.Category.GEM:
+		label.text = "%s\n%d 槽" % [item.definition.display_name, item.definition.gem_slots]
+	else:
+		label.text = item.definition.display_name
+
+func _refresh_character_equipment() -> void:
+	var eq := GameFlow.get_equipment()
+	var items: Array[ItemInstance] = [eq.hat, eq.robe, eq.accessory]
+	var titles := ["巫师帽", "巫师袍", "配饰"]
 
 	for i in range(_equip_slots.size()):
 		var slot := _equip_slots[i]
 		var bg: ColorRect = slot.get_node("Bg")
 		var label: Label = slot.get_node("Name")
-		bg.color = EQUIP_BG if i < 2 and eq.wand_slots[i] != null else Color(0.18, 0.18, 0.21, 1.0)
-		label.text = texts[i]
+		var item := items[i]
+		bg.color = EQUIP_BG if item != null else Color(0.18, 0.18, 0.21, 1.0)
+		label.text = "%s\n%s" % [titles[i], _equip_name(item)]
 		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 		label.offset_left = 12
 
@@ -227,6 +330,35 @@ func _on_slot_gui_input(event: InputEvent, slot: Panel) -> void:
 func _start_drag(slot: Panel, split: bool) -> void:
 	var kind: String = slot.get_meta("kind")
 	var index: int = slot.get_meta("index")
+
+	if kind == "assembly":
+		var eq := GameFlow.get_equipment()
+		var wand: WandInstance = eq.wand_slots[_edit_index]
+		if wand == null:
+			return
+
+		var inv := GameFlow.get_inventory()
+		var item: ItemInstance = null
+		if index == 0:
+			item = wand.body
+			wand.body = null
+		else:
+			item = wand.gem
+			if item != null:
+				var returned := wand.cards.duplicate()
+				wand.gem = null
+				wand.cards.clear()
+				for card in returned:
+					inv.add_card(card, 1)
+
+		if item == null:
+			return
+
+		_drag_item = item
+		_drag_origin = {"kind": "assembly", "index": index, "wand": _edit_index, "split": false}
+		_create_drag_visual(item)
+		_refresh()
+		return
 
 	if kind == "equipment":
 		if index < 2:
@@ -314,6 +446,8 @@ func _drop_at_mouse() -> void:
 		_drop_to_cell(int(target.get_meta("index")))
 	elif kind == "equipment":
 		_drop_to_equipment(int(target.get_meta("index")))
+	elif kind == "assembly":
+		_drop_to_assembly(int(target.get_meta("index")))
 	else:
 		_restore_drag()
 
@@ -371,6 +505,13 @@ func _drop_to_cell(target_index: int) -> void:
 			_restore_drag()
 			return
 
+	elif src.kind == "assembly":
+		if inv.cells[target_index] == null:
+			inv.cells[target_index] = item
+		else:
+			_restore_drag()
+			return
+
 	elif src.kind == "overflow":
 		var target = inv.cells[target_index]
 		if target == null:
@@ -416,6 +557,56 @@ func _drop_to_trash() -> void:
 		return
 
 	inv.trash = _drag_item
+	inv.auto_transfer()
+	_finish_drag()
+
+func _drop_to_assembly(target_index: int) -> void:
+	var inv := GameFlow.get_inventory()
+	var eq := GameFlow.get_equipment()
+	var wand: WandInstance = eq.wand_slots[_edit_index]
+	var src: Dictionary = _drag_origin
+	var item = _drag_item
+
+	if wand == null or not (item is ItemInstance):
+		_restore_drag()
+		return
+
+	if target_index == 0:
+		if item.definition.category != ItemDefinition.Category.STAFF_BODY:
+			_restore_drag()
+			return
+	elif target_index == 1:
+		if item.definition.category != ItemDefinition.Category.GEM:
+			_restore_drag()
+			return
+	else:
+		_restore_drag()
+		return
+
+	if src.kind == "assembly":
+		_restore_drag()
+		return
+
+	var old: ItemInstance = null
+
+	if target_index == 0:
+		old = wand.body
+		wand.body = item
+	else:
+		old = wand.gem
+		# 替换宝石：原卡槽里的卡全部退回背包/溢出
+		var returned := wand.cards.duplicate()
+		wand.cards.clear()
+		for card in returned:
+			inv.add_card(card, 1)
+		wand.gem = item
+
+	if old != null:
+		if src.kind == "cell" and inv.cells[int(src.index)] == null:
+			inv.cells[int(src.index)] = old
+		else:
+			inv.add(old)
+
 	inv.auto_transfer()
 	_finish_drag()
 
@@ -485,6 +676,18 @@ func _restore_drag() -> void:
 			var index: int = src.index
 			if eq.equipment_item_at(index) == null:
 				eq.equip_item(item)
+			else:
+				inv.add(item)
+		"assembly":
+			var eq := GameFlow.get_equipment()
+			var wand: WandInstance = eq.wand_slots[_edit_index]
+			if wand != null:
+				if src.index == 0 and wand.body == null:
+					wand.body = item
+				elif src.index == 1 and wand.gem == null:
+					wand.gem = item
+				else:
+					inv.add(item)
 			else:
 				inv.add(item)
 

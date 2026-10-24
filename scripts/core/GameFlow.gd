@@ -320,63 +320,64 @@ func _seed_starter_inventory() -> void:
 	inventory = GridInventory.new()
 	equipment = PlayerEquipment.new()
 
-	var bolt := _make_def(&"card_bolt", "魔弹卡", ItemDefinition.Category.SPELL_CARD, 3, 15)
-	var heavy := _make_def(&"card_heavy", "重弹卡", ItemDefinition.Category.SPELL_CARD, 3, 30)
+	var single := _make_def(&"card_single", "单发卡", ItemDefinition.Category.SPELL_CARD, 3, 15)
 	var spread := _make_def(&"card_spread", "散射卡", ItemDefinition.Category.SPELL_CARD, 3, 25)
-	var pierce := _make_def(&"card_pierce", "穿透卡", ItemDefinition.Category.SPELL_CARD, 3, 35)
 	var homing := _make_def(&"card_homing", "追踪卡", ItemDefinition.Category.SPELL_CARD, 3, 40)
+	var pierce := _make_def(&"card_pierce", "穿透卡", ItemDefinition.Category.SPELL_CARD, 3, 35)
 	var boom := _make_def(&"card_boom", "爆裂卡", ItemDefinition.Category.SPELL_CARD, 3, 50)
 
-	var gem_def := _make_def(&"gem_apprentice", "学徒宝石", ItemDefinition.Category.GEM, 1, 120)
-	gem_def.gem_slots = 4
-	var body_def := _make_def(&"body_apprentice", "学徒杖身", ItemDefinition.Category.STAFF_BODY, 1, 100)
+	var gem_a := _make_def(&"gem_a", "测试宝石 A", ItemDefinition.Category.GEM, 1, 80)
+	gem_a.gem_slots = 3
+	var gem_b := _make_def(&"gem_b", "测试宝石 B", ItemDefinition.Category.GEM, 1, 120)
+	gem_b.gem_slots = 5
+	var gem_c := _make_def(&"gem_c", "测试宝石 C", ItemDefinition.Category.GEM, 1, 160)
+	gem_c.gem_slots = 7
+
+	var body_a := _make_def(&"body_a", "测试杖身 A", ItemDefinition.Category.STAFF_BODY, 1, 90, 3)
+	var body_b := _make_def(&"body_b", "测试杖身 B", ItemDefinition.Category.STAFF_BODY, 1, 120, 5)
+
 	var hat_def := _make_def(&"hat_apprentice", "学徒帽", ItemDefinition.Category.HAT, 1, 80)
 	var robe_def := _make_def(&"robe_apprentice", "学徒袍", ItemDefinition.Category.ROBE, 1, 90)
 	var acc_def := _make_def(&"acc_charm", "拾取护符", ItemDefinition.Category.ACCESSORY, 1, 70)
 
-	# 背包里先放一些卡和备用装备
-	inventory.add_card(bolt, 3)
-	inventory.add_card(heavy, 2)
+	# 法术卡全部先放背包，方便测试装配
+	inventory.add_card(single, 1)
 	inventory.add_card(spread, 1)
+	inventory.add_card(homing, 1)
 	inventory.add_card(pierce, 1)
-	inventory.add_card(homing, 2)
 	inventory.add_card(boom, 1)
-	inventory.add(ItemInstance.create(gem_def, [_make_affix("增幅", &"spell_power", 0.08, 20)]))
-	inventory.add(ItemInstance.create(body_def, [_make_affix("迅捷", &"cast_speed", 0.1, 15)]))
+
+	# 备用宝石
+	inventory.add(ItemInstance.create(gem_c))
 	inventory.add(ItemInstance.create(hat_def, [_make_affix("法力", &"max_mana", 10, 15)]))
 	inventory.add(ItemInstance.create(robe_def, [_make_affix("生命", &"max_hp", 1, 15)]))
 	inventory.add(ItemInstance.create(acc_def, [_make_affix("拾取", &"pickup_radius", 0.15, 10)]))
 
-	# 两把已装备法杖
+	# 两把已装备法杖：A 宝石/杖身，B 宝石/杖身；卡槽为空，等玩家装配
 	var wand0 := WandInstance.create(
-		ItemInstance.create(body_def),
-		ItemInstance.create(gem_def)
+		ItemInstance.create(body_a),
+		ItemInstance.create(gem_a)
 	)
-	wand0.add_card(bolt)
-	wand0.add_card(bolt)
-	wand0.add_card(spread)
-	wand0.add_card(pierce)
 	equipment.equip_wand(0, wand0)
 
 	var wand1 := WandInstance.create(
-		ItemInstance.create(body_def),
-		ItemInstance.create(gem_def)
+		ItemInstance.create(body_b),
+		ItemInstance.create(gem_b)
 	)
-	wand1.add_card(heavy)
-	wand1.add_card(homing)
 	equipment.equip_wand(1, wand1)
 
 	equipment.equip_item(ItemInstance.create(hat_def, [_make_affix("法力", &"max_mana", 10, 15)]))
 	equipment.equip_item(ItemInstance.create(robe_def, [_make_affix("生命", &"max_hp", 1, 15)]))
 	equipment.equip_item(ItemInstance.create(acc_def, [_make_affix("拾取", &"pickup_radius", 0.15, 10)]))
 
-func _make_def(id: StringName, name: String, category: int, stack_limit: int, price: int) -> ItemDefinition:
+func _make_def(id: StringName, name: String, category: int, stack_limit: int, price: int, damage := 0) -> ItemDefinition:
 	var def := ItemDefinition.new()
 	def.id = id
 	def.display_name = name
 	def.category = category
 	def.stack_limit = stack_limit
 	def.base_price = price
+	def.damage_bonus = damage
 	return def
 
 func _make_affix(name: String, stat: StringName, amount: float, value_bonus: int) -> ItemAffix:

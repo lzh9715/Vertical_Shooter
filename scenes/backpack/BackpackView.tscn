@@ -1,6 +1,7 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://scenes/backpack/BackpackView.gd" id="1_backpack"]
+[ext_resource type="PackedScene" path="res://scenes/backpack/CardAssemblyPanel.tscn" id="2_card"]
 
 [node name="BackpackView" type="CanvasLayer"]
 process_mode = 3
@@ -86,10 +87,59 @@ custom_minimum_size = Vector2(520, 0)
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="EquipTitle" type="Label" parent="Center/Panel/Margin/VBox/Content/Side"]
+[node name="AssemblyTitle" type="Label" parent="Center/Panel/Margin/VBox/Content/Side"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 30
-text = "装备"
+text = "法杖装配"
+
+[node name="WandTabs" type="HBoxContainer" parent="Center/Panel/Margin/VBox/Content/Side"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="AssemblyPanel" type="Panel" parent="Center/Panel/Margin/VBox/Content/Side"]
+custom_minimum_size = Vector2(0, 190)
+layout_mode = 2
+
+[node name="VBox" type="VBoxContainer" parent="Center/Panel/Margin/VBox/Content/Side/AssemblyPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 8
+
+[node name="Header" type="HBoxContainer" parent="Center/Panel/Margin/VBox/Content/Side/AssemblyPanel/VBox"]
+layout_mode = 2
+
+[node name="SelectedLabel" type="Label" parent="Center/Panel/Margin/VBox/Content/Side/AssemblyPanel/VBox/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 22
+text = "当前：法杖 1   战斗：法杖 1"
+
+[node name="BtnEditCards" type="Button" parent="Center/Panel/Margin/VBox/Content/Side/AssemblyPanel/VBox/Header"]
+custom_minimum_size = Vector2(150, 48)
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "编辑法术"
+
+[node name="Slots" type="HBoxContainer" parent="Center/Panel/Margin/VBox/Content/Side/AssemblyPanel/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="BodySlot" type="Panel" parent="Center/Panel/Margin/VBox/Content/Side/AssemblyPanel/VBox/Slots"]
+custom_minimum_size = Vector2(220, 100)
+layout_mode = 2
+
+[node name="GemSlot" type="Panel" parent="Center/Panel/Margin/VBox/Content/Side/AssemblyPanel/VBox/Slots"]
+custom_minimum_size = Vector2(220, 100)
+layout_mode = 2
+
+[node name="CharacterTitle" type="Label" parent="Center/Panel/Margin/VBox/Content/Side"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "角色装备"
 
 [node name="EquipSlots" type="VBoxContainer" parent="Center/Panel/Margin/VBox/Content/Side"]
 layout_mode = 2
@@ -123,3 +173,5 @@ size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 24
 text = "左键拖整组，右键拖单个；拖到垃圾桶丢弃"
 vertical_alignment = 1
+
+[node name="CardAssemblyPanel" parent="." instance=ExtResource("2_card")]

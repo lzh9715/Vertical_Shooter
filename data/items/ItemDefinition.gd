@@ -22,6 +22,7 @@ enum Category {
 @export var icon: Texture2D
 @export var tags: Array[StringName] = []
 @export var gem_slots := 0        # 仅宝石使用：提供多少个法术卡槽
+@export var damage_bonus := 0     # 仅杖身使用：占位伤害加成
 
 func is_card() -> bool:
 	return category == Category.SPELL_CARD
