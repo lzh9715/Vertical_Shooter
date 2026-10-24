@@ -68,20 +68,17 @@ static func make_affixes(category: int, rarity: int = 0) -> Array[ItemAffix]:
 			pool = [
 				_affix("增幅", &"spell_power", 0.08, 20),
 				_affix("节能", &"mana_cost", 0.10, 25),
-				_affix("迅捷", &"cast_speed", 0.10, 15),
 			]
 		ItemDefinition.Category.STAFF_BODY:
 			pool = [
 				_affix("锋锐", &"damage", 1.0, 25),
 				_affix("沉重", &"damage", 2.0, 40),
-				_affix("轻快", &"cast_speed", 0.05, 15),
 				_affix("锐利", &"crit_chance", 0.05, 20),
 				_affix("致命", &"crit_damage", 0.15, 25),
 			]
 		ItemDefinition.Category.HAT:
 			pool = [
 				_affix("法力", &"max_mana", 10.0, 20),
-				_affix("专注", &"cooldown", 0.05, 20),
 				_affix("精准", &"crit_chance", 0.03, 15),
 			]
 		ItemDefinition.Category.ROBE:

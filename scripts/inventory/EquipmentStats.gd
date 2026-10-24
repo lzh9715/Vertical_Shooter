@@ -19,7 +19,6 @@ var mana_pct := 0.0
 var mana_regen_flat := 0.0
 var damage_flat := 0.0
 var damage_pct := 0.0
-var cast_speed_flat := 0.0
 var crit_chance_flat := 0.0
 var crit_damage_flat := 0.0
 var defense_flat := 0.0
@@ -62,9 +61,6 @@ func move_speed() -> float:
 func crit_chance() -> float:
 	return clampf(BASE_CRIT_CHANCE + crit_chance_flat, 0.0, 1.0)
 
-func cast_speed_multiplier() -> float:
-	return 1.0 / maxf(1.0 + cast_speed_flat, 0.1)
-
 func crit_damage() -> float:
 	return maxf(BASE_CRIT_DAMAGE + crit_damage_flat, 1.0)
 
@@ -89,8 +85,6 @@ func _apply_affix(affix: ItemAffix) -> void:
 			damage_flat += affix.amount
 		&"spell_power":
 			damage_pct += affix.amount
-		&"cast_speed", &"cooldown":
-			cast_speed_flat += affix.amount
 		&"max_hp":
 			hp_flat += affix.amount
 		&"hp_regen":

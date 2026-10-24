@@ -99,7 +99,6 @@ func _tick_cast(delta: float) -> void:
 		if not apply_overdraft(plan.hp_cost):
 			return
 
-	plan.interval = maxf(0.0, plan.interval * _stats.cast_speed_multiplier())
 	runtime.commit(plan)
 	_fire_plan(plan)
 
