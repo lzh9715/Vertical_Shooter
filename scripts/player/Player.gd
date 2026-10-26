@@ -150,7 +150,6 @@ func _block_modifiers(block: Array) -> Dictionary:
 		"pierce": 1,
 		"explosive": false,
 		"radius": 0.0,
-		"explosion_damage": 0.0,
 		"damage_bonus": 0.0,
 	}
 
@@ -166,7 +165,6 @@ func _block_modifiers(block: Array) -> Dictionary:
 			ItemDefinition.EffectType.EXPLOSION:
 				modifiers.explosive = true
 				modifiers.radius = card.effect_radius
-				modifiers.explosion_damage += card.effect_value
 			ItemDefinition.EffectType.DAMAGE:
 				modifiers.damage_bonus += card.effect_value
 
@@ -182,7 +180,6 @@ func _apply_module_effects(effect: Dictionary, modifiers: Dictionary) -> void:
 	if modifiers.explosive:
 		effect.explosive = true
 		effect.radius = modifiers.radius
-		effect.explosion_damage = modifiers.explosion_damage
 
 func apply_overdraft(cost: float) -> bool:
 	if cost <= 0.0:
@@ -253,7 +250,6 @@ func _shoot_legacy_spell(spell: SpellData) -> void:
 		"pierce": spell.pierce_amount,
 		"explosive": spell.is_explosive,
 		"radius": spell.explosion_radius,
-		"explosion_damage": spell.explosion_damage,
 	}
 	_fire_volley(effect, 0)
 
@@ -268,7 +264,6 @@ func _card_effect(card: ItemDefinition) -> Dictionary:
 		"pierce": 1,
 		"explosive": false,
 		"radius": 0.0,
-		"explosion_damage": 0.0,
 	}
 
 	return effect
@@ -286,11 +281,6 @@ func _fire_volley(effect: Dictionary, body_bonus: int) -> void:
 		var crit := randf() < _stats.crit_chance()
 		var final_damage := base_damage * (_stats.crit_damage() if crit else 1.0)
 		bullet.damage = maxi(1, roundi(final_damage))
-
-		var explosion_base: float = (
-			float(effect.explosion_damage) + float(body_bonus) + _stats.damage_flat
-		) * (1.0 + _stats.damage_pct)
-		bullet.explosion_damage = maxi(0, roundi(explosion_base))
 
 		bullet.is_homing = effect.homing
 		bullet.is_piercing = effect.piercing
