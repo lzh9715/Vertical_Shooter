@@ -17,6 +17,7 @@ var _wand_runtimes: Dictionary = {}
 var _legacy_cooldown := 0.0
 var _iframe_generation := 0
 var _stats: EquipmentStats = EquipmentStats.new()
+var _dead := false
 
 @onready var shoot_timer: Timer = $ShootTimer
 @onready var hurtbox: Area2D = $Hurtbox
@@ -54,6 +55,8 @@ func _rebuild_stats() -> void:
 
 
 func _physics_process(delta):
+	if _dead or GameFlow.is_run_ended():
+		return
 	_tick_steal(delta)
 	_regen_mana(delta)
 	_regen_hp(delta)
@@ -327,6 +330,8 @@ func _on_hurtbox_area_entered(area):
 
 
 func take_damage(amount: float = 1.0):
+	if _dead or GameFlow.is_run_ended():
+		return
 	AudioManager.play_sfx(&"player_hit")
 
 	var effective := amount
@@ -334,11 +339,12 @@ func take_damage(amount: float = 1.0):
 		effective = maxf(amount - _stats.defense(), 1.0)
 		effective *= (1.0 - _stats.damage_reduction())
 
-	current_hp -= effective
+	current_hp = maxf(current_hp - effective, 0.0)
+	_dead = current_hp <= 0.0
 	GameFlow.hp = current_hp
 	hp_changed.emit(current_hp, max_hp)
 
-	if current_hp <= 0.0:
+	if _dead:
 		GameFlow.end_run()
 		return
 
