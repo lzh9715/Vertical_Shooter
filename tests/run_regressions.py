@@ -30,7 +30,9 @@ def main() -> int:
             handle.write('\n[application]\nconfig/use_custom_user_dir=true\n'
                          'config/custom_user_dir_name="VerticalShooterRegressionTests"\n')
 
-        for extra in [["--import"], ["--script", "res://tests/p1_regressions.gd"]]:
+        suites = [["--script", f"res://tests/{name}_regressions.gd"]
+                  for name in ["p1", "p2"]]
+        for extra in [["--import"], *suites]:
             command = [engine, "--headless", "--path", str(project),
                        "--log-file", str(Path(temporary) / "godot.log"), *extra]
             try:

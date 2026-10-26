@@ -31,6 +31,7 @@ func _ready():
 	hurtbox.area_entered.connect(_on_hurtbox_area_entered)
 	shoot_timer.stop()
 	EventBus.loadout_changed.connect(_rebuild_stats)
+	GameFlow.max_hp_changed.connect(_rebuild_stats)
 	_rebuild_stats()
 	hp_changed.emit(current_hp, max_hp)
 
@@ -39,10 +40,10 @@ func _ready():
 	EventBus.wand_switched.emit(GameFlow.get_equipment().active_wand_index)
 
 func _rebuild_stats() -> void:
-	_stats = EquipmentStats.compute(GameFlow.get_equipment())
+	_stats = GameFlow.get_player_stats()
 
 	max_hp = _stats.max_hp()
-	current_hp = minf(current_hp, max_hp)
+	current_hp = minf(GameFlow.hp, max_hp)
 	GameFlow.max_hp = max_hp
 	GameFlow.hp = current_hp
 

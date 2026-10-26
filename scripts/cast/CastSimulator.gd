@@ -252,7 +252,8 @@ static func _simulate_indices(
 						"chain_extra": 0,
 					}
 
-				var deficit := cost - mana
+				# 负余额是已支付过生命的债务，本张卡只为新借的法力扣血。
+				var deficit := cost - maxf(mana, 0.0)
 				var damage := deficit * OVERDRAFT_HP_RATIO
 				if damage >= hp_left:
 					return {

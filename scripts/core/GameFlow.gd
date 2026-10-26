@@ -5,6 +5,7 @@ signal run_started
 signal node_entered(node: MapNodeData)
 signal node_finished(node: MapNodeData)
 signal stats_changed
+signal max_hp_changed
 
 
 const MAP_SCENE := "res://scenes/map/MapView.tscn"
@@ -26,6 +27,7 @@ var gold := 5000
 var score := 0
 var hp := 100.0
 var max_hp := 100.0
+var max_hp_bonus := 0.0 # 本局事件的生命上限修正，与装备词条分开保存
 var mana := 100.0
 var max_mana := 100.0
 var mana_regen := 35.0
@@ -155,6 +157,7 @@ func is_node_available(node: MapNodeData) -> bool:
 func reset_stats() -> void:
 	gold = 5000
 	score = 0
+	max_hp_bonus = 0.0
 	max_hp = 100.0
 	hp = max_hp
 	mana = 100.0
@@ -300,8 +303,12 @@ func change_hp(delta: float) -> void:
 
 ## 事件用：改变最大生命（最低 1，当前血量跟随上限）
 func change_max_hp(delta: float) -> void:
-	max_hp = maxf(1.0, max_hp + delta)
+	var stats := get_player_stats()
+	# 只保存实际生效的增减量，触底后不会积累隐藏的负修正。
+	max_hp_bonus += maxf(1.0, stats.max_hp() + delta) - stats.max_hp_unclamped()
+	max_hp = get_player_stats().max_hp()
 	hp = minf(hp, max_hp)
+	max_hp_changed.emit()
 	stats_changed.emit()
 
 func spend_mana(amount: float) -> bool:
@@ -351,6 +358,10 @@ func get_equipment() -> PlayerEquipment:
 	if equipment == null:
 		equipment = PlayerEquipment.new()
 	return equipment
+
+## 角色属性统一入口：装备词条与本局事件修正共同参与计算。
+func get_player_stats() -> EquipmentStats:
+	return EquipmentStats.compute(get_equipment(), max_hp_bonus)
 
 ## 临时起始物资：接入掉落/商店后删除
 func _seed_starter_inventory() -> void:

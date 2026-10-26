@@ -108,7 +108,7 @@ func row_start(row: int) -> int:
 func _make_offer(definition: ItemDefinition) -> ShopOffer:
 	var instance: ItemInstance = null
 	if not definition.is_card():
-		var luck := EquipmentStats.compute(GameFlow.get_equipment()).luck
+		var luck := GameFlow.get_player_stats().luck
 		var rarity := ItemCatalog.roll_rarity(luck)
 		instance = ItemCatalog.make_instance(definition, rarity)
 
