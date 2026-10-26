@@ -33,6 +33,9 @@ func _run() -> void:
 		"test_enemy_rewards_once",
 		"test_nonpiercing_overlap",
 		"test_piercing_overlap_limit",
+		"test_pierce_damage_falloff",
+		"test_homing_target_priority",
+		"test_explosion_uses_projectile_damage",
 		"test_explosion_once",
 		"test_clear_then_death",
 		"test_death_then_clear",
@@ -120,7 +123,7 @@ func _check_overlap(piercing: bool, limit: int, expected_hits: int) -> bool:
 	await process_frame
 	var hits := 0
 	for enemy in enemies:
-		if enemy.hp == 90:
+		if enemy.hp < enemy.max_hp:
 			hits += 1
 	_expect(hits == expected_hits, "overlapping enemies: expected %d hits, got %d" % [expected_hits, hits])
 	_expect(not is_instance_valid(bullet), "consumed bullet must be freed")
@@ -131,6 +134,69 @@ func test_nonpiercing_overlap() -> bool:
 
 func test_piercing_overlap_limit() -> bool:
 	return await _check_overlap(true, 2, 2)
+
+func test_pierce_damage_falloff() -> bool:
+	var enemies: Array = []
+	for i in range(2):
+		enemies.append(_enemy(Vector2(1000 + i * 50, 1000)))
+	var bullet = _bullet_scene.instantiate()
+	bullet.position = Vector2(1000, 1000)
+	bullet.damage = 10
+	bullet.is_piercing = true
+	bullet.pierce_amount = 2
+	current_scene.add_child(bullet)
+	bullet._hit_target(enemies[0])
+	bullet._hit_target(enemies[1])
+	_expect(enemies[0].hp == 90, "first pierce hit must deal full damage")
+	_expect(enemies[1].hp == 92, "second pierce hit must use 80% falloff")
+	_expect(bullet.is_queued_for_deletion(), "bullet must be consumed after its hit budget")
+	return true
+
+func test_homing_target_priority() -> bool:
+	var first = _enemy(Vector2(1000, 1000))
+	var second = _enemy(Vector2(1200, 1000))
+	var third = _enemy(Vector2(1400, 1000))
+	var bullet = _bullet_scene.instantiate()
+	bullet.position = Vector2(1000, 1000)
+	bullet.is_homing = true
+	bullet.is_piercing = true
+	bullet.pierce_amount = 3
+	current_scene.add_child(bullet)
+
+	bullet._acquire_target()
+	_expect(bullet._target == first, "homing must start with the nearest target")
+	bullet._hit_target(first)
+	bullet._acquire_target()
+	_expect(bullet._target == second, "after a hit, homing must prefer an unvisited target")
+	bullet._hit_target(second)
+	bullet._visited[third] = true
+	bullet._last_hit_target = second
+	bullet._acquire_target()
+	_expect(bullet._target == first, "after all targets are visited, homing must exclude the previous target")
+	return true
+
+func test_explosion_uses_projectile_damage() -> bool:
+	var first = _enemy(Vector2(1000, 1000))
+	var second = _enemy(Vector2(1050, 1000))
+	var bullet = _bullet_scene.instantiate()
+	bullet.position = Vector2(1000, 1000)
+	bullet.speed = 0.0
+	bullet.damage = 10
+	bullet.is_explosive = true
+	bullet.explosion_radius = 100.0
+	bullet.is_piercing = true
+	bullet.pierce_amount = 2
+	current_scene.add_child(bullet)
+
+	bullet._hit_target(first)
+	_expect(first.hp == 90, "direct hit must use projectile damage")
+	_expect(second.hp == 90, "explosion must reuse the current projectile damage")
+
+	bullet._hit_target(first)
+	_expect(first.hp == 82, "second direct hit must use 80% falloff")
+	_expect(second.hp == 82, "explosion must also use the fallen-off damage")
+	_expect(bullet.is_queued_for_deletion(), "bullet must be consumed after its hit budget")
+	return true
 
 func test_explosion_once() -> bool:
 	var first = _enemy(Vector2(1000, 1000))

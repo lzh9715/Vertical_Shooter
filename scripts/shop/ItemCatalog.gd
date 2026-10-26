@@ -223,7 +223,6 @@ static func _ensure() -> void:
 	var boom := _make_def(&"card_boom", "爆炸模块", ItemDefinition.Category.SPELL_CARD, 3, 50)
 	boom.spell_kind = ItemDefinition.SpellKind.MODULE
 	boom.effect_type = ItemDefinition.EffectType.EXPLOSION
-	boom.effect_value = 32.0
 	boom.effect_radius = 100.0
 	boom.mana_cost = 18
 	boom.cast_interval = 0.12
