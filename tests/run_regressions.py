@@ -36,7 +36,14 @@ def main() -> int:
             command = [engine, "--headless", "--path", str(project),
                        "--log-file", str(Path(temporary) / "godot.log"), *extra]
             try:
-                result = subprocess.run(command, capture_output=True, text=True, timeout=45)
+                result = subprocess.run(
+                    command,
+                    capture_output=True,
+                    text=True,
+                    encoding="utf-8",
+                    errors="replace",
+                    timeout=45,
+                )
             except subprocess.TimeoutExpired as error:
                 print(f"Godot timed out: {error}", file=sys.stderr)
                 return 1
