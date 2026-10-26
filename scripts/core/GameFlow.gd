@@ -5,6 +5,7 @@ signal run_started
 signal node_entered(node: MapNodeData)
 signal node_finished(node: MapNodeData)
 signal stats_changed
+signal max_hp_changed
 
 
 const MAP_SCENE := "res://scenes/map/MapView.tscn"
@@ -26,6 +27,7 @@ var gold := 5000
 var score := 0
 var hp := 100.0
 var max_hp := 100.0
+var max_hp_bonus := 0.0 # 本局事件的生命上限修正，与装备词条分开保存
 var mana := 100.0
 var max_mana := 100.0
 var mana_regen := 35.0
@@ -39,9 +41,14 @@ var current_event: EventData           # 当前事件
 var event_context: Dictionary = {}     # 事件战斗上下文（Boss / 限时 / 被偷金额）
 var _used_events: Array[String] = []   # 本局已出现过的事件
 var _reward_modifiers: Dictionary = {} # 收益类 buff：来源 ID -> 倍率
+var _node_finishing := false
+var _run_ended := false
 
 ## 开一局：生成/读取地图，起点自动算作已通过
 func start_run(config: LevelConfig, seed_value: int = 0) -> void:
+	_node_finishing = false
+	_run_ended = false
+	get_tree().paused = false
 	level = config
 	pricing = config.pricing
 	if seed_value != 0:
@@ -68,8 +75,9 @@ func start_run(config: LevelConfig, seed_value: int = 0) -> void:
 
 ## 点击地图节点
 func enter_node(node: MapNodeData) -> void:
-	if node == null:
+	if node == null or _run_ended:
 		return
+	_node_finishing = false
 	current_node = node
 	node_entered.emit(node)
 
@@ -96,7 +104,11 @@ func enter_node(node: MapNodeData) -> void:
 
 ## 节点打完
 func finish_node() -> void:
-	get_tree().paused = false            # 确保离开战斗/商店时不会停留在暂停状态
+	if _run_ended or _node_finishing:
+		return
+	_node_finishing = true
+	# 冻结残留弹幕、波次和延迟生成；转场自身始终可以运行。
+	get_tree().paused = true
 
 	if current_node == null:
 		SceneTransition.change_scene(MAP_SCENE)
@@ -106,6 +118,8 @@ func finish_node() -> void:
 	cleared.append(finished.id)
 	frontier = _next_ids_of(finished.id)
 	node_finished.emit(finished)
+	if _run_ended:
+		return
 	current_node = null
 	current_reward = null
 	current_event = null
@@ -143,6 +157,7 @@ func is_node_available(node: MapNodeData) -> bool:
 func reset_stats() -> void:
 	gold = 5000
 	score = 0
+	max_hp_bonus = 0.0
 	max_hp = 100.0
 	hp = max_hp
 	mana = 100.0
@@ -152,6 +167,8 @@ func reset_stats() -> void:
 
 ## 返回主菜单时立即清空本局运行状态（保留 last_result 供展示）
 func reset_run() -> void:
+	_node_finishing = false
+	_run_ended = true
 	get_tree().paused = false
 
 	map = null
@@ -170,6 +187,7 @@ func reset_run() -> void:
 
 func go_main_menu() -> void:
 	reset_run()
+	get_tree().paused = true
 	SceneTransition.change_scene(MAIN_MENU_SCENE)
 
 func add_gold(amount: int) -> void:
@@ -188,9 +206,16 @@ func spend_gold(amount: int) -> bool:
 	stats_changed.emit()
 	return true
 
+func is_run_ended() -> bool:
+	return _run_ended
+
 ## 结束一局（阵亡 / 通关）：记录结果并进入结算界面
 func end_run(victory: bool = false) -> void:
-	get_tree().paused = false
+	if _run_ended:
+		return
+	_run_ended = true
+	_node_finishing = true
+	get_tree().paused = true
 
 	last_result = {
 		"victory": victory,
@@ -278,8 +303,12 @@ func change_hp(delta: float) -> void:
 
 ## 事件用：改变最大生命（最低 1，当前血量跟随上限）
 func change_max_hp(delta: float) -> void:
-	max_hp = maxf(1.0, max_hp + delta)
+	var stats := get_player_stats()
+	# 只保存实际生效的增减量，触底后不会积累隐藏的负修正。
+	max_hp_bonus += maxf(1.0, stats.max_hp() + delta) - stats.max_hp_unclamped()
+	max_hp = get_player_stats().max_hp()
 	hp = minf(hp, max_hp)
+	max_hp_changed.emit()
 	stats_changed.emit()
 
 func spend_mana(amount: float) -> bool:
@@ -329,6 +358,10 @@ func get_equipment() -> PlayerEquipment:
 	if equipment == null:
 		equipment = PlayerEquipment.new()
 	return equipment
+
+## 角色属性统一入口：装备词条与本局事件修正共同参与计算。
+func get_player_stats() -> EquipmentStats:
+	return EquipmentStats.compute(get_equipment(), max_hp_bonus)
 
 ## 临时起始物资：接入掉落/商店后删除
 func _seed_starter_inventory() -> void:

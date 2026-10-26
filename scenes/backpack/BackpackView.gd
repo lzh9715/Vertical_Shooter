@@ -273,7 +273,13 @@ func _refresh_assembly() -> void:
 	]
 
 	_paint_component(body_slot, wand.body, "杖身")
-	_paint_component(gem_slot, wand.gem, "宝石")
+	var dragging_gem: bool = (
+		_drag_item != null
+		and _drag_origin.get("kind") == "assembly"
+		and _drag_origin.get("index") == 1
+		and _drag_origin.get("wand_instance") == wand
+	)
+	_paint_component(gem_slot, null if dragging_gem else wand.gem, "宝石")
 
 func _paint_component(panel: Panel, item: ItemInstance, empty_text: String) -> void:
 	var bg: ColorRect = panel.get_node("Bg")
@@ -337,25 +343,19 @@ func _start_drag(slot: Panel, split: bool) -> void:
 		if wand == null:
 			return
 
-		var inv := GameFlow.get_inventory()
 		var item: ItemInstance = null
 		if index == 0:
 			item = wand.body
 			wand.body = null
 		else:
+			# 宝石和程序先保留在原法杖，只有有效落点才提交拆卸。
 			item = wand.gem
-			if item != null:
-				var returned := wand.cards.duplicate()
-				wand.gem = null
-				wand.cards.clear()
-				for card in returned:
-					inv.add_card(card, 1)
 
 		if item == null:
 			return
 
 		_drag_item = item
-		_drag_origin = {"kind": "assembly", "index": index, "wand": _edit_index, "split": false}
+		_drag_origin = {"kind": "assembly", "index": index, "wand_instance": wand, "split": false}
 		_create_drag_visual(item)
 		_refresh()
 		return
@@ -588,24 +588,29 @@ func _drop_to_assembly(target_index: int) -> void:
 		return
 
 	var old: ItemInstance = null
+	var returned: Array[ItemDefinition] = []
 
 	if target_index == 0:
 		old = wand.body
 		wand.body = item
 	else:
 		old = wand.gem
-		# 替换宝石：原卡槽里的卡全部退回背包/溢出
-		var returned := wand.cards.duplicate()
+		returned = wand.cards.duplicate()
 		wand.cards.clear()
-		for card in returned:
-			inv.add_card(card, 1)
+		wand.cast_index = 0
 		wand.gem = item
+		wand.ensure_slots()
 
 	if old != null:
 		if src.kind == "cell" and inv.cells[int(src.index)] == null:
 			inv.cells[int(src.index)] = old
 		else:
 			inv.add(old)
+
+	# 先安置旧组件，再让卡牌合并、占空格或进入溢出队列。
+	for card in returned:
+		if card != null:
+			inv.add_card(card, 1)
 
 	inv.auto_transfer()
 	_finish_drag()
@@ -654,8 +659,15 @@ func _restore_drag() -> void:
 	var src: Dictionary = _drag_origin
 	var item = _drag_item
 	if item == null:
-		_finish_drag()
+		_finish_drag(false)
 		return
+
+	if src.kind == "assembly" and src.index == 1:
+		var original_wand: WandInstance = src.wand_instance
+		if original_wand != null and original_wand.gem == item:
+			# 未提交的拖拽没有改动模型，也不触发溢出补位。
+			_finish_drag(false)
+			return
 
 	match src.kind:
 		"cell":
@@ -679,8 +691,7 @@ func _restore_drag() -> void:
 			else:
 				inv.add(item)
 		"assembly":
-			var eq := GameFlow.get_equipment()
-			var wand: WandInstance = eq.wand_slots[_edit_index]
+			var wand: WandInstance = src.wand_instance
 			if wand != null:
 				if src.index == 0 and wand.body == null:
 					wand.body = item
@@ -692,9 +703,25 @@ func _restore_drag() -> void:
 				inv.add(item)
 
 	inv.auto_transfer()
-	_finish_drag()
+	_finish_drag(false)
 
-func _finish_drag() -> void:
+func _commit_gem_drag() -> void:
+	if _drag_origin.get("kind") != "assembly" or _drag_origin.index != 1:
+		return
+	var wand: WandInstance = _drag_origin.wand_instance
+	if wand == null or wand.gem != _drag_item:
+		return
+	var returned := wand.cards.duplicate()
+	wand.gem = null
+	wand.cards.clear()
+	wand.cast_index = 0
+	for card in returned:
+		if card != null:
+			GameFlow.get_inventory().add_card(card, 1)
+
+func _finish_drag(commit: bool = true) -> void:
+	if commit:
+		_commit_gem_drag()
 	_cancel_drag()
 	_refresh()
 	EventBus.loadout_changed.emit()

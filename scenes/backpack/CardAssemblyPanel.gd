@@ -391,7 +391,7 @@ func _refresh_warnings() -> void:
 			if _wand.body != null and _wand.body.definition != null:
 				staff_interval = _wand.body.definition.cast_interval
 
-			var stats := EquipmentStats.compute(GameFlow.get_equipment())
+			var stats := GameFlow.get_player_stats()
 			var max_mana := stats.max_mana()
 
 			var index := 0

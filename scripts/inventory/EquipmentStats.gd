@@ -13,6 +13,7 @@ const BASE_CRIT_DAMAGE := 1.5
 
 var hp_flat := 0.0
 var hp_pct := 0.0
+var max_hp_bonus := 0.0 # 本局事件修正，按最终生命值相加
 var hp_regen_flat := 0.0
 var mana_flat := 0.0
 var mana_pct := 0.0
@@ -27,8 +28,9 @@ var move_speed_pct := 0.0
 var pickup_radius_pct := 0.0
 var luck := 0.0
 
-static func compute(equipment: PlayerEquipment) -> EquipmentStats:
+static func compute(equipment: PlayerEquipment, run_max_hp_bonus: float = 0.0) -> EquipmentStats:
 	var stats := EquipmentStats.new()
+	stats.max_hp_bonus = run_max_hp_bonus
 	if equipment == null:
 		return stats
 
@@ -44,7 +46,10 @@ static func compute(equipment: PlayerEquipment) -> EquipmentStats:
 	return stats
 
 func max_hp() -> float:
-	return maxf((BASE_MAX_HP + hp_flat) * (1.0 + hp_pct), 1.0)
+	return maxf(max_hp_unclamped(), 1.0)
+
+func max_hp_unclamped() -> float:
+	return (BASE_MAX_HP + hp_flat) * (1.0 + hp_pct) + max_hp_bonus
 
 func hp_regen() -> float:
 	return maxf(BASE_HP_REGEN + hp_regen_flat, 0.0)

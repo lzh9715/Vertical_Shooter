@@ -20,6 +20,7 @@ extends Area2D
 
 var _lifetime := 0.0
 var _offscreen_time := 0.0
+var _spent := false
 
 var pierced_enemies := [] # 记录已经打过的敌人，防止同一只怪被重复扣血
 
@@ -70,8 +71,15 @@ func _update_view_lifetime(delta: float) -> void:
 		queue_free()
 
 func _on_area_entered(area):
+	if _spent or is_queued_for_deletion():
+		return
+
 	if area.is_in_group("enemy") and not area in pierced_enemies:
 		pierced_enemies.append(area)
+		# 先消耗弹体，再执行可能发出同步信号的伤害和爆炸逻辑。
+		if not is_piercing or pierced_enemies.size() >= maxi(pierce_amount, 1):
+			_spent = true
+			queue_free()
 
 		if is_explosive:
 			explode()
@@ -79,11 +87,6 @@ func _on_area_entered(area):
 		# ← 原来这里是 area.queue_free()
 		if area.has_method("take_damage"):
 			area.take_damage(damage)
-
-		if is_piercing and pierced_enemies.size() < pierce_amount:
-			pass
-		else:
-			queue_free()
 
 func explode():
 	AudioManager.play_sfx(&"explosion")

@@ -85,3 +85,19 @@ debug/        手动调试场景（BossTest、EventTest、MapDebug、SettingsTes
 - `debug/EventTest.tscn`：事件选项
 - `debug/MapDebug.tscn`：地图生成压力测试
 - `debug/SettingsTest.tscn`：设置读写
+
+## 回归测试
+
+使用 Godot 4.7，在项目根目录执行：
+
+```bash
+python3 tests/run_regressions.py --godot /path/to/Godot
+```
+
+也可以通过 `GODOT_BIN` 指定引擎路径；引擎已在 PATH 中时直接运行 `python3 tests/run_regressions.py`。
+脚本会创建临时项目副本、导入资源，再依次运行两组测试：
+
+- `tests/p1_regressions.gd`：单次击杀奖励、重叠碰撞与穿透上限、爆炸重复回调、清关和死亡的竞态、连续节点、通关重开及淡入期间的场景请求。
+- `tests/p2_regressions.gd`：宝石拖拽取消/卸下/替换、空槽和满背包、事件生命上限与换装/存档/新局重置、连续透支与回蓝/零费卡/致死边界，以及玩家实际施法提交。
+
+断言失败、脚本错误或超时均以非零退出码结束。

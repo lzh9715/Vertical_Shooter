@@ -32,6 +32,7 @@ var _attack_running := false
 var _step_index := 0
 var _repeats_left := 0
 var _timer := 0.0
+var _dead := false
 
 @onready var polygon: Polygon2D = $Polygon2D
 @onready var sprite: Sprite2D = $Body
@@ -48,6 +49,9 @@ func _ready() -> void:
 	_begin_attack()
 
 func take_damage(amount: float) -> void:
+	if _dead or is_queued_for_deletion():
+		return
+
 	var after_defense := maxf(amount - defense, 1.0)
 	var final_damage := maxf(after_defense * (1.0 - damage_reduction), 1.0)
 	var dealt := maxi(1, roundi(final_damage))
@@ -55,6 +59,10 @@ func take_damage(amount: float) -> void:
 	hp -= dealt
 	if hp > 0:
 		return
+	# queue_free 到帧末才释放；先锁定死亡，避免同帧多次伤害重复发奖。
+	_dead = true
+	set_physics_process(false)
+	remove_from_group("enemy")
 	AudioManager.play_sfx(&"enemy_die")
 	died.emit(score_reward, gold_reward)
 	queue_free()

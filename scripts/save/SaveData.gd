@@ -24,6 +24,7 @@ static func capture() -> Dictionary:
 		"player": {
 			"hp": GameFlow.hp,
 			"max_hp": GameFlow.max_hp,
+			"max_hp_bonus": GameFlow.max_hp_bonus,
 			"mana": GameFlow.mana,
 			"max_mana": GameFlow.max_mana,
 		},
@@ -90,6 +91,12 @@ static func restore(data: Dictionary) -> bool:
 
 	GameFlow.inventory = inventory
 	GameFlow.equipment = equipment
+	# 旧的 version 1 草案只保存最终上限，从已恢复装备中推回事件修正。
+	GameFlow.max_hp_bonus = float(player.get(
+		"max_hp_bonus", GameFlow.max_hp - EquipmentStats.compute(equipment).max_hp()
+	))
+	GameFlow.max_hp = GameFlow.get_player_stats().max_hp()
+	GameFlow.hp = minf(GameFlow.hp, GameFlow.max_hp)
 	return true
 
 static func _item_to_dict(item, slot: int = -1) -> Dictionary:
