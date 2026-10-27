@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://data/core/EnemyData.gd" id="1_data"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/charger.tscn" id="2_scene"]
+
+[resource]
+script = ExtResource("1_data")
+scene = ExtResource("2_scene")
+max_hp = 80
+speed = 160.0
+attack_power = 15.0
+defense = 2.0
+damage_reduction = 0.0
+score = 45
+gold = 18
+visual_scale = 1.2

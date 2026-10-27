@@ -1,0 +1,60 @@
+[gd_resource type="Resource" script_class="WaveData" format=3]
+
+[ext_resource type="Script" path="res://data/core/WaveData.gd" id="1_wave"]
+[ext_resource type="Script" path="res://data/core/WaveEntry.gd" id="2_entry"]
+
+[ext_resource type="Script" path="res://data/core/FormationData.gd" id="3_formation"]
+[ext_resource type="Script" path="res://data/shapes/ShapeColumn.gd" id="4_shape"]
+[ext_resource type="Resource" path="res://data/enemies/Enemy_ShieldGuard.tres" id="5_shield"]
+[ext_resource type="Resource" path="res://data/enemies/Enemy_Charger.tres" id="6_charger"]
+[ext_resource type="Script" path="res://data/core/QueueData.gd" id="7_queue"]
+[ext_resource type="Resource" path="res://data/enemies/Enemy_SelfDestruct.tres" id="8_self"]
+
+[sub_resource type="Resource" id="Resource_shape"]
+script = ExtResource("4_shape")
+
+[sub_resource type="Resource" id="Resource_shield"]
+script = ExtResource("3_formation")
+shape = SubResource("Resource_shape")
+enemy_data = ExtResource("5_shield")
+anchor = Vector2(0.96, 0.0)
+count = 2
+spacing = Vector2(0, 150)
+interval = 0.2
+
+[sub_resource type="Resource" id="Resource_charger"]
+script = ExtResource("3_formation")
+shape = SubResource("Resource_shape")
+enemy_data = ExtResource("6_charger")
+anchor = Vector2(0.9, 0.0)
+count = 3
+spacing = Vector2(0, 120)
+interval = 0.2
+
+[sub_resource type="Resource" id="Resource_entry_shield"]
+script = ExtResource("2_entry")
+spawn = SubResource("Resource_shield")
+
+[sub_resource type="Resource" id="Resource_entry_charger"]
+script = ExtResource("2_entry")
+spawn = SubResource("Resource_charger")
+delay = 1.0
+
+[sub_resource type="Resource" id="Resource_self"]
+script = ExtResource("7_queue")
+enemy_data = ExtResource("8_self")
+anchor = Vector2(0.96, 0.0)
+count = 1
+
+[sub_resource type="Resource" id="Resource_entry_self"]
+script = ExtResource("2_entry")
+spawn = SubResource("Resource_self")
+delay = 2.0
+
+[resource]
+script = ExtResource("1_wave")
+entries = Array[ExtResource("2_entry")]([
+	SubResource("Resource_entry_shield"),
+	SubResource("Resource_entry_charger"),
+	SubResource("Resource_entry_self"),
+])

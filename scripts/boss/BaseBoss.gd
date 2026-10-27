@@ -206,7 +206,8 @@ func take_damage(amount: int) -> void:
 		return
 
 	var after_defense := maxf(float(amount) - defense, 1.0)
-	var final_damage := maxi(1, roundi(after_defense * (1.0 - damage_reduction)))
+	var dr := clampf(damage_reduction, 0.0, 0.75)
+	var final_damage := maxi(1, roundi(after_defense * (1.0 - dr)))
 	amount = final_damage
 
 	hp = maxi(hp - amount, 0)

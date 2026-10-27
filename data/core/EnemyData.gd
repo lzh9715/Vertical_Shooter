@@ -10,7 +10,7 @@ class_name EnemyData
 @export var speed: float = 200.0
 @export var attack_power: float = 8.0
 @export var defense: float = 0.0
-@export_range(0.0, 0.8, 0.01) var damage_reduction := 0.0
+@export_range(0.0, 0.75, 0.01) var damage_reduction := 0.0
 @export var score: int = 10      # 击杀得分
 @export var gold: int = 5        # 掉落金币
 @export var despawn_margin: float = 300.0

@@ -1,0 +1,20 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/ShieldGuard.gd" id="1_sg"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_sg"]
+size = Vector2(50, 50)
+
+[node name="ShieldGuard" type="Area2D" groups=["enemy"]]
+collision_layer = 4
+script = ExtResource("1_sg")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_sg")
+
+[node name="Polygon2D" type="Polygon2D" parent="."]
+color = Color(0.2, 0.45, 1, 1)
+polygon = PackedVector2Array(-25, -25, 25, -25, 25, 25, -25, 25)
+
+[node name="Body" type="Sprite2D" parent="."]
+visible = false
