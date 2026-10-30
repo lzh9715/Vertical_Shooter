@@ -97,6 +97,7 @@ func _direction_vector() -> Vector2:
 		"Right_To_Left": return Vector2.LEFT
 		"Left_To_Right": return Vector2.RIGHT
 		"Top_To_Bottom": return Vector2.DOWN
+		"Bottom_To_Top": return Vector2.UP
 		_: return Vector2.LEFT
 
 # ---------- 攻击序列 ----------
