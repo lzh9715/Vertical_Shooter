@@ -147,26 +147,43 @@ func _hit_target(area) -> void:
 	_target = null
 	_next_target_search = _lifetime
 
-	if is_explosive:
-		explode(hit_damage)
+	# 普通射弹先被护盾吸收；穿透弹直接绕过护盾打本体。
+	var shield_stopped := false
+	if (
+		area.has_method("has_active_shield")
+		and area.has_active_shield()
+		and not is_piercing
+	):
+		if area.has_method("absorb_shield_damage"):
+			area.absorb_shield_damage(hit_damage)
+		shield_stopped = true
 
-	if area.has_method("take_damage"):
+	if is_explosive:
+		# 盾卫直击被护盾吸收时，爆炸仍然要能伤害本体；
+		# 普通直击目标则跳过，避免和直击伤害重复。
+		explode(hit_damage, shield_stopped)
+	if not shield_stopped and area.has_method("take_damage"):
 		area.take_damage(hit_damage)
 
 	if not is_piercing or _hit_count >= _max_hits:
 		_spent = true
 		queue_free()
 
-func explode(explosion_damage: int):
+func explode(explosion_damage: int, include_direct: bool = false):
 	AudioManager.play_sfx(&"explosion")
 	var enemies = get_tree().get_nodes_in_group("enemy")
 	for enemy in enemies:
-		# 本次直接命中的敌人已经单独结算过了，爆炸不再重复扣血
 		if _visited.has(enemy):
-			continue
+			# 普通直击已经结算；只有“直击被护盾吸收”时才补一次爆炸本体伤害
+			if not (include_direct and enemy == _last_hit_target):
+				continue
 		if global_position.distance_to(enemy.global_position) <= explosion_radius:
 			if enemy.has_method("take_damage"):
-				enemy.take_damage(explosion_damage)
+				var multiplier := ExplosionMath.falloff(
+					global_position.distance_to(enemy.global_position),
+					explosion_radius
+				)
+				enemy.take_damage(maxi(1, roundi(float(explosion_damage) * multiplier)))
 
 	# 视觉反馈（可选）：在屏幕上画一个圈代表爆炸范围
 	var explosion_visual = Polygon2D.new()

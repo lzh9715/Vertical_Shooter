@@ -1,6 +1,5 @@
-extends SceneTree
-## P1 回归：真实碰撞、单次奖励、节点结束与死亡结算。
-
+﻿extends SceneTree
+## P1 regressions: collisions, rewards, and clear/death races.
 var _flow
 var _transition
 var _enemy_scene: PackedScene
@@ -15,7 +14,7 @@ func _initialize() -> void:
 func _run() -> void:
 	_flow = root.get_node("GameFlow")
 	_transition = root.get_node("SceneTransition")
-	# --script 的入口先于 autoload 编译；等单例注册后再加载依赖它们的场景。
+	# Load scenes after autoloads are registered.
 	_enemy_scene = load("res://scenes/enemies/enemy.tscn")
 	_bullet_scene = load("res://scenes/player/bullet.tscn")
 	_player_scene = load("res://scenes/player/player.tscn")
@@ -37,6 +36,12 @@ func _run() -> void:
 		"test_homing_target_priority",
 		"test_explosion_uses_projectile_damage",
 		"test_explosion_once",
+		"test_shield_blocks_ordinary_and_pierce_bypasses",
+		"test_shield_explosion_bypasses",
+		"test_enemy_damage_reduction_cap",
+		"test_self_destruct_fuse_survives_death",
+		"test_multiple_explosions_take_highest_once",
+		"test_charger_damages_only_once",
 		"test_clear_then_death",
 		"test_death_then_clear",
 		"test_normal_clear",
@@ -177,7 +182,8 @@ func test_homing_target_priority() -> bool:
 
 func test_explosion_uses_projectile_damage() -> bool:
 	var first = _enemy(Vector2(1000, 1000))
-	var second = _enemy(Vector2(1050, 1000))
+	var second = _enemy(Vector2(1030, 1000))
+	var third = _enemy(Vector2(1100, 1000))
 	var bullet = _bullet_scene.instantiate()
 	bullet.position = Vector2(1000, 1000)
 	bullet.speed = 0.0
@@ -190,11 +196,13 @@ func test_explosion_uses_projectile_damage() -> bool:
 
 	bullet._hit_target(first)
 	_expect(first.hp == 90, "direct hit must use projectile damage")
-	_expect(second.hp == 90, "explosion must reuse the current projectile damage")
+	_expect(second.hp == 90, "inner explosion radius must use full projectile damage")
+	_expect(third.hp == 94, "explosion edge must use 60% falloff")
 
 	bullet._hit_target(first)
 	_expect(first.hp == 82, "second direct hit must use 80% falloff")
-	_expect(second.hp == 82, "explosion must also use the fallen-off damage")
+	_expect(second.hp == 82, "inner explosion must also use fallen-off damage")
+	_expect(third.hp == 89, "outer explosion must combine both falloffs")
 	_expect(bullet.is_queued_for_deletion(), "bullet must be consumed after its hit budget")
 	return true
 
@@ -208,7 +216,7 @@ func test_explosion_once() -> bool:
 	bullet.is_explosive = true
 	bullet.explosion_radius = 50.0
 	current_scene.add_child(bullet)
-	# 同一物理帧可能排队送达多个 area_entered；queue_free 不能取消这些回调。
+	# Queued overlap callbacks must not re-trigger a spent bullet.
 	bullet._on_area_entered(first)
 	bullet._on_area_entered(second)
 	var explosions := 0
@@ -219,6 +227,111 @@ func test_explosion_once() -> bool:
 	_expect(first.hp == 90 and second.hp == 100, "a consumed bullet must ignore later collision callbacks")
 	return true
 
+func test_shield_blocks_ordinary_and_pierce_bypasses() -> bool:
+	var shield = load("res://scenes/enemies/shield_guard.tscn").instantiate()
+	shield.start_position = Vector2(1000, 1000)
+	shield.speed = 0.0
+	shield.max_hp = 100
+	current_scene.add_child(shield)
+
+	var ordinary = _bullet_scene.instantiate()
+	ordinary.damage = 10
+	current_scene.add_child(ordinary)
+	ordinary._hit_target(shield)
+	_expect(shield.shield_hp == shield.shield_max - 10, "ordinary bullet must damage the shield")
+	_expect(shield.hp == shield.max_hp, "ordinary bullet must not damage the shielded body")
+
+	var piercing = _bullet_scene.instantiate()
+	piercing.damage = 10
+	piercing.is_piercing = true
+	piercing.pierce_amount = 2
+	current_scene.add_child(piercing)
+	piercing._hit_target(shield)
+	_expect(shield.hp == shield.max_hp - 10, "piercing bullet must bypass the shield")
+	return true
+
+func test_shield_explosion_bypasses() -> bool:
+	var shield = load("res://scenes/enemies/shield_guard.tscn").instantiate()
+	shield.start_position = Vector2(1000, 1000)
+	shield.speed = 0.0
+	shield.max_hp = 100
+	current_scene.add_child(shield)
+
+	var explosive = _bullet_scene.instantiate()
+	explosive.position = shield.global_position
+	explosive.damage = 10
+	explosive.is_explosive = true
+	explosive.explosion_radius = 100.0
+	current_scene.add_child(explosive)
+	explosive._hit_target(shield)
+	_expect(shield.hp == shield.max_hp - 10, "explosion must bypass the shield and damage the body")
+	return true
+
+func test_enemy_damage_reduction_cap() -> bool:
+	var enemy = _enemy(Vector2(1000, 1000), 100)
+	enemy.defense = 0.0
+	enemy.damage_reduction = 2.0
+	enemy.take_damage(100)
+	_expect(enemy.hp == 75, "enemy damage reduction must be capped at 75%")
+	return true
+
+func test_self_destruct_fuse_survives_death() -> bool:
+	var self_destruct = load("res://scenes/enemies/self_destruct.tscn").instantiate()
+	self_destruct.start_position = Vector2(1000, 1000)
+	self_destruct.speed = 0.0
+	self_destruct.max_hp = 10
+	current_scene.add_child(self_destruct)
+	self_destruct.take_damage(100)
+	_expect(self_destruct.is_queued_for_deletion(), "killed self-destruct must leave the field")
+	var hazards := 0
+	var hazard_script = load("res://scripts/enemies/SelfDestructExplosion.gd")
+	for child in current_scene.get_children():
+		if child.get_script() == hazard_script:
+			hazards += 1
+	_expect(hazards == 1, "death must create an independent delayed explosion")
+	await create_timer(1.7).timeout
+	var hazards_after := 0
+	for child in current_scene.get_children():
+		if child.get_script() == hazard_script:
+			hazards_after += 1
+	_expect(hazards_after == 0, "self-destruct fuse must clean itself up after exploding")
+	return true
+
+func test_multiple_explosions_take_highest_once() -> bool:
+	var player = _player_scene.instantiate()
+	current_scene.add_child(player)
+	player.set_physics_process(false)
+	player._stats = EquipmentStats.new()
+	var hp_before: float = player.current_hp
+	player.queue_explosion_damage(10.0)
+	player.queue_explosion_damage(20.0)
+	await process_frame
+	_expect(is_equal_approx(player.current_hp, hp_before - 20.0),
+		"same-frame explosions must apply the highest damage only once")
+	return true
+
+func test_charger_damages_only_once() -> bool:
+	var player = _player_scene.instantiate()
+	current_scene.add_child(player)
+	player.set_physics_process(false)
+	player._stats = EquipmentStats.new()
+	player.global_position = Vector2(1000, 1000)
+
+	var charger = load("res://scenes/enemies/charger.tscn").instantiate()
+	charger.start_position = Vector2(1100, 1000)
+	charger.speed = 0.0
+	charger.attack_power = 15.0
+	charger.max_hp = 100
+	current_scene.add_child(charger)
+	charger._enter_aim()
+	charger._physics_process(1.1)
+	charger._physics_process(0.1)
+	var hp_after_first: float = player.current_hp
+	charger._physics_process(0.1)
+	_expect(is_equal_approx(hp_after_first, 85.0), "charge must deal contact damage")
+	_expect(is_equal_approx(player.current_hp, hp_after_first), "charge must damage the player only once")
+	return true
+
 func test_clear_then_death() -> bool:
 	_select_battle_node()
 	var player = _player_scene.instantiate()
@@ -227,7 +340,7 @@ func test_clear_then_death() -> bool:
 	_flow.hp = 1.0
 	_flow.finish_node()
 	_expect(paused, "combat must pause as soon as node exit begins")
-	# 模拟同帧已经送达的致死回调；它必须覆盖待执行的回地图跳转。
+	# Simulate a lethal callback delivered during the clear fade.
 	player.take_damage(1000)
 	var result: Dictionary = _flow.last_result.duplicate(true)
 	player.take_damage(1000)
@@ -274,7 +387,7 @@ func test_normal_clear() -> bool:
 	_expect(_flow.map == original_map, "normal clear must preserve the run")
 	_expect(_flow.cleared.size() == clear_count + 1 and _flow.cleared.has(node_id), "node must be marked cleared exactly once")
 	_expect(not paused, "map must be interactive after clear")
-	# 没有战斗的节点也必须能连续完成，不能被上个节点的结束标记锁住。
+	# A request during fade-in must still execute.
 	var next_node = _flow.map.get_node_data(_flow.frontier[0])
 	next_node.type = MapNodeData.NodeType.START
 	_flow.enter_node(next_node)
@@ -301,7 +414,7 @@ func test_victory_and_restart() -> bool:
 func test_request_during_fade_in() -> bool:
 	_transition.change_scene(_flow.MAIN_MENU_SCENE)
 	await scene_changed
-	# 新场景已进入，但旧淡入仍在运行；这时的后续请求也不能被丢弃。
+	# The new scene is active but the previous fade-in is still running.
 	_transition.change_scene(_flow.RESULT_SCENE)
 	await _wait_transition()
 	_expect(current_scene.scene_file_path == _flow.RESULT_SCENE, "scene request during fade-in must eventually execute")

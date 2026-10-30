@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://data/core/EnemyData.gd" id="1_data"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/self_destruct.tscn" id="2_scene"]
+
+[resource]
+script = ExtResource("1_data")
+scene = ExtResource("2_scene")
+max_hp = 240
+speed = 65.0
+attack_power = 0.0
+defense = 3.0
+damage_reduction = 0.1
+score = 70
+gold = 35
+visual_scale = 1.2

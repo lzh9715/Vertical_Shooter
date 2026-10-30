@@ -18,6 +18,9 @@ var _legacy_cooldown := 0.0
 var _iframe_generation := 0
 var _stats: EquipmentStats = EquipmentStats.new()
 var _dead := false
+var _pending_explosion_frame := -1
+var _pending_explosion_damage := 0.0
+var _explosion_queued := false
 
 @onready var shoot_timer: Timer = $ShootTimer
 @onready var hurtbox: Area2D = $Hurtbox
@@ -317,7 +320,32 @@ func _on_hurtbox_area_entered(area):
 		var contact_damage := 1.0
 		if "attack_power" in area:
 			contact_damage = float(area.attack_power)
-		take_damage(contact_damage)
+		if contact_damage > 0.0:
+			take_damage(contact_damage)
+
+
+## 同一物理帧内的多个自爆合并，取最高一次伤害。
+func queue_explosion_damage(amount: float) -> void:
+	if amount <= 0.0 or _dead or GameFlow.is_run_ended() or is_invincible:
+		return
+
+	var frame := Engine.get_physics_frames()
+	if frame != _pending_explosion_frame:
+		_pending_explosion_frame = frame
+		_pending_explosion_damage = 0.0
+		_explosion_queued = false
+
+	_pending_explosion_damage = maxf(_pending_explosion_damage, amount)
+	if not _explosion_queued:
+		_explosion_queued = true
+		_apply_pending_explosion.call_deferred()
+
+func _apply_pending_explosion() -> void:
+	_explosion_queued = false
+	var damage := _pending_explosion_damage
+	_pending_explosion_damage = 0.0
+	if damage > 0.0 and not is_invincible and not _dead:
+		take_damage(damage)
 
 
 func take_damage(amount: float = 1.0):

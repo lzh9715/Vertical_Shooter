@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://data/core/EnemyData.gd" id="1_data"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/shield_guard.tscn" id="2_scene"]
+[ext_resource type="Resource" path="res://data/attacks/Attack_ShieldGuard.tres" id="3_attack"]
+
+[resource]
+script = ExtResource("1_data")
+scene = ExtResource("2_scene")
+max_hp = 220
+speed = 48.0
+attack_power = 10.0
+defense = 6.0
+damage_reduction = 0.25
+score = 90
+gold = 40
+visual_scale = 1.5
+attack = ExtResource("3_attack")

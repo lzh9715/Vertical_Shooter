@@ -53,7 +53,8 @@ func take_damage(amount: float) -> void:
 		return
 
 	var after_defense := maxf(amount - defense, 1.0)
-	var final_damage := maxf(after_defense * (1.0 - damage_reduction), 1.0)
+	var dr := clampf(damage_reduction, 0.0, 0.75)
+	var final_damage := maxf(after_defense * (1.0 - dr), 1.0)
 	var dealt := maxi(1, roundi(final_damage))
 	DamageNumbers.spawn(global_position, dealt)
 	hp -= dealt
