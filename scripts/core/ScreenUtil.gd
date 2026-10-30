@@ -39,6 +39,28 @@ static func world_from_anchor(anchor: Vector2) -> Vector2:
 	var s := world_size()
 	return Vector2((anchor.x + 1.0) * 0.5 * s.x, (anchor.y + 1.0) * 0.5 * s.y)
 
+## 归一化锚点(-1~1) → 当前摄像机视野外侧的世界坐标。
+## 没有摄像机时回退到整张地图的锚点。
+static func world_from_view_anchor(anchor: Vector2) -> Vector2:
+	var tree := Engine.get_main_loop() as SceneTree
+	if tree == null or tree.root == null:
+		return world_from_anchor(anchor)
+
+	var viewport := tree.root.get_viewport()
+	if viewport == null:
+		return world_from_anchor(anchor)
+
+	var camera := viewport.get_camera_2d()
+	if camera == null:
+		return world_from_anchor(anchor)
+
+	var view_size := viewport.get_visible_rect().size
+	var center := camera.get_screen_center_position()
+	return center + Vector2(
+		anchor.x * view_size.x * 0.5,
+		anchor.y * view_size.y * 0.5
+	)
+
 ## 摄像机 y 的可移动范围（保持视口不出世界）
 static func camera_y_range() -> Vector2:
 	var half := size().y * 0.5

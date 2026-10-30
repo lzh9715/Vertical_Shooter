@@ -11,7 +11,7 @@ class_name SpawnGroup
 @export var offset_px := Vector2.ZERO       # 锚点基础上的像素微调
 
 @export_group("行为")
-@export_enum("Right_To_Left", "Left_To_Right", "Top_To_Bottom") var direction := "Right_To_Left"
+@export_enum("Right_To_Left", "Left_To_Right", "Top_To_Bottom", "Bottom_To_Top") var direction := "Right_To_Left"
 @export var movement: MovementPattern
 
 ## 由 EnemySpawner 调用：把这一组敌人实例化并放进场景
