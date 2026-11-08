@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ItemDefinition" format=3]
+
+[ext_resource type="Script" path="res://data/items/ItemDefinition.gd" id="1_g0l5t"]
+
+[resource]
+script = ExtResource("1_g0l5t")
+id = &"module_multicast_double"
+display_name = "双重施法"
+stack_limit = 3
+base_price = 40
+spell_kind = 2
+effect_type = 6
+mana_cost = 10
+cast_interval = 0.1
+multicast_count = 2
+base_value = 40

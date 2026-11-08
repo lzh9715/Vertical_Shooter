@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="ItemDefinition" format=3]
+
+[ext_resource type="Script" path="res://data/items/ItemDefinition.gd" id="1_h5yhb"]
+[ext_resource type="PackedScene" path="res://scenes/projectiles/projectile_magic_bolt_delayed.tscn" id="2_qh1kj"]
+
+[resource]
+script = ExtResource("1_h5yhb")
+id = &"projectile_magic_bolt_delayed"
+sort_order = 120
+display_name = "魔法弹1级（延时）"
+stack_limit = 3
+base_price = 28
+spell_kind = 1
+mana_cost = 5
+cast_interval = 0.2
+base_value = 28
+visual_scene = ExtResource("2_qh1kj")
+base_damage = 5
+projectile_speed = 300.0
+offset_type = 1
+lifetime = 1.0
+behavior_tag = &"delayed"
+trigger_type = 3
+trigger_target = &"next_block"
+trigger_count = 1

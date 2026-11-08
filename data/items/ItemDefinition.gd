@@ -30,10 +30,37 @@ enum EffectType {
 	PIERCE,
 	EXPLOSION,
 	DAMAGE,
+	SPREAD,
 	MULTICAST,
+	BOUNCE,
+	REFRACT,
+	RETURN,
+	ACCELERATE,
+	DECELERATE,
+	LIFETIME,
+}
+
+enum OffsetType {
+	FIXED,
+	RANDOM,
+	MULTI,
+}
+
+enum CollisionShape {
+	CIRCLE,
+	RECTANGLE,
+	CAPSULE,
+}
+
+enum TriggerType {
+	NONE,
+	ON_HIT,
+	ON_EXPIRE,
+	ON_HIT_OR_EXPIRE,
 }
 
 @export var id: StringName = &""
+@export var sort_order := 0
 @export var display_name := ""
 @export_multiline var description := ""
 @export var category: Category = Category.SPELL_CARD
@@ -59,13 +86,32 @@ enum EffectType {
 @export var max_equipped := 0   # 0 = 不限制；未来用于同名模块装备上限
 @export var base_value := 0
 @export var visual_scene: PackedScene
+@export var is_copy_module := false
+@export var inherit_to_copy := true
+@export var compatibility_group: StringName = &""
+@export var damage_falloff := 0.8
+@export var damage_floor := 0.3
+@export var target_rule: StringName = &""
 
 @export_group("攻击卡基础")
 @export var base_damage := 0
 @export var projectile_count := 1
 @export var projectile_speed := 800.0
 @export var spread_angle := 0.0
+@export var offset_type: OffsetType = OffsetType.FIXED
+@export var offset_angle := 0.0
 @export var lifetime := 1.8
+@export var collision_shape: CollisionShape = CollisionShape.CIRCLE
+@export var collision_size := Vector2(5.0, 5.0)
+@export var crit_chance_bonus := 0.0
+@export var crit_damage_bonus := 0.0
+@export var behavior_tag: StringName = &"normal"
+@export var copyable := true
+@export var copy_inherits_trigger := true
+@export var trigger_type: TriggerType = TriggerType.NONE
+@export var trigger_delay := 0.0
+@export var trigger_target: StringName = &""
+@export var trigger_count := 0
 
 func is_card() -> bool:
 	return category == Category.SPELL_CARD

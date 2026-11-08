@@ -179,4 +179,7 @@ func _fire_volley(volley: EnemyBulletPattern) -> void:
 		bullet.radius = volley.radius
 		bullet.texture = volley.texture
 		get_parent().add_child(bullet)
+		if not ProjectileRegistry.register(bullet, &"enemy"):
+			bullet.queue_free()
+			continue
 		bullet.global_position = global_position

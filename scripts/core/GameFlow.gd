@@ -385,8 +385,8 @@ func _seed_starter_inventory() -> void:
 		ItemInstance.create(bodies[0]),
 		ItemInstance.create(gems[0])
 	)
-	wand0.add_card(ItemCatalog.find_card(&"card_homing"))
-	wand0.add_card(ItemCatalog.find_card(&"card_pierce"))
+	wand0.add_card(ItemCatalog.find_card(&"module_homing"))
+	wand0.add_card(ItemCatalog.find_card(&"module_pierce_1"))
 	wand0.add_card(ItemCatalog.find_card(&"card_single"))
 	equipment.equip_wand(0, wand0)
 
@@ -395,9 +395,9 @@ func _seed_starter_inventory() -> void:
 		ItemInstance.create(gems[1])
 	)
 	wand1.add_card(ItemCatalog.find_card(&"module_damage"))
-	wand1.add_card(ItemCatalog.find_card(&"card_boom"))
+	wand1.add_card(ItemCatalog.find_card(&"module_explosion"))
 	wand1.add_card(ItemCatalog.find_card(&"card_single"))
-	wand1.add_card(ItemCatalog.find_card(&"card_spread"))
+	wand1.add_card(ItemCatalog.find_card(&"projectile_scatter_double"))
 	wand1.add_card(ItemCatalog.find_card(&"card_single"))
 	equipment.equip_wand(1, wand1)
 

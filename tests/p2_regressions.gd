@@ -81,7 +81,7 @@ func _wand() -> WandInstance:
 		ItemInstance.create(ItemCatalog.gems()[1])
 	)
 	wand.cards[0] = ItemCatalog.find_card(&"card_single")
-	wand.cards[2] = ItemCatalog.find_card(&"card_spread")
+	wand.cards[2] = ItemCatalog.find_card(&"projectile_scatter_double")
 	wand.cards[4] = ItemCatalog.find_card(&"card_single")
 	wand.cast_index = 2
 	_flow.get_equipment().equip_wand(0, wand)

@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ItemDefinition" format=3]
+
+[ext_resource type="Script" path="res://data/items/ItemDefinition.gd" id="1_ak0q3"]
+
+[resource]
+script = ExtResource("1_ak0q3")
+id = &"module_pierce_3"
+display_name = "穿透模块3级"
+stack_limit = 3
+base_price = 30
+spell_kind = 2
+effect_type = 2
+effect_value = 3.0
+mana_cost = 5
+base_value = 30
+compatibility_group = &"PIERCE_MODE"
+damage_falloff = 0.7

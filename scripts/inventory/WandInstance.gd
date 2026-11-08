@@ -40,8 +40,31 @@ func can_add_card() -> bool:
 			return true
 	return false
 
+func can_install(definition: ItemDefinition, ignore: ItemDefinition = null) -> bool:
+	if definition == null or not definition.is_card():
+		return false
+	if definition.is_attack() and definition.trigger_type != ItemDefinition.TriggerType.NONE and definition.projectile_count > 1:
+		return false
+	var same_count := 0
+	for card in cards:
+		if card == null or card == ignore:
+			continue
+		if card.id == definition.id:
+			same_count += 1
+	if definition.stack_limit > 0 and same_count >= definition.stack_limit:
+		return false
+	if definition.is_module() and definition.compatibility_group != &"":
+		for card in cards:
+			if card == null or card == ignore or not card.is_module():
+				continue
+			if card.compatibility_group == definition.compatibility_group and card.effect_type != definition.effect_type:
+				return false
+	return true
+
 func add_card(definition: ItemDefinition) -> bool:
 	if definition == null or not definition.is_card():
+		return false
+	if not can_install(definition):
 		return false
 	ensure_slots()
 	for i in range(cards.size()):
@@ -58,6 +81,8 @@ func insert_card(index: int, definition: ItemDefinition) -> bool:
 	if index < 0 or index >= cards.size():
 		return false
 	if cards[index] != null:
+		return false
+	if not can_install(definition):
 		return false
 	cards[index] = definition
 	return true

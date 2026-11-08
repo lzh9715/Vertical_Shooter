@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ItemDefinition" format=3]
+
+[ext_resource type="Script" path="res://data/items/ItemDefinition.gd" id="1_0vef4"]
+
+[resource]
+script = ExtResource("1_0vef4")
+id = &"module_homing"
+display_name = "追踪模块"
+stack_limit = 3
+base_price = 40
+spell_kind = 2
+effect_type = 1
+mana_cost = 10
+cast_interval = 0.1
+base_value = 40

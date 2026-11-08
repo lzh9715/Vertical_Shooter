@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ItemDefinition" format=3]
+
+[ext_resource type="Script" path="res://data/items/ItemDefinition.gd" id="1_jvplq"]
+
+[resource]
+script = ExtResource("1_jvplq")
+id = &"module_multicast_triple"
+display_name = "三重施法"
+stack_limit = 3
+base_price = 80
+spell_kind = 2
+effect_type = 6
+mana_cost = 20
+cast_interval = 0.2
+multicast_count = 3
+base_value = 80

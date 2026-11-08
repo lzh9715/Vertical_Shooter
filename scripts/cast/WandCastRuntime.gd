@@ -88,13 +88,75 @@ func attempt(player_hp: float) -> Dictionary:
 		# 只有满蓝也放不出来时才允许透支；当前蓝不够时先等满
 		if GameFlow.mana < GameFlow.max_mana:
 			return {"status": "wait", "reason": "等待满蓝后透支"}
+		var overdraft_plan := _make_trigger_plan(result, true, player_hp, staff_interval)
+		if not overdraft_plan.is_empty():
+			return overdraft_plan
 		return _make_plan(result, true)
 
 	if result.status == "ok":
+		var trigger_plan := _make_trigger_plan(result, false, player_hp, staff_interval)
+		if not trigger_plan.is_empty():
+			return trigger_plan
 		return _make_plan(result, false)
 
 	# degrade：先拆成当前普通块，再退到最小攻击块
 	return _degrade_plan(staff_interval)
+
+func _block_has_trigger(block: Array) -> bool:
+	for card in block:
+		if card != null and card.is_attack() and card.trigger_type != ItemDefinition.TriggerType.NONE:
+			return true
+	return false
+
+func _make_trigger_plan(result: Dictionary, is_overdraft: bool, player_hp: float, staff_interval: float) -> Dictionary:
+	# 触发链只处理单块动作；多重施法的同帧块暂不接入触发链。
+	var indices: Array = result.indices
+	if indices.size() != 1:
+		return {}
+	var start: int = int(indices[0])
+	if not _block_has_trigger(blocks[start]):
+		return {}
+	if start + 1 >= blocks.size():
+		return {}
+
+	var chain_indices: Array[int] = [start]
+	var trigger_blocks: Array = []
+	var cursor := start
+	while _block_has_trigger(blocks[cursor]) and cursor + 1 < blocks.size():
+		cursor += 1
+		chain_indices.append(cursor)
+		trigger_blocks.append(blocks[cursor].duplicate())
+	if trigger_blocks.is_empty():
+		return {}
+
+	var chained := CastSimulator._simulate_indices(
+		blocks,
+		chain_indices,
+		GameFlow.mana,
+		GameFlow.max_mana,
+		is_overdraft or not is_shuffled(),
+		player_hp,
+		staff_interval
+	)
+	if not chained.ok:
+		return {}
+
+	var action_blocks: Array = [blocks[start].duplicate()]
+	var cards: Array = []
+	for card in blocks[start]:
+		cards.append(card)
+	return {
+		"status": "overdraft" if (is_overdraft or chained.hp_cost > 0.0) else "ok",
+		"cards": cards,
+		"action_blocks": action_blocks,
+		"trigger_blocks": trigger_blocks,
+		"mana_after": chained.mana,
+		"hp_cost": chained.hp_cost,
+		"interval": result.interval,
+		"advance": cursor + 1,
+		"chain_extra": result.chain_extra,
+		"reason": "",
+	}
 
 func _make_plan(result: Dictionary, is_overdraft: bool) -> Dictionary:
 	var indices: Array = result.indices

@@ -26,6 +26,7 @@ var _explosion_queued := false
 @onready var hurtbox: Area2D = $Hurtbox
 
 func _ready():
+	add_to_group("player")
 	max_hp = GameFlow.max_hp
 	current_hp = GameFlow.hp
 	if GameFlow.spell != null:
@@ -132,6 +133,7 @@ func _fire_plan(plan: Dictionary) -> void:
 		return
 
 	var fired := false
+	var trigger_blocks: Array = plan.get("trigger_blocks", [])
 	for block in action_blocks:
 		var modifiers := _block_modifiers(block)
 		for card in block:
@@ -139,6 +141,7 @@ func _fire_plan(plan: Dictionary) -> void:
 				continue
 			var effect := _card_effect(card)
 			_apply_module_effects(effect, modifiers)
+			effect["trigger_blocks"] = trigger_blocks
 			_fire_volley(effect, body_bonus)
 			fired = true
 
@@ -146,14 +149,41 @@ func _fire_plan(plan: Dictionary) -> void:
 		# 全模块施法：法力已经提交，不生成弹体
 		AudioManager.play_sfx(&"shoot", -12.0)
 
+## 触发链中的后续块：法力在发射时已预付，这里只负责执行弹体。
+func fire_trigger_blocks(blocks: Array, origin: Vector2) -> void:
+	if blocks.is_empty() or _dead or GameFlow.is_run_ended():
+		return
+	var block: Array = blocks[0]
+	var remaining: Array = blocks.slice(1)
+	var body_bonus := 0
+	var wand := GameFlow.get_equipment().active_wand()
+	if wand != null and wand.body != null:
+		body_bonus = wand.body.definition.damage_bonus
+	var modifiers := _block_modifiers(block)
+	for card in block:
+		if card == null or not card.is_attack():
+			continue
+		var effect := _card_effect(card)
+		_apply_module_effects(effect, modifiers)
+		effect["trigger_blocks"] = remaining
+		_fire_volley(effect, body_bonus, origin)
+	AudioManager.play_sfx(&"shoot", -9.0)
+
 func _block_modifiers(block: Array) -> Dictionary:
 	var modifiers := {
 		"homing": false,
 		"piercing": false,
-		"pierce": 1,
+		"pierce_bonus": 0,
 		"explosive": false,
 		"radius": 0.0,
 		"damage_bonus": 0.0,
+		"bounce": 0,
+		"refract": 0,
+		"return": 0,
+		"speed_delta": 0.0,
+		"lifetime_bonus": 0.0,
+		"falloff": 0.8,
+		"floor": 0.3,
 	}
 
 	for card in block:
@@ -164,22 +194,47 @@ func _block_modifiers(block: Array) -> Dictionary:
 				modifiers.homing = true
 			ItemDefinition.EffectType.PIERCE:
 				modifiers.piercing = true
-				modifiers.pierce = maxi(int(card.effect_value), 1)
+				modifiers.pierce_bonus += maxi(int(card.effect_value), 1)
+				modifiers.falloff = card.damage_falloff
+				modifiers.floor = card.damage_floor
 			ItemDefinition.EffectType.EXPLOSION:
 				modifiers.explosive = true
 				modifiers.radius = card.effect_radius
 			ItemDefinition.EffectType.DAMAGE:
 				modifiers.damage_bonus += card.effect_value
+			ItemDefinition.EffectType.BOUNCE:
+				modifiers.bounce += maxi(int(card.effect_value), 1)
+				modifiers.falloff = card.damage_falloff
+				modifiers.floor = card.damage_floor
+			ItemDefinition.EffectType.REFRACT:
+				modifiers.refract += maxi(int(card.effect_value), 1)
+				modifiers.falloff = card.damage_falloff
+				modifiers.floor = card.damage_floor
+			ItemDefinition.EffectType.RETURN:
+				modifiers.return += 1
+			ItemDefinition.EffectType.ACCELERATE:
+				modifiers.speed_delta += card.effect_value
+			ItemDefinition.EffectType.DECELERATE:
+				modifiers.speed_delta -= card.effect_value
+			ItemDefinition.EffectType.LIFETIME:
+				modifiers.lifetime_bonus += card.effect_value
 
 	return modifiers
 
 func _apply_module_effects(effect: Dictionary, modifiers: Dictionary) -> void:
 	effect.damage += modifiers.damage_bonus
+	effect.bounce = modifiers.bounce
+	effect.refract = modifiers.refract
+	effect.return_count = modifiers.return
+	effect.speed_delta = modifiers.speed_delta
+	effect.falloff = modifiers.falloff
+	effect.floor = modifiers.floor
+	effect.lifetime = maxf(0.1, effect.lifetime + modifiers.lifetime_bonus)
+	effect.pierce = 1 + modifiers.pierce_bonus + modifiers.bounce + modifiers.refract
 	if modifiers.homing:
 		effect.homing = true
 	if modifiers.piercing:
 		effect.piercing = true
-		effect.pierce = modifiers.pierce
 	if modifiers.explosive:
 		effect.explosive = true
 		effect.radius = modifiers.radius
@@ -267,22 +322,48 @@ func _card_effect(card: ItemDefinition) -> Dictionary:
 		"pierce": 1,
 		"explosive": false,
 		"radius": 0.0,
+		"bounce": 0,
+		"refract": 0,
+		"return_count": 0,
+		"speed_delta": 0.0,
+		"lifetime": card.lifetime,
+		"falloff": 0.8,
+		"floor": 0.3,
+		"offset_type": card.offset_type,
+		"offset_angle": card.offset_angle,
+		"collision_shape": card.collision_shape,
+		"collision_size": card.collision_size,
+		"visual_scene": card.visual_scene,
+		"crit_chance_bonus": card.crit_chance_bonus,
+		"crit_damage_bonus": card.crit_damage_bonus,
+		"trigger_type": card.trigger_type,
+		"trigger_count": card.trigger_count,
+		"copyable": card.copyable,
+		"copy_inherits_trigger": card.copy_inherits_trigger,
+		"trigger_blocks": [],
 	}
 
 	return effect
 
-func _fire_volley(effect: Dictionary, body_bonus: int) -> void:
+func _fire_volley(effect: Dictionary, body_bonus: int, origin = null) -> void:
 	var count: int = effect.count
 	var base_damage: float = (
 		float(effect.damage) + float(body_bonus) + _stats.damage_flat
 	) * (1.0 + _stats.damage_pct)
+	var spawn_position: Vector2 = origin if origin != null else global_position + Vector2(40, 0)
 
 	for i in range(count):
-		var bullet = bullet_scene.instantiate()
+		var bullet = ProjectilePool.acquire(bullet_scene, get_parent())
 		bullet.speed = effect.speed
 
-		var crit := randf() < _stats.crit_chance()
-		var final_damage := base_damage * (_stats.crit_damage() if crit else 1.0)
+		var crit_chance := clampf(
+			_stats.crit_chance() + float(effect.crit_chance_bonus) / 100.0,
+			0.0,
+			1.0
+		)
+		var crit := randf() < crit_chance
+		var crit_multiplier := _stats.crit_damage() + float(effect.crit_damage_bonus) / 100.0
+		var final_damage := base_damage * (crit_multiplier if crit else 1.0)
 		bullet.damage = maxi(1, roundi(final_damage))
 
 		bullet.is_homing = effect.homing
@@ -290,14 +371,39 @@ func _fire_volley(effect: Dictionary, body_bonus: int) -> void:
 		bullet.pierce_amount = effect.pierce
 		bullet.is_explosive = effect.explosive
 		bullet.explosion_radius = effect.radius
+		bullet.damage_falloff = effect.falloff
+		bullet.min_damage_ratio = effect.floor
+		bullet.bounce_remaining = effect.bounce
+		bullet.refract_remaining = effect.refract
+		bullet.return_remaining = effect.return_count
+		bullet.speed_delta = effect.speed_delta
+		bullet.max_lifetime = effect.lifetime
+		bullet.lifetime_bonus = 0.0
+		bullet.visual_scene = effect.visual_scene
+		bullet.use_data_shape = true
+		bullet.collision_shape_type = effect.collision_shape
+		bullet.collision_size = effect.collision_size
+		bullet.trigger_type = effect.trigger_type
+		bullet.trigger_remaining = effect.trigger_count
+		bullet.trigger_initial_count = effect.trigger_count
+		bullet.copyable = effect.copyable
+		bullet.copy_inherits_trigger = effect.copy_inherits_trigger
+		bullet.trigger_blocks = effect.trigger_blocks
+		bullet.refresh_visuals()
 
-		get_parent().add_child(bullet)
-		bullet.global_position = global_position + Vector2(40, 0)
+		if not ProjectileRegistry.register(bullet, &"player"):
+			bullet.queue_free()
+			continue
+		bullet.global_position = spawn_position
 
 		var angle_offset := 0.0
 		if count > 1:
 			var total_spread: float = effect.spread * (count - 1)
 			angle_offset = deg_to_rad(-total_spread / 2.0 + effect.spread * i)
+		if effect.offset_type == ItemDefinition.OffsetType.RANDOM:
+			angle_offset += deg_to_rad(randf_range(-effect.offset_angle, effect.offset_angle))
+		elif effect.offset_type == ItemDefinition.OffsetType.FIXED:
+			angle_offset += deg_to_rad(effect.offset_angle)
 
 		bullet.rotation = angle_offset
 

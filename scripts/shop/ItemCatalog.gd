@@ -195,86 +195,338 @@ static func _ensure() -> void:
 	single.cast_interval = 0.18
 	single.base_value = 15
 
-	var spread := _make_def(&"card_spread", "散射卡", ItemDefinition.Category.SPELL_CARD, 3, 25)
-	spread.spell_kind = ItemDefinition.SpellKind.ATTACK
-	spread.mana_cost = 8
-	spread.base_damage = 6
-	spread.projectile_count = 3
-	spread.spread_angle = 15.0
-	spread.projectile_speed = 700.0
-	spread.cast_interval = 0.20
-	spread.base_value = 25
+	var magic_bolt := _make_def(&"projectile_magic_bolt_1", "魔法弹1级", ItemDefinition.Category.SPELL_CARD, 3, 20)
+	magic_bolt.sort_order = 100
+	magic_bolt.spell_kind = ItemDefinition.SpellKind.ATTACK
+	magic_bolt.mana_cost = 5
+	magic_bolt.base_damage = 5
+	magic_bolt.projectile_count = 1
+	magic_bolt.projectile_speed = 300.0
+	magic_bolt.cast_interval = 0.20
+	magic_bolt.offset_type = ItemDefinition.OffsetType.RANDOM
+	magic_bolt.offset_angle = 0.0
+	magic_bolt.lifetime = 5.0
+	magic_bolt.collision_shape = ItemDefinition.CollisionShape.CIRCLE
+	magic_bolt.collision_size = Vector2(5.0, 5.0)
+	magic_bolt.visual_scene = load("res://scenes/projectiles/projectile_magic_bolt_1.tscn")
+	magic_bolt.behavior_tag = &"normal"
+	magic_bolt.base_value = 20
 
-	var homing := _make_def(&"card_homing", "追踪模块", ItemDefinition.Category.SPELL_CARD, 3, 40)
+	var magic_bolt_trigger := _make_def(&"projectile_magic_bolt_trigger", "魔法弹1级（触发）", ItemDefinition.Category.SPELL_CARD, 3, 28)
+	magic_bolt_trigger.sort_order = 110
+	magic_bolt_trigger.spell_kind = ItemDefinition.SpellKind.ATTACK
+	magic_bolt_trigger.mana_cost = 5
+	magic_bolt_trigger.base_damage = 5
+	magic_bolt_trigger.projectile_count = 1
+	magic_bolt_trigger.projectile_speed = 300.0
+	magic_bolt_trigger.cast_interval = 0.20
+	magic_bolt_trigger.offset_type = ItemDefinition.OffsetType.RANDOM
+	magic_bolt_trigger.offset_angle = 0.0
+	magic_bolt_trigger.lifetime = 5.0
+	magic_bolt_trigger.collision_shape = ItemDefinition.CollisionShape.CIRCLE
+	magic_bolt_trigger.collision_size = Vector2(5.0, 5.0)
+	magic_bolt_trigger.visual_scene = load("res://scenes/projectiles/projectile_magic_bolt_trigger.tscn")
+	magic_bolt_trigger.behavior_tag = &"trigger"
+	magic_bolt_trigger.trigger_type = ItemDefinition.TriggerType.ON_HIT
+	magic_bolt_trigger.trigger_target = &"next_block"
+	magic_bolt_trigger.trigger_count = 1
+	magic_bolt_trigger.base_value = 28
+
+	var magic_bolt_delayed := _make_def(&"projectile_magic_bolt_delayed", "魔法弹1级（延时）", ItemDefinition.Category.SPELL_CARD, 3, 28)
+	magic_bolt_delayed.sort_order = 120
+	magic_bolt_delayed.spell_kind = ItemDefinition.SpellKind.ATTACK
+	magic_bolt_delayed.mana_cost = 5
+	magic_bolt_delayed.base_damage = 5
+	magic_bolt_delayed.projectile_count = 1
+	magic_bolt_delayed.projectile_speed = 300.0
+	magic_bolt_delayed.cast_interval = 0.20
+	magic_bolt_delayed.offset_type = ItemDefinition.OffsetType.RANDOM
+	magic_bolt_delayed.offset_angle = 0.0
+	magic_bolt_delayed.lifetime = 1.0
+	magic_bolt_delayed.collision_shape = ItemDefinition.CollisionShape.CIRCLE
+	magic_bolt_delayed.collision_size = Vector2(5.0, 5.0)
+	magic_bolt_delayed.visual_scene = load("res://scenes/projectiles/projectile_magic_bolt_delayed.tscn")
+	magic_bolt_delayed.behavior_tag = &"delayed"
+	magic_bolt_delayed.trigger_type = ItemDefinition.TriggerType.ON_HIT_OR_EXPIRE
+	magic_bolt_delayed.trigger_target = &"next_block"
+	magic_bolt_delayed.trigger_count = 1
+	magic_bolt_delayed.base_value = 28
+
+	var arrow := _make_def(&"projectile_arrow", "木箭", ItemDefinition.Category.SPELL_CARD, 3, 24)
+	arrow.sort_order = 130
+	arrow.spell_kind = ItemDefinition.SpellKind.ATTACK
+	arrow.mana_cost = 5
+	arrow.base_damage = 10
+	arrow.projectile_count = 1
+	arrow.projectile_speed = 400.0
+	arrow.cast_interval = 0.20
+	arrow.offset_type = ItemDefinition.OffsetType.RANDOM
+	arrow.offset_angle = 5.0
+	arrow.lifetime = 5.0
+	arrow.collision_shape = ItemDefinition.CollisionShape.RECTANGLE
+	arrow.collision_size = Vector2(10.0, 3.0)
+	arrow.crit_chance_bonus = 10.0
+	arrow.visual_scene = load("res://scenes/projectiles/projectile_arrow.tscn")
+	arrow.base_value = 24
+
+	var stone := _make_def(&"projectile_stone", "石块", ItemDefinition.Category.SPELL_CARD, 3, 8)
+	stone.sort_order = 140
+	stone.spell_kind = ItemDefinition.SpellKind.ATTACK
+	stone.mana_cost = 1
+	stone.base_damage = 10
+	stone.projectile_count = 1
+	stone.projectile_speed = 150.0
+	stone.cast_interval = 0.20
+	stone.offset_type = ItemDefinition.OffsetType.RANDOM
+	stone.offset_angle = 5.0
+	stone.lifetime = 5.0
+	stone.collision_shape = ItemDefinition.CollisionShape.CIRCLE
+	stone.collision_size = Vector2(5.0, 5.0)
+	stone.crit_chance_bonus = 5.0
+	stone.visual_scene = load("res://scenes/projectiles/projectile_stone.tscn")
+	stone.base_value = 8
+
+	var dirt := _make_def(&"projectile_dirt", "土块", ItemDefinition.Category.SPELL_CARD, 3, 8)
+	dirt.sort_order = 150
+	dirt.spell_kind = ItemDefinition.SpellKind.ATTACK
+	dirt.mana_cost = 1
+	dirt.base_damage = 5
+	dirt.projectile_count = 1
+	dirt.projectile_speed = 200.0
+	dirt.cast_interval = 0.20
+	dirt.offset_type = ItemDefinition.OffsetType.RANDOM
+	dirt.offset_angle = 5.0
+	dirt.lifetime = 5.0
+	dirt.collision_shape = ItemDefinition.CollisionShape.CIRCLE
+	dirt.collision_size = Vector2(5.0, 5.0)
+	dirt.crit_chance_bonus = 5.0
+	dirt.visual_scene = load("res://scenes/projectiles/projectile_dirt.tscn")
+	dirt.base_value = 8
+
+	var fireball := _make_def(&"projectile_fireball", "单发火球", ItemDefinition.Category.SPELL_CARD, 3, 36)
+	fireball.sort_order = 160
+	fireball.spell_kind = ItemDefinition.SpellKind.ATTACK
+	fireball.mana_cost = 10
+	fireball.base_damage = 10
+	fireball.projectile_count = 1
+	fireball.projectile_speed = 500.0
+	fireball.cast_interval = 0.30
+	fireball.offset_type = ItemDefinition.OffsetType.RANDOM
+	fireball.offset_angle = 0.0
+	fireball.lifetime = 5.0
+	fireball.collision_shape = ItemDefinition.CollisionShape.CIRCLE
+	fireball.collision_size = Vector2(5.0, 5.0)
+	fireball.crit_chance_bonus = 10.0
+	fireball.visual_scene = load("res://scenes/projectiles/projectile_fireball.tscn")
+	fireball.base_value = 36
+
+	var fireball_double := _make_def(&"projectile_fireball_double", "双发散射火球", ItemDefinition.Category.SPELL_CARD, 3, 60)
+	fireball_double.sort_order = 170
+	fireball_double.spell_kind = ItemDefinition.SpellKind.ATTACK
+	fireball_double.mana_cost = 20
+	fireball_double.base_damage = 10
+	fireball_double.projectile_count = 2
+	fireball_double.projectile_speed = 500.0
+	fireball_double.cast_interval = 0.30
+	fireball_double.offset_type = ItemDefinition.OffsetType.MULTI
+	fireball_double.spread_angle = 10.0
+	fireball_double.lifetime = 5.0
+	fireball_double.collision_shape = ItemDefinition.CollisionShape.CIRCLE
+	fireball_double.collision_size = Vector2(5.0, 5.0)
+	fireball_double.crit_chance_bonus = 10.0
+	fireball_double.visual_scene = load("res://scenes/projectiles/projectile_fireball_double.tscn")
+	fireball_double.base_value = 60
+
+	var scatter_double := _make_def(&"projectile_scatter_double", "二重散射魔法弹", ItemDefinition.Category.SPELL_CARD, 3, 25)
+	scatter_double.sort_order = 180
+	scatter_double.spell_kind = ItemDefinition.SpellKind.ATTACK
+	scatter_double.mana_cost = 10
+	scatter_double.base_damage = 5
+	scatter_double.projectile_count = 2
+	scatter_double.spread_angle = 5.0
+	scatter_double.projectile_speed = 300.0
+	scatter_double.cast_interval = 0.20
+	scatter_double.offset_type = ItemDefinition.OffsetType.MULTI
+	scatter_double.lifetime = 5.0
+	scatter_double.visual_scene = load("res://scenes/projectiles/projectile_scatter_double.tscn")
+	scatter_double.base_value = 25
+
+	var scatter_triple := _make_def(&"projectile_scatter_triple", "三重散射魔法弹", ItemDefinition.Category.SPELL_CARD, 3, 35)
+	scatter_triple.sort_order = 190
+	scatter_triple.spell_kind = ItemDefinition.SpellKind.ATTACK
+	scatter_triple.mana_cost = 15
+	scatter_triple.base_damage = 5
+	scatter_triple.projectile_count = 3
+	scatter_triple.spread_angle = 5.0
+	scatter_triple.projectile_speed = 300.0
+	scatter_triple.cast_interval = 0.30
+	scatter_triple.offset_type = ItemDefinition.OffsetType.MULTI
+	scatter_triple.lifetime = 5.0
+	scatter_triple.visual_scene = load("res://scenes/projectiles/projectile_scatter_triple.tscn")
+	scatter_triple.base_value = 35
+
+	var homing := _make_def(&"module_homing", "追踪模块", ItemDefinition.Category.SPELL_CARD, 3, 40)
 	homing.spell_kind = ItemDefinition.SpellKind.MODULE
 	homing.effect_type = ItemDefinition.EffectType.HOMING
-	homing.mana_cost = 6
-	homing.cast_interval = 0.02
+	homing.mana_cost = 10
+	homing.cast_interval = 0.10
 	homing.base_value = 40
 
-	var pierce := _make_def(&"card_pierce", "穿透模块", ItemDefinition.Category.SPELL_CARD, 3, 35)
-	pierce.spell_kind = ItemDefinition.SpellKind.MODULE
-	pierce.effect_type = ItemDefinition.EffectType.PIERCE
-	pierce.effect_value = 3.0
-	pierce.mana_cost = 8
-	pierce.cast_interval = 0.04
-	pierce.base_value = 35
+	var pierce_1 := _make_def(&"module_pierce_1", "穿透模块1级", ItemDefinition.Category.SPELL_CARD, 3, 20)
+	pierce_1.spell_kind = ItemDefinition.SpellKind.MODULE
+	pierce_1.effect_type = ItemDefinition.EffectType.PIERCE
+	pierce_1.effect_value = 1.0
+	pierce_1.mana_cost = 5
+	pierce_1.cast_interval = 0.0
+	pierce_1.compatibility_group = &"PIERCE_MODE"
+	pierce_1.damage_falloff = 0.7
+	pierce_1.damage_floor = 0.3
+	pierce_1.base_value = 20
 
-	var boom := _make_def(&"card_boom", "爆炸模块", ItemDefinition.Category.SPELL_CARD, 3, 50)
+	var pierce_2 := _make_def(&"module_pierce_2", "穿透模块2级", ItemDefinition.Category.SPELL_CARD, 3, 25)
+	pierce_2.spell_kind = ItemDefinition.SpellKind.MODULE
+	pierce_2.effect_type = ItemDefinition.EffectType.PIERCE
+	pierce_2.effect_value = 2.0
+	pierce_2.mana_cost = 5
+	pierce_2.cast_interval = 0.0
+	pierce_2.compatibility_group = &"PIERCE_MODE"
+	pierce_2.damage_falloff = 0.7
+	pierce_2.damage_floor = 0.3
+	pierce_2.base_value = 25
+
+	var pierce_3 := _make_def(&"module_pierce_3", "穿透模块3级", ItemDefinition.Category.SPELL_CARD, 3, 30)
+	pierce_3.spell_kind = ItemDefinition.SpellKind.MODULE
+	pierce_3.effect_type = ItemDefinition.EffectType.PIERCE
+	pierce_3.effect_value = 3.0
+	pierce_3.mana_cost = 5
+	pierce_3.cast_interval = 0.0
+	pierce_3.compatibility_group = &"PIERCE_MODE"
+	pierce_3.damage_falloff = 0.7
+	pierce_3.damage_floor = 0.3
+	pierce_3.base_value = 30
+
+	var boom := _make_def(&"module_explosion", "爆炸模块", ItemDefinition.Category.SPELL_CARD, 3, 50)
 	boom.spell_kind = ItemDefinition.SpellKind.MODULE
 	boom.effect_type = ItemDefinition.EffectType.EXPLOSION
 	boom.effect_radius = 100.0
-	boom.mana_cost = 18
-	boom.cast_interval = 0.12
+	boom.mana_cost = 15
+	boom.cast_interval = 0.20
 	boom.base_value = 50
 
 	var damage := _make_def(&"module_damage", "增伤模块", ItemDefinition.Category.SPELL_CARD, 3, 30)
 	damage.spell_kind = ItemDefinition.SpellKind.MODULE
 	damage.effect_type = ItemDefinition.EffectType.DAMAGE
-	damage.effect_value = 6.0
-	damage.mana_cost = 8
-	damage.cast_interval = 0.03
+	damage.effect_value = 5.0
+	damage.mana_cost = 5
+	damage.cast_interval = 0.10
 	damage.base_value = 30
 
-	var double_cast := _make_def(&"module_double", "双重施法", ItemDefinition.Category.SPELL_CARD, 3, 40)
+	var double_cast := _make_def(&"module_multicast_double", "双重施法", ItemDefinition.Category.SPELL_CARD, 3, 40)
 	double_cast.spell_kind = ItemDefinition.SpellKind.MODULE
 	double_cast.effect_type = ItemDefinition.EffectType.MULTICAST
 	double_cast.multicast_count = 2
-	double_cast.mana_cost = 2
-	double_cast.cast_interval = 0.02
+	double_cast.mana_cost = 10
+	double_cast.cast_interval = 0.10
 	double_cast.base_value = 40
 
-	var triple_cast := _make_def(&"module_triple", "三重施法", ItemDefinition.Category.SPELL_CARD, 3, 80)
+	var triple_cast := _make_def(&"module_multicast_triple", "三重施法", ItemDefinition.Category.SPELL_CARD, 3, 80)
 	triple_cast.spell_kind = ItemDefinition.SpellKind.MODULE
 	triple_cast.effect_type = ItemDefinition.EffectType.MULTICAST
 	triple_cast.multicast_count = 3
-	triple_cast.mana_cost = 4
-	triple_cast.cast_interval = 0.04
+	triple_cast.mana_cost = 20
+	triple_cast.cast_interval = 0.20
 	triple_cast.base_value = 80
 
-	var quad_cast := _make_def(&"module_quad", "四重施法", ItemDefinition.Category.SPELL_CARD, 3, 120)
+	var quad_cast := _make_def(&"module_multicast_quad", "四重施法", ItemDefinition.Category.SPELL_CARD, 3, 120)
 	quad_cast.spell_kind = ItemDefinition.SpellKind.MODULE
 	quad_cast.effect_type = ItemDefinition.EffectType.MULTICAST
 	quad_cast.multicast_count = 4
-	quad_cast.mana_cost = 8
-	quad_cast.cast_interval = 0.06
+	quad_cast.mana_cost = 30
+	quad_cast.cast_interval = 0.30
 	quad_cast.base_value = 120
 
 	var inject := _make_def(&"module_inject", "注能", ItemDefinition.Category.SPELL_CARD, 3, 20)
 	inject.spell_kind = ItemDefinition.SpellKind.MODULE
 	inject.effect_type = ItemDefinition.EffectType.NONE
 	inject.mana_restore = 20
-	inject.cast_interval = 0.10
+	inject.cast_interval = 0.0
 	inject.base_value = 20
 
 	var discount := _make_def(&"module_discount", "减耗", ItemDefinition.Category.SPELL_CARD, 3, 20)
 	discount.spell_kind = ItemDefinition.SpellKind.MODULE
 	discount.effect_type = ItemDefinition.EffectType.NONE
-	discount.mana_discount = 2
+	discount.mana_discount = 20
 	discount.cast_interval = 0.0
 	discount.base_value = 20
 
-	_cards = [single, spread, homing, pierce, boom, damage, double_cast, triple_cast, quad_cast, inject, discount]
+	var bounce := _make_def(&"module_bounce", "弹射模块", ItemDefinition.Category.SPELL_CARD, 3, 30)
+	bounce.spell_kind = ItemDefinition.SpellKind.MODULE
+	bounce.effect_type = ItemDefinition.EffectType.BOUNCE
+	bounce.effect_value = 1.0
+	bounce.mana_cost = 5
+	bounce.cast_interval = 0.0
+	bounce.damage_falloff = 0.7
+	bounce.damage_floor = 0.3
+	bounce.compatibility_group = &"PIERCE_MODE"
+	bounce.base_value = 30
+
+	var refract := _make_def(&"module_refract", "折射模块", ItemDefinition.Category.SPELL_CARD, 3, 30)
+	refract.spell_kind = ItemDefinition.SpellKind.MODULE
+	refract.effect_type = ItemDefinition.EffectType.REFRACT
+	refract.effect_value = 1.0
+	refract.mana_cost = 5
+	refract.cast_interval = 0.0
+	refract.damage_falloff = 0.7
+	refract.damage_floor = 0.3
+	refract.compatibility_group = &"PIERCE_MODE"
+	refract.target_rule = &"unvisited"
+	refract.base_value = 30
+
+	var return_module := _make_def(&"module_return", "回旋模块", ItemDefinition.Category.SPELL_CARD, 1, 90)
+	return_module.spell_kind = ItemDefinition.SpellKind.MODULE
+	return_module.effect_type = ItemDefinition.EffectType.RETURN
+	return_module.effect_value = 1.0
+	return_module.mana_cost = 50
+	return_module.cast_interval = 0.0
+	return_module.is_copy_module = true
+	return_module.inherit_to_copy = false
+	return_module.base_value = 90
+
+	var accelerate := _make_def(&"module_accelerate", "加速模块", ItemDefinition.Category.SPELL_CARD, 3, 20)
+	accelerate.spell_kind = ItemDefinition.SpellKind.MODULE
+	accelerate.effect_type = ItemDefinition.EffectType.ACCELERATE
+	accelerate.effect_value = 50.0
+	accelerate.mana_cost = 10
+	accelerate.cast_interval = 0.0
+	accelerate.base_value = 20
+
+	var decelerate := _make_def(&"module_decelerate", "减速模块", ItemDefinition.Category.SPELL_CARD, 3, 20)
+	decelerate.spell_kind = ItemDefinition.SpellKind.MODULE
+	decelerate.effect_type = ItemDefinition.EffectType.DECELERATE
+	decelerate.effect_value = 50.0
+	decelerate.mana_cost = 10
+	decelerate.cast_interval = 0.0
+	decelerate.base_value = 20
+
+	var lifetime_up := _make_def(&"module_lifetime_up", "持久模块", ItemDefinition.Category.SPELL_CARD, 3, 20)
+	lifetime_up.spell_kind = ItemDefinition.SpellKind.MODULE
+	lifetime_up.effect_type = ItemDefinition.EffectType.LIFETIME
+	lifetime_up.effect_value = 2.0
+	lifetime_up.mana_cost = 10
+	lifetime_up.cast_interval = 0.0
+	lifetime_up.base_value = 20
+
+	var lifetime_down := _make_def(&"module_lifetime_down", "消逝模块", ItemDefinition.Category.SPELL_CARD, 3, 20)
+	lifetime_down.spell_kind = ItemDefinition.SpellKind.MODULE
+	lifetime_down.effect_type = ItemDefinition.EffectType.LIFETIME
+	lifetime_down.effect_value = -2.0
+	lifetime_down.mana_cost = 10
+	lifetime_down.cast_interval = 0.0
+	lifetime_down.base_value = 20
+
+	_cards = [single]
+	_cards.append_array(_load_projectile_resources())
+	_cards.append_array(_load_module_resources())
 
 	_gems = [
 		_make_def(&"gem_a", "测试宝石 A", ItemDefinition.Category.GEM, 1, 80, 3),
@@ -313,6 +565,34 @@ static func _ensure() -> void:
 	]
 	_accessories[0].rarity = 0
 	_accessories[1].rarity = 1
+
+static func _load_projectile_resources() -> Array:
+	var result: Array = []
+	var dir := DirAccess.open("res://data/projectiles")
+	if dir == null:
+		return result
+	for file in dir.get_files():
+		if not file.ends_with(".tres"):
+			continue
+		var resource = load("res://data/projectiles/%s" % file)
+		if resource is ItemDefinition and resource.is_attack():
+			result.append(resource)
+	result.sort_custom(func(a, b): return a.sort_order < b.sort_order)
+	return result
+
+static func _load_module_resources() -> Array:
+	var result: Array = []
+	var dir := DirAccess.open("res://data/spell_modules")
+	if dir == null:
+		return result
+	for file in dir.get_files():
+		if not file.ends_with(".tres"):
+			continue
+		var resource = load("res://data/spell_modules/%s" % file)
+		if resource is ItemDefinition and resource.is_module():
+			result.append(resource)
+	result.sort_custom(func(a, b): return a.sort_order < b.sort_order)
+	return result
 
 static func _make_def(id: StringName, name: String, category: int, stack_limit: int, price: int, gem_slots := 0, damage := 0) -> ItemDefinition:
 	var def := ItemDefinition.new()

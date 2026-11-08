@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ItemDefinition" format=3]
+
+[ext_resource type="Script" path="res://data/items/ItemDefinition.gd" id="1_64jhy"]
+
+[resource]
+script = ExtResource("1_64jhy")
+id = &"module_inject"
+display_name = "注能"
+stack_limit = 3
+base_price = 20
+spell_kind = 2
+mana_restore = 20
+base_value = 20

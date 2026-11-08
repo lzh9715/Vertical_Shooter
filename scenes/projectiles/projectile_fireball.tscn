@@ -1,0 +1,13 @@
+[gd_scene format=3]
+
+[node name="projectile_fireball" type="Node2D"]
+
+[node name="Visual" type="Polygon2D" parent="."]
+color = Color(1.0, 0.45, 0.1, 1.0)
+polygon = PackedVector2Array(0, -9, 6, -5, 9, 0, 6, 5, 0, 9, -6, 5, -9, 0, -6, -5)
+
+[node name="Glow" type="Polygon2D" parent="."]
+color = Color(1.0, 0.2, 0.0, 0.3)
+polygon = PackedVector2Array(0, -9, 6, -5, 9, 0, 6, 5, 0, 9, -6, 5, -9, 0, -6, -5)
+scale = Vector2(1.65, 1.65)
+show_behind_parent = true

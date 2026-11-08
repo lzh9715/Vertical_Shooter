@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="ItemDefinition" format=3]
+
+[ext_resource type="Script" path="res://data/items/ItemDefinition.gd" id="1_46d45"]
+[ext_resource type="PackedScene" path="res://scenes/projectiles/projectile_dirt.tscn" id="2_cpofg"]
+
+[resource]
+script = ExtResource("1_46d45")
+id = &"projectile_dirt"
+sort_order = 150
+display_name = "土块"
+stack_limit = 3
+base_price = 8
+spell_kind = 1
+mana_cost = 1
+cast_interval = 0.2
+base_value = 8
+visual_scene = ExtResource("2_cpofg")
+base_damage = 5
+projectile_speed = 200.0
+offset_type = 1
+offset_angle = 5.0
+lifetime = 5.0
+crit_chance_bonus = 5.0
