@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ItemDefinition" format=3]
+
+[ext_resource type="Script" path="res://data/items/ItemDefinition.gd" id="1_nxwj5"]
+
+[resource]
+script = ExtResource("1_nxwj5")
+id = &"module_multicast_quad"
+display_name = "四重施法"
+stack_limit = 3
+base_price = 120
+spell_kind = 2
+effect_type = 6
+mana_cost = 30
+cast_interval = 0.3
+multicast_count = 4
+base_value = 120

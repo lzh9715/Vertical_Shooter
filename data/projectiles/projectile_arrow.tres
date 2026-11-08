@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="ItemDefinition" format=3]
+
+[ext_resource type="Script" path="res://data/items/ItemDefinition.gd" id="1_vsr7b"]
+[ext_resource type="PackedScene" path="res://scenes/projectiles/projectile_arrow.tscn" id="2_8p3d4"]
+
+[resource]
+script = ExtResource("1_vsr7b")
+id = &"projectile_arrow"
+sort_order = 130
+display_name = "木箭"
+stack_limit = 3
+base_price = 24
+spell_kind = 1
+mana_cost = 5
+cast_interval = 0.2
+base_value = 24
+visual_scene = ExtResource("2_8p3d4")
+base_damage = 10
+projectile_speed = 400.0
+offset_type = 1
+offset_angle = 5.0
+lifetime = 5.0
+collision_shape = 1
+collision_size = Vector2(10, 3)
+crit_chance_bonus = 10.0

@@ -28,6 +28,7 @@ var _targets: Array[Panel] = []
 var _drag_card: ItemDefinition
 var _drag_origin: Dictionary = {}
 var _drag_panel: Panel
+var _interaction_warning := ""
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -293,6 +294,11 @@ func _drop_at_mouse() -> void:
 			# 槽位已满时，拖到具体槽位直接替换该槽卡牌
 			if slot_index >= 0 and slot_index < _wand.cards.size():
 				var old_card: ItemDefinition = _wand.cards[slot_index]
+				if not _wand.can_install(_drag_card, old_card):
+					_interaction_warning = "⚠ 已有弹射/折射/穿透模块，无法安装该模块"
+					_restore_drag()
+					_refresh_warnings()
+					return
 				_wand.cards[slot_index] = _drag_card
 				if _drag_origin.get("kind", "") == "card_slot":
 					_wand.cards[int(_drag_origin.index)] = old_card
@@ -370,6 +376,27 @@ func _refresh_warnings() -> void:
 
 	var warnings: Array[String] = []
 	var seen := {}
+	if _interaction_warning != "":
+		warnings.append(_interaction_warning)
+		_interaction_warning = ""
+
+	var mode_kind := {}
+	for card in _wand.cards:
+		if card == null or not card.is_module():
+			continue
+		if card.compatibility_group == &"":
+			continue
+		if mode_kind.has(card.compatibility_group) and int(mode_kind[card.compatibility_group]) != card.effect_type:
+			_add_unique(warnings, seen, "⚠ 已有弹射/折射/穿透模块，无法同时安装其他穿透方式")
+			break
+		mode_kind[card.compatibility_group] = card.effect_type
+
+	for card in _wand.cards:
+		if card == null or not card.is_attack():
+			continue
+		if card.trigger_type != ItemDefinition.TriggerType.NONE and card.projectile_count > 1:
+			_add_unique(warnings, seen, "⚠ 触发型攻击卡必须为单发")
+			break
 
 	if _is_shuffled():
 		_add_unique(warnings, seen, "⚠ 乱序法杖不会透支生命，无法支付的组合会降级或跳过")
@@ -386,13 +413,21 @@ func _refresh_warnings() -> void:
 		if not has_attack:
 			_add_unique(warnings, seen, "⚠ 当前配装没有可发射弹体")
 
+		var stats := GameFlow.get_player_stats()
+		var max_mana := stats.max_mana()
+		for i in range(blocks.size()):
+			if _block_has_trigger(blocks[i]) and i + 1 < blocks.size():
+				var chain_mana := _trigger_chain_mana(blocks, i, max_mana)
+				if chain_mana < 0.0:
+					_add_unique(warnings, seen, "⚠ 触发链无法完整支付，战斗中会截断")
+				else:
+					_add_unique(warnings, seen, "⚠ 触发链计划预扣 %.0f 法力" % chain_mana)
+				break
+
 		if not _is_shuffled():
 			var staff_interval := 0.0
 			if _wand.body != null and _wand.body.definition != null:
 				staff_interval = _wand.body.definition.cast_interval
-
-			var stats := GameFlow.get_player_stats()
-			var max_mana := stats.max_mana()
 
 			var index := 0
 			while index < blocks.size():
@@ -439,3 +474,24 @@ func _add_unique(warnings: Array[String], seen: Dictionary, text: String) -> voi
 		return
 	seen[text] = true
 	warnings.append(text)
+
+func _block_has_trigger(block: Array) -> bool:
+	for card in block:
+		if card != null and card.is_attack() and card.trigger_type != ItemDefinition.TriggerType.NONE:
+			return true
+	return false
+
+func _trigger_chain_mana(blocks: Array, start: int, max_mana: float) -> float:
+	var mana := max_mana
+	var total := 0.0
+	var cursor := start
+	while cursor < blocks.size():
+		var result := CastSimulator.simulate_block(blocks[cursor], mana, max_mana)
+		if not result.ok:
+			return -1.0
+		total += maxf(mana - float(result.mana), 0.0)
+		mana = result.mana
+		if not _block_has_trigger(blocks[cursor]) or cursor + 1 >= blocks.size():
+			break
+		cursor += 1
+	return total

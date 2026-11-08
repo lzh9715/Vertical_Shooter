@@ -1,0 +1,7 @@
+[gd_scene format=3]
+
+[node name="projectile_dirt" type="Node2D"]
+
+[node name="Visual" type="Polygon2D" parent="."]
+color = Color(0.55, 0.36, 0.18, 1.0)
+polygon = PackedVector2Array(-4.5, -4.5, 4.5, -4.5, 6.3, 3.6, 1.8, 6.3, -5.4, 3.6)

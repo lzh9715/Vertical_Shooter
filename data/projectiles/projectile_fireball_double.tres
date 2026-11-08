@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="ItemDefinition" format=3]
+
+[ext_resource type="Script" path="res://data/items/ItemDefinition.gd" id="1_qym7i"]
+[ext_resource type="PackedScene" path="res://scenes/projectiles/projectile_fireball_double.tscn" id="2_8hk4e"]
+
+[resource]
+script = ExtResource("1_qym7i")
+id = &"projectile_fireball_double"
+sort_order = 170
+display_name = "双发散射火球"
+stack_limit = 3
+base_price = 60
+spell_kind = 1
+mana_cost = 20
+cast_interval = 0.3
+base_value = 60
+visual_scene = ExtResource("2_8hk4e")
+base_damage = 10
+projectile_count = 2
+projectile_speed = 500.0
+spread_angle = 10.0
+offset_type = 2
+lifetime = 5.0
+crit_chance_bonus = 10.0

@@ -1,4 +1,4 @@
-﻿extends SceneTree
+extends SceneTree
 ## P1 regressions: collisions, rewards, and clear/death races.
 var _flow
 var _transition
@@ -32,8 +32,14 @@ func _run() -> void:
 		"test_enemy_rewards_once",
 		"test_nonpiercing_overlap",
 		"test_piercing_overlap_limit",
+		"test_same_target_callback_guard",
 		"test_pierce_damage_falloff",
 		"test_homing_target_priority",
+		"test_scatter_attack_card",
+		"test_new_projectile_modules_aggregate",
+		"test_bounce_module_keeps_projectile",
+		"test_refract_module_redirects",
+		"test_return_module_spawns_copy",
 		"test_explosion_uses_projectile_damage",
 		"test_explosion_once",
 		"test_shield_blocks_ordinary_and_pierce_bypasses",
@@ -140,6 +146,29 @@ func test_nonpiercing_overlap() -> bool:
 func test_piercing_overlap_limit() -> bool:
 	return await _check_overlap(true, 2, 2)
 
+func test_same_target_callback_guard() -> bool:
+	var enemy = _enemy(Vector2(1000, 1000))
+	var bullet = _bullet_scene.instantiate()
+	bullet.position = Vector2(1000, 1000)
+	bullet.damage = 10
+	current_scene.add_child(bullet)
+	bullet._on_area_entered(enemy)
+	bullet._on_area_entered(enemy)
+	_expect(enemy.hp == 90, "duplicate callbacks on one target must only damage once")
+	_expect(bullet._hit_count == 1, "duplicate callbacks must not consume extra hit count")
+
+	var piercing = _bullet_scene.instantiate()
+	piercing.position = Vector2(1000, 1000)
+	piercing.damage = 10
+	piercing.is_piercing = true
+	piercing.pierce_amount = 2
+	current_scene.add_child(piercing)
+	piercing._on_area_entered(enemy)
+	piercing._on_area_entered(enemy)
+	_expect(enemy.hp == 80, "duplicate piercing callbacks must only damage once")
+	_expect(piercing._hit_count == 1, "duplicate piercing callbacks must consume one hit")
+	return true
+
 func test_pierce_damage_falloff() -> bool:
 	var enemies: Array = []
 	for i in range(2):
@@ -178,6 +207,88 @@ func test_homing_target_priority() -> bool:
 	bullet._last_hit_target = second
 	bullet._acquire_target()
 	_expect(bullet._target == first, "after all targets are visited, homing must exclude the previous target")
+	return true
+
+func test_scatter_attack_card() -> bool:
+	var double_scatter = ItemCatalog.find_card(&"projectile_scatter_double")
+	var triple_scatter = ItemCatalog.find_card(&"projectile_scatter_triple")
+	_expect(double_scatter != null and double_scatter.is_attack(), "double scatter must be an attack card")
+	_expect(double_scatter.mana_cost == 10, "double scatter must cost 10 mana")
+	_expect(double_scatter.projectile_count == 2, "double scatter must fire 2 projectiles")
+	_expect(is_equal_approx(double_scatter.spread_angle, 5.0), "double scatter must use 5 degree gaps")
+	_expect(triple_scatter != null and triple_scatter.projectile_count == 3, "triple scatter must fire 3 projectiles")
+	return true
+
+func test_new_projectile_modules_aggregate() -> bool:
+	var player = _player_scene.instantiate()
+	var attack = ItemCatalog.find_card(&"projectile_magic_bolt_1")
+	var modules := [
+		ItemCatalog.find_card(&"module_bounce"),
+		ItemCatalog.find_card(&"module_accelerate"),
+		ItemCatalog.find_card(&"module_lifetime_up"),
+	]
+	var modifiers: Dictionary = player._block_modifiers(modules)
+	var effect: Dictionary = player._card_effect(attack)
+	player._apply_module_effects(effect, modifiers)
+	_expect(effect.bounce == 1, "bounce module must add one bounce")
+	_expect(effect.pierce == 2, "bounce hit budget must be base 1 plus one bounce")
+	_expect(is_equal_approx(effect.speed_delta, 50.0), "accelerate module must add 50 speed per second")
+	_expect(is_equal_approx(effect.lifetime, 7.0), "lifetime module must add 2 seconds")
+	_expect(is_equal_approx(effect.falloff, 0.7), "bounce module must use 0.7 falloff")
+	player.free()
+	return true
+
+func test_bounce_module_keeps_projectile() -> bool:
+	var enemy = _enemy(Vector2(1000, 1000))
+	var bullet = _bullet_scene.instantiate()
+	bullet.position = Vector2(1000, 1000)
+	bullet.damage = 10
+	bullet.pierce_amount = 2
+	bullet.bounce_remaining = 1
+	current_scene.add_child(bullet)
+	bullet._hit_target(enemy)
+	_expect(bullet.bounce_remaining == 0, "bounce must be consumed")
+	_expect(not bullet.is_queued_for_deletion(), "bounce projectile must keep flying")
+	_expect(enemy.hp == 90, "bounce first hit must deal damage")
+	bullet.queue_free()
+	return true
+
+func test_refract_module_redirects() -> bool:
+	var first = _enemy(Vector2(1000, 1000))
+	var second = _enemy(Vector2(1100, 1000))
+	var bullet = _bullet_scene.instantiate()
+	bullet.position = Vector2(1000, 1000)
+	bullet.damage = 10
+	bullet.pierce_amount = 2
+	bullet.refract_remaining = 1
+	current_scene.add_child(bullet)
+	bullet._hit_target(first)
+	_expect(bullet.refract_remaining == 0, "refract must be consumed")
+	_expect(not bullet.is_queued_for_deletion(), "refract projectile must keep flying")
+	_expect(absf(bullet.rotation) < 0.1, "refract must point at the nearest other enemy")
+	_expect(first.hp == 90, "refract first hit must deal damage")
+	bullet.queue_free()
+	return true
+
+func test_return_module_spawns_copy() -> bool:
+	var enemy = _enemy(Vector2(1000, 1000))
+	var bullet = _bullet_scene.instantiate()
+	bullet.position = Vector2(1000, 1000)
+	bullet.speed = 0.0
+	bullet.damage = 10
+	bullet.return_remaining = 1
+	bullet.copyable = true
+	current_scene.add_child(bullet)
+	bullet._hit_target(enemy)
+	await process_frame
+	var copy = null
+	for candidate in get_nodes_in_group("player_bullet"):
+		if candidate != bullet:
+			copy = candidate
+	_expect(copy != null and copy.is_copy, "return copy must be marked as copy")
+	_expect(copy != null and copy.return_remaining == 0, "return copy must not be able to return again")
+	if copy != null:
+		copy.queue_free()
 	return true
 
 func test_explosion_uses_projectile_damage() -> bool:

@@ -1,0 +1,109 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://debug/ProjectileGallery.gd" id="1"]
+
+[node name="ProjectileGallery" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.055, 0.065, 0.085, 1)
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 0
+offset_left = 32.0
+offset_top = 32.0
+offset_right = 500.0
+offset_bottom = 1408.0
+
+[node name="List" type="ItemList" parent="Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = 120.0
+offset_right = -16.0
+offset_bottom = -16.0
+theme_override_font_sizes/font_size = 28
+
+[node name="Title" type="Label" parent="Panel"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 24.0
+offset_top = 24.0
+offset_right = -24.0
+offset_bottom = 72.0
+theme_override_font_sizes/font_size = 32
+text = "射弹图鉴"
+
+[node name="Hint" type="Label" parent="Panel"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 24.0
+offset_top = 76.0
+offset_right = -24.0
+offset_bottom = 110.0
+theme_override_font_sizes/font_size = 20
+text = "选择射弹查看直线与圆周飞行占位表现"
+
+[node name="Header" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 540.0
+offset_top = 40.0
+offset_right = -40.0
+offset_bottom = 160.0
+
+[node name="Title" type="Label" parent="Header"]
+layout_mode = 0
+offset_right = 900.0
+offset_bottom = 60.0
+theme_override_font_sizes/font_size = 42
+text = "射弹预览"
+
+[node name="Info" type="Label" parent="Header"]
+layout_mode = 0
+offset_top = 72.0
+offset_right = 1200.0
+offset_bottom = 110.0
+theme_override_font_sizes/font_size = 24
+text = ""
+
+[node name="StraightArea" type="Node2D" parent="."]
+position = Vector2(1000, 520)
+
+[node name="Holder" type="Node2D" parent="StraightArea"]
+
+[node name="Label" type="Label" parent="StraightArea"]
+offset_left = -280.0
+offset_top = 190.0
+offset_right = 280.0
+offset_bottom = 230.0
+theme_override_font_sizes/font_size = 26
+text = "直线飞行：从左到右反复射出"
+horizontal_alignment = 1
+
+[node name="OrbitArea" type="Node2D" parent="."]
+position = Vector2(1850, 1020)
+
+[node name="Holder" type="Node2D" parent="OrbitArea"]
+
+[node name="Label" type="Label" parent="OrbitArea"]
+offset_left = -280.0
+offset_top = 300.0
+offset_right = 280.0
+offset_bottom = 340.0
+theme_override_font_sizes/font_size = 26
+text = "圆周飞行"
+horizontal_alignment = 1

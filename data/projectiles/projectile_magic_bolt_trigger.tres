@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="ItemDefinition" format=3]
+
+[ext_resource type="Script" path="res://data/items/ItemDefinition.gd" id="1_1xsr3"]
+[ext_resource type="PackedScene" path="res://scenes/projectiles/projectile_magic_bolt_trigger.tscn" id="2_vj3jf"]
+
+[resource]
+script = ExtResource("1_1xsr3")
+id = &"projectile_magic_bolt_trigger"
+sort_order = 110
+display_name = "魔法弹1级（触发）"
+stack_limit = 3
+base_price = 28
+spell_kind = 1
+mana_cost = 5
+cast_interval = 0.2
+base_value = 28
+visual_scene = ExtResource("2_vj3jf")
+base_damage = 5
+projectile_speed = 300.0
+offset_type = 1
+lifetime = 5.0
+behavior_tag = &"trigger"
+trigger_type = 1
+trigger_target = &"next_block"
+trigger_count = 1

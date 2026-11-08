@@ -197,6 +197,9 @@ func _fire(volley: EnemyBulletPattern) -> void:
 		b.tint = volley.tint
 		b.radius = volley.radius
 		get_parent().add_child(b)
+		if not ProjectileRegistry.register(b, &"enemy"):
+			b.queue_free()
+			continue
 		b.global_position = global_position
 
 # ---------- 受伤 / 死亡 ----------

@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ItemDefinition" format=3]
+
+[ext_resource type="Script" path="res://data/items/ItemDefinition.gd" id="1_jdnoy"]
+
+[resource]
+script = ExtResource("1_jdnoy")
+id = &"module_pierce_1"
+display_name = "穿透模块1级"
+stack_limit = 3
+base_price = 20
+spell_kind = 2
+effect_type = 2
+effect_value = 1.0
+mana_cost = 5
+base_value = 20
+compatibility_group = &"PIERCE_MODE"
+damage_falloff = 0.7

@@ -1,0 +1,13 @@
+[gd_scene format=3]
+
+[node name="projectile_magic_bolt_delayed" type="Node2D"]
+
+[node name="Visual" type="Polygon2D" parent="."]
+color = Color(0.35, 0.95, 0.95, 1.0)
+polygon = PackedVector2Array(0, -9, 5, 0, 0, 9, -5, 0)
+
+[node name="Glow" type="Polygon2D" parent="."]
+color = Color(0.2, 0.9, 1.0, 0.3)
+polygon = PackedVector2Array(0, -9, 5, 0, 0, 9, -5, 0)
+scale = Vector2(1.65, 1.65)
+show_behind_parent = true

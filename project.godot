@@ -25,6 +25,8 @@ AudioManager="*res://scripts/core/AudioManager.gd"
 Diagnostics="*res://scripts/core/Diagnostics.gd"
 DamageNumbers="*res://scripts/core/DamageNumbers.gd"
 SceneTransition="*res://scripts/core/SceneTransition.gd"
+ProjectileRegistry="*res://scripts/core/ProjectileRegistry.gd"
+ProjectilePool="*res://scripts/core/ProjectilePool.gd"
 
 [display]
 
