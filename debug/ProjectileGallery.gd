@@ -36,13 +36,13 @@ func _on_selected(index: int) -> void:
 	]
 	_straight_visual = _make_visual(card)
 	if _straight_visual != null:
-		_straight_holder.add_child(_straight_visual)
+		straight_holder.add_child(_straight_visual)
 		_straight_x = -520.0
 		_straight_visual.position = Vector2(_straight_x, 0)
 		_straight_visual.rotation = PI / 2.0
 	_orbit_visual = _make_visual(card)
 	if _orbit_visual != null:
-		_orbit_holder.add_child(_orbit_visual)
+		orbit_holder.add_child(_orbit_visual)
 		_orbit_angle = 0.0
 		_orbit_visual.position = Vector2(240, 0)
 
