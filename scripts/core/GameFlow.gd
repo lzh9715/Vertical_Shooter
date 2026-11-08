@@ -387,7 +387,7 @@ func _seed_starter_inventory() -> void:
 	)
 	wand0.add_card(ItemCatalog.find_card(&"module_homing"))
 	wand0.add_card(ItemCatalog.find_card(&"module_pierce_1"))
-	wand0.add_card(ItemCatalog.find_card(&"card_single"))
+	wand0.add_card(ItemCatalog.find_card(&"projectile_magic_bolt_1"))
 	equipment.equip_wand(0, wand0)
 
 	var wand1 := WandInstance.create(
@@ -396,9 +396,9 @@ func _seed_starter_inventory() -> void:
 	)
 	wand1.add_card(ItemCatalog.find_card(&"module_damage"))
 	wand1.add_card(ItemCatalog.find_card(&"module_explosion"))
-	wand1.add_card(ItemCatalog.find_card(&"card_single"))
+	wand1.add_card(ItemCatalog.find_card(&"projectile_magic_bolt_1"))
 	wand1.add_card(ItemCatalog.find_card(&"projectile_scatter_double"))
-	wand1.add_card(ItemCatalog.find_card(&"card_single"))
+	wand1.add_card(ItemCatalog.find_card(&"projectile_magic_bolt_1"))
 	equipment.equip_wand(1, wand1)
 
 	equipment.equip_item(ItemCatalog.make_instance(hats[0]))

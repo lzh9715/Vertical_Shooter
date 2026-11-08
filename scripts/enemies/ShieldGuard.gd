@@ -73,7 +73,10 @@ func _physics_process(delta: float) -> void:
 	super._physics_process(delta)
 
 func _resume_after_stun() -> void:
-	start_position = global_position
+	# 用当前实际位置反推 start_position，避免 movement 在 t=0 的采样造成一次跳变。
+	var dir := _direction_vector()
+	var local := movement.sample(0.0) * ScreenUtil.scale_factor() if movement else Vector2.ZERO
+	start_position = global_position - (dir.orthogonal() * local.x + dir * local.y + offset)
 	elapsed_time = 0.0
 	_begin_attack()
 

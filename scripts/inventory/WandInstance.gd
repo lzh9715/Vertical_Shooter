@@ -40,35 +40,60 @@ func can_add_card() -> bool:
 			return true
 	return false
 
-func can_install(definition: ItemDefinition, ignore: ItemDefinition = null) -> bool:
+func can_install(definition: ItemDefinition, ignore: ItemDefinition = null, at_index: int = -1) -> bool:
 	if definition == null or not definition.is_card():
 		return false
 	if definition.is_attack() and definition.trigger_type != ItemDefinition.TriggerType.NONE and definition.projectile_count > 1:
 		return false
-	var same_count := 0
-	for card in cards:
-		if card == null or card == ignore:
-			continue
-		if card.id == definition.id:
-			same_count += 1
-	if definition.stack_limit > 0 and same_count >= definition.stack_limit:
+	var candidate := cards.duplicate()
+	var target_index := at_index
+	if target_index < 0 and ignore != null:
+		target_index = cards.find(ignore)
+	if target_index < 0:
+		for i in range(candidate.size()):
+			if candidate[i] == null:
+				target_index = i
+				break
+	if target_index < 0 or target_index >= candidate.size():
 		return false
-	if definition.is_module() and definition.compatibility_group != &"":
-		for card in cards:
-			if card == null or card == ignore or not card.is_module():
+	for i in range(candidate.size()):
+		if candidate[i] == ignore and i != target_index:
+			candidate[i] = null
+	candidate[target_index] = definition
+	return _candidate_valid(candidate)
+
+func _candidate_valid(candidate: Array) -> bool:
+	var definition_count := {}
+	for card in candidate:
+		if card == null:
+			continue
+		definition_count[card.id] = int(definition_count.get(card.id, 0)) + 1
+		if card.stack_limit > 0 and int(definition_count[card.id]) > card.stack_limit:
+			return false
+		if card.is_attack() and card.trigger_type != ItemDefinition.TriggerType.NONE and card.projectile_count > 1:
+			return false
+
+	var blocks := CastSimulator.build_blocks(candidate)
+	for block in blocks:
+		var mode_kind := {}
+		for card in block:
+			if card == null or not card.is_module():
 				continue
-			if card.compatibility_group == definition.compatibility_group and card.effect_type != definition.effect_type:
+			if card.compatibility_group == &"":
+				continue
+			if mode_kind.has(card.compatibility_group) and int(mode_kind[card.compatibility_group]) != card.effect_type:
 				return false
+			mode_kind[card.compatibility_group] = card.effect_type
 	return true
 
 func add_card(definition: ItemDefinition) -> bool:
 	if definition == null or not definition.is_card():
 		return false
-	if not can_install(definition):
-		return false
 	ensure_slots()
 	for i in range(cards.size()):
 		if cards[i] == null:
+			if not can_install(definition, null, i):
+				return false
 			cards[i] = definition
 			return true
 	return false
@@ -82,7 +107,7 @@ func insert_card(index: int, definition: ItemDefinition) -> bool:
 		return false
 	if cards[index] != null:
 		return false
-	if not can_install(definition):
+	if not can_install(definition, null, index):
 		return false
 	cards[index] = definition
 	return true
@@ -95,9 +120,13 @@ func move_card(from_index: int, to_index: int) -> bool:
 		return false
 	if from_index == to_index or cards[from_index] == null:
 		return false
-	var moving := cards[from_index]
-	cards[from_index] = cards[to_index]
-	cards[to_index] = moving
+	var candidate := cards.duplicate()
+	candidate[from_index] = cards[to_index]
+	candidate[to_index] = cards[from_index]
+	if not _candidate_valid(candidate):
+		return false
+	cards[from_index] = candidate[from_index]
+	cards[to_index] = candidate[to_index]
 	return true
 
 func remove_card(index: int) -> ItemDefinition:
