@@ -40,6 +40,7 @@ func _run() -> void:
 		"test_bounce_module_keeps_projectile",
 		"test_refract_module_redirects",
 		"test_return_module_spawns_copy",
+		"test_per_block_pierce_compatibility",
 		"test_explosion_uses_projectile_damage",
 		"test_explosion_once",
 		"test_shield_blocks_ordinary_and_pierce_bypasses",
@@ -289,6 +290,20 @@ func test_return_module_spawns_copy() -> bool:
 	_expect(copy != null and copy.return_remaining == 0, "return copy must not be able to return again")
 	if copy != null:
 		copy.queue_free()
+	return true
+
+func test_per_block_pierce_compatibility() -> bool:
+	var wand := WandInstance.create(
+		ItemInstance.create(ItemCatalog.bodies()[1]),
+		ItemInstance.create(ItemCatalog.gems()[1])
+	)
+	wand.cards[0] = ItemCatalog.find_card(&"module_bounce")
+	wand.cards[1] = ItemCatalog.find_card(&"card_single")
+	wand.cards[2] = ItemCatalog.find_card(&"module_pierce_1")
+	wand.cards[3] = ItemCatalog.find_card(&"card_single")
+	_expect(not wand.can_install(ItemCatalog.find_card(&"module_refract"), null, 1), "same block must reject mixed pierce modes")
+	wand.cards[2] = null
+	_expect(wand.can_install(ItemCatalog.find_card(&"module_refract"), null, 4), "different blocks may use different pierce modes")
 	return true
 
 func test_explosion_uses_projectile_damage() -> bool:

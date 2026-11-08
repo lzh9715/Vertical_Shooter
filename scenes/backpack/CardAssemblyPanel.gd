@@ -294,8 +294,8 @@ func _drop_at_mouse() -> void:
 			# 槽位已满时，拖到具体槽位直接替换该槽卡牌
 			if slot_index >= 0 and slot_index < _wand.cards.size():
 				var old_card: ItemDefinition = _wand.cards[slot_index]
-				if not _wand.can_install(_drag_card, old_card):
-					_interaction_warning = "⚠ 已有弹射/折射/穿透模块，无法安装该模块"
+				if not _wand.can_install(_drag_card, old_card, slot_index):
+					_interaction_warning = "⚠ 同一个法术块内不能混用弹射/折射/穿透模块"
 					_restore_drag()
 					_refresh_warnings()
 					return
@@ -380,16 +380,18 @@ func _refresh_warnings() -> void:
 		warnings.append(_interaction_warning)
 		_interaction_warning = ""
 
-	var mode_kind := {}
-	for card in _wand.cards:
-		if card == null or not card.is_module():
-			continue
-		if card.compatibility_group == &"":
-			continue
-		if mode_kind.has(card.compatibility_group) and int(mode_kind[card.compatibility_group]) != card.effect_type:
-			_add_unique(warnings, seen, "⚠ 已有弹射/折射/穿透模块，无法同时安装其他穿透方式")
-			break
-		mode_kind[card.compatibility_group] = card.effect_type
+	var mount_blocks := CastSimulator.build_blocks(_wand.cards)
+	for block in mount_blocks:
+		var mode_kind := {}
+		for card in block:
+			if card == null or not card.is_module():
+				continue
+			if card.compatibility_group == &"":
+				continue
+			if mode_kind.has(card.compatibility_group) and int(mode_kind[card.compatibility_group]) != card.effect_type:
+				_add_unique(warnings, seen, "⚠ 同一个法术块内不能混用弹射/折射/穿透模块")
+				break
+			mode_kind[card.compatibility_group] = card.effect_type
 
 	for card in _wand.cards:
 		if card == null or not card.is_attack():
