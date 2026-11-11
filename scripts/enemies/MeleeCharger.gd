@@ -118,7 +118,7 @@ func _enter_enter() -> void:
 
 func _update_enter(delta: float) -> void:
 	var s := ScreenUtil.scale_factor()
-	global_position.x = move_toward(global_position.x, _stop_x, entry_speed * s * delta)
+	global_position.x = move_toward(global_position.x, _stop_x, entry_speed * s * speed_scale * delta)
 	if absf(global_position.x - _stop_x) <= 1.0:
 		global_position.x = _stop_x
 		_brain.change(STATE_PREPARE)
@@ -141,12 +141,12 @@ func _enter_charge() -> void:
 	_hide_warning()
 	_set_body_color(_base_color)
 	_charge_time = 0.0
-	_charge_speed = charge_start_speed
+	_charge_speed = charge_start_speed * speed_scale
 
 func _update_charge(delta: float) -> void:
 	var s := ScreenUtil.scale_factor()
 	_charge_time += delta
-	_charge_speed = minf(charge_start_speed + charge_speed_gain * _charge_time, charge_max_speed)
+	_charge_speed = minf(charge_start_speed + charge_speed_gain * _charge_time, charge_max_speed) * speed_scale
 	global_position += _charge_direction * _charge_speed * s * delta
 	if global_position.x < -despawn_margin:
 		_brain.change(STATE_DESPAWN)

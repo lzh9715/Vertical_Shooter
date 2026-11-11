@@ -6,6 +6,7 @@ const DEFAULT_BULLET := preload("res://scenes/enemies/enemy_bullet.tscn")
 
 @export var movement: MovementPattern
 @export var speed := 200.0
+@export var speed_scale := 1.0
 @export var direction := "Right_To_Left"
 @export var despawn_margin := 300.0
 

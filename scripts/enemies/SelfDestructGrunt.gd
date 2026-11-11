@@ -108,7 +108,7 @@ func _update_track(delta: float) -> void:
 		_brain.change(STATE_CHARGING)
 		return
 	if to_player.length_squared() > 0.001:
-		global_position += to_player.normalized() * tracking_speed * ScreenUtil.scale_factor() * delta
+		global_position += to_player.normalized() * tracking_speed * ScreenUtil.scale_factor() * speed_scale * delta
 
 func _enter_charging() -> void:
 	_state_time = charge_time

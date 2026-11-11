@@ -41,6 +41,7 @@ func create_enemy(data: EnemyData):
 	enemy.defense = data.defense
 	enemy.damage_reduction = data.damage_reduction
 	enemy.speed = data.speed * speed_mult * ScreenUtil.scale_factor()
+	enemy.speed_scale = speed_mult
 	enemy.score_reward = roundi(data.score * reward_mult)
 	enemy.gold_reward = roundi(data.gold * reward_mult)
 	enemy.despawn_margin = data.despawn_margin * ScreenUtil.scale_factor()

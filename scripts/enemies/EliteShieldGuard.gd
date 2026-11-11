@@ -149,7 +149,7 @@ func _enter_advance() -> void:
 
 func _update_advance(delta: float) -> void:
 	var s := ScreenUtil.scale_factor()
-	global_position.x = move_toward(global_position.x, stop_x, advance_speed * s * delta)
+	global_position.x = move_toward(global_position.x, stop_x, advance_speed * s * speed_scale * delta)
 	_tick_pattern_attack(SPREAD_PATTERN, Vector2.LEFT)
 	if absf(global_position.x - stop_x) <= 1.0:
 		global_position.x = stop_x
@@ -182,10 +182,10 @@ func _enter_intercept() -> void:
 func _update_intercept(delta: float) -> void:
 	var s := ScreenUtil.scale_factor()
 	if global_position.x > stop_x:
-		global_position.x = move_toward(global_position.x, stop_x, intercept_x_speed * s * delta)
+		global_position.x = move_toward(global_position.x, stop_x, intercept_x_speed * s * speed_scale * delta)
 	var player := get_tree().get_first_node_in_group("player")
 	if player != null:
-		global_position.y = move_toward(global_position.y, player.global_position.y, intercept_y_speed * s * delta)
+		global_position.y = move_toward(global_position.y, player.global_position.y, intercept_y_speed * s * speed_scale * delta)
 	_tick_pattern_attack(HEAVY_PATTERN, _aim_at_player())
 
 func _tick_pattern_attack(pattern: EnemyBulletPattern, aim: Vector2) -> void:

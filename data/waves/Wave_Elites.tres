@@ -1,36 +1,41 @@
-[gd_resource type="Resource" script_class="WaveData" format=3 uid="uid://bqfpgikejj53i"]
+[gd_resource type="Resource" script_class="WaveData" format=3]
 
-[ext_resource type="Script" uid="uid://ys7eld55hqog" path="res://data/core/WaveEntry.gd" id="1_q861l"]
-[ext_resource type="Resource" path="res://data/enemies/Enemy_Elite_Gunner.tres" id="2_03xpv"]
-[ext_resource type="Script" uid="uid://6wp4d30kylxh" path="res://data/core/WaveData.gd" id="2_c0yh7"]
-[ext_resource type="Script" uid="uid://b243fk7jdlvh2" path="res://data/core/QueueData.gd" id="3_52g5e"]
-[ext_resource type="Resource" path="res://data/enemies/Enemy_Elite_Suppressor.tres" id="4_rw8na"]
+[ext_resource type="Script" path="res://data/core/WaveEntry.gd" id="1_ixdia"]
+[ext_resource type="Resource" path="res://data/enemies/Enemy_EliteShieldGuard.tres" id="2_644nx"]
+[ext_resource type="Script" path="res://data/core/QueueData.gd" id="3_rk4j2"]
+[ext_resource type="Resource" path="res://data/enemies/Enemy_RangedGrunt.tres" id="4_l86rx"]
+[ext_resource type="Script" path="res://data/core/FormationData.gd" id="5_yfx0x"]
+[ext_resource type="Script" path="res://data/shapes/ShapeColumn.gd" id="6_ooo1t"]
+[ext_resource type="Script" path="res://data/core/WaveData.gd" id="7_l35h8"]
 
-[sub_resource type="Resource" id="Resource_52g5e"]
-script = ExtResource("3_52g5e")
+[sub_resource type="Resource" id="Resource_5ixae"]
+script = ExtResource("3_rk4j2")
 count = 1
-enemy_data = ExtResource("2_03xpv")
-metadata/_custom_type_script = "uid://b243fk7jdlvh2"
+enemy_data = ExtResource("2_644nx")
+anchor = Vector2(0.96, 0)
 
-[sub_resource type="Resource" id="Resource_p6egm"]
-script = ExtResource("1_q861l")
-spawn = SubResource("Resource_52g5e")
-metadata/_custom_type_script = "uid://ys7eld55hqog"
+[sub_resource type="Resource" id="Resource_svand"]
+script = ExtResource("1_ixdia")
+spawn = SubResource("Resource_5ixae")
 
-[sub_resource type="Resource" id="Resource_rw8na"]
-script = ExtResource("3_52g5e")
-count = 1
-enemy_data = ExtResource("4_rw8na")
-metadata/_custom_type_script = "uid://b243fk7jdlvh2"
+[sub_resource type="Resource" id="Resource_k1fcc"]
+script = ExtResource("6_ooo1t")
 
-[sub_resource type="Resource" id="Resource_03xpv"]
-script = ExtResource("1_q861l")
-spawn = SubResource("Resource_rw8na")
+[sub_resource type="Resource" id="Resource_8uwx8"]
+script = ExtResource("5_yfx0x")
+shape = SubResource("Resource_k1fcc")
+count = 2
+spacing = Vector2(0, 120)
+interval = 0.2
+enemy_data = ExtResource("4_l86rx")
+anchor = Vector2(0.9, 0)
+
+[sub_resource type="Resource" id="Resource_06pjv"]
+script = ExtResource("1_ixdia")
+spawn = SubResource("Resource_8uwx8")
 delay = 1.5
-metadata/_custom_type_script = "uid://ys7eld55hqog"
 
 [resource]
-script = ExtResource("2_c0yh7")
-entries = Array[ExtResource("1_q861l")]([SubResource("Resource_p6egm"), SubResource("Resource_03xpv")])
+script = ExtResource("7_l35h8")
+entries = Array[ExtResource("1_ixdia")]([SubResource("Resource_svand"), SubResource("Resource_06pjv")])
 gap_after = 2.0
-metadata/_custom_type_script = "uid://6wp4d30kylxh"
