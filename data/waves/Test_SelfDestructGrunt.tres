@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="WaveData" format=3]
+
+[ext_resource type="Script" path="res://data/core/WaveEntry.gd" id="1_k8i6i"]
+[ext_resource type="Resource" path="res://data/enemies/Enemy_SelfDestructGrunt.tres" id="2_yul18"]
+[ext_resource type="Script" path="res://data/core/QueueData.gd" id="3_77yfb"]
+[ext_resource type="Script" path="res://data/core/WaveData.gd" id="4_b63fe"]
+
+[sub_resource type="Resource" id="Resource_tsgnc"]
+script = ExtResource("3_77yfb")
+count = 1
+enemy_data = ExtResource("2_yul18")
+
+[sub_resource type="Resource" id="Resource_8fkwg"]
+script = ExtResource("1_k8i6i")
+spawn = SubResource("Resource_tsgnc")
+
+[resource]
+script = ExtResource("4_b63fe")
+entries = Array[ExtResource("1_k8i6i")]([SubResource("Resource_8fkwg")])
+gap_after = 1.0
