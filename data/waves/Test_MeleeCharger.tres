@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="WaveData" format=3]
+
+[ext_resource type="Script" path="res://data/core/WaveEntry.gd" id="1_ybc5c"]
+[ext_resource type="Resource" path="res://data/enemies/Enemy_MeleeCharger.tres" id="2_wtuww"]
+[ext_resource type="Script" path="res://data/core/FormationData.gd" id="3_nevk8"]
+[ext_resource type="Script" path="res://data/shapes/ShapeColumn.gd" id="4_flxdl"]
+[ext_resource type="Script" path="res://data/core/WaveData.gd" id="5_ick61"]
+
+[sub_resource type="Resource" id="Resource_b561a"]
+script = ExtResource("4_flxdl")
+
+[sub_resource type="Resource" id="Resource_jsy84"]
+script = ExtResource("3_nevk8")
+shape = SubResource("Resource_b561a")
+count = 2
+spacing = Vector2(0, 240)
+enemy_data = ExtResource("2_wtuww")
+
+[sub_resource type="Resource" id="Resource_0s5jp"]
+script = ExtResource("1_ybc5c")
+spawn = SubResource("Resource_jsy84")
+
+[resource]
+script = ExtResource("5_ick61")
+entries = Array[ExtResource("1_ybc5c")]([SubResource("Resource_0s5jp")])
+gap_after = 1.0

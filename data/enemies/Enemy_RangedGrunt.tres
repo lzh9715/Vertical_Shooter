@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://data/core/EnemyData.gd" id="1_data"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/ranged_grunt.tscn" id="2_scene"]
+
+[resource]
+script = ExtResource("1_data")
+scene = ExtResource("2_scene")
+max_hp = 30
+speed = 90.0
+attack_power = 6.0
+defense = 0.0
+damage_reduction = 0.0
+score = 20
+gold = 8
+despawn_margin = 300.0
+contact_damage = 0.0
+visual_scale = 1.0

@@ -1,0 +1,21 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/RangedGrunt.gd" id="1_ranged"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ranged"]
+size = Vector2(30, 30)
+
+[node name="RangedGrunt" type="Area2D" groups=["enemy"]]
+collision_layer = 4
+script = ExtResource("1_ranged")
+contact_damage = 0.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_ranged")
+
+[node name="Polygon2D" type="Polygon2D" parent="."]
+color = Color(0.17, 0.78, 0.85, 1)
+polygon = PackedVector2Array(-15, -15, 15, -15, 15, 15, -15, 15)
+
+[node name="Body" type="Sprite2D" parent="."]
+visible = false

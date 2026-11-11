@@ -1,0 +1,21 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/MeleeCharger.gd" id="1_melee"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_melee"]
+size = Vector2(30, 30)
+
+[node name="MeleeCharger" type="Area2D" groups=["enemy"]]
+collision_layer = 4
+script = ExtResource("1_melee")
+contact_damage = 8.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_melee")
+
+[node name="Polygon2D" type="Polygon2D" parent="."]
+color = Color(0.95, 0.32, 0.12, 1)
+polygon = PackedVector2Array(-15, -15, 15, -15, 15, 15, -15, 15)
+
+[node name="Body" type="Sprite2D" parent="."]
+visible = false

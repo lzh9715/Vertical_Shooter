@@ -14,6 +14,7 @@ class_name EnemyData
 @export var score: int = 10      # 击杀得分
 @export var gold: int = 5        # 掉落金币
 @export var despawn_margin: float = 300.0
+@export var contact_damage: float = -1.0  # 负数 = 使用 attack_power；0 = 无接触伤害
 
 @export_group("表现")
 @export var texture: Texture2D   # 留空 = 红色方块占位；以后直接拖贴图

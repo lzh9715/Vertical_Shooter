@@ -424,7 +424,9 @@ func _on_hurtbox_area_entered(area):
 	# 撞到敌人本体
 	if area.is_in_group("enemy") and not is_invincible:
 		var contact_damage := 1.0
-		if "attack_power" in area:
+		if "contact_damage" in area and float(area.contact_damage) >= 0.0:
+			contact_damage = float(area.contact_damage)
+		elif "attack_power" in area:
 			contact_damage = float(area.attack_power)
 		if contact_damage > 0.0:
 			take_damage(contact_damage)
