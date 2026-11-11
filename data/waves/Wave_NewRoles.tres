@@ -1,60 +1,58 @@
 [gd_resource type="Resource" script_class="WaveData" format=3]
 
-[ext_resource type="Script" path="res://data/core/WaveData.gd" id="1_wave"]
-[ext_resource type="Script" path="res://data/core/WaveEntry.gd" id="2_entry"]
+[ext_resource type="Script" path="res://data/core/WaveEntry.gd" id="1_4ivw1"]
+[ext_resource type="Resource" path="res://data/enemies/Enemy_RangedGrunt.tres" id="2_or3t4"]
+[ext_resource type="Script" path="res://data/core/FormationData.gd" id="3_ukmwa"]
+[ext_resource type="Script" path="res://data/shapes/ShapeColumn.gd" id="4_dsxj1"]
+[ext_resource type="Resource" path="res://data/enemies/Enemy_MeleeCharger.tres" id="5_lbiup"]
+[ext_resource type="Resource" path="res://data/enemies/Enemy_SelfDestructGrunt.tres" id="6_oikr0"]
+[ext_resource type="Script" path="res://data/core/QueueData.gd" id="7_s2htw"]
+[ext_resource type="Script" path="res://data/core/WaveData.gd" id="8_g23qo"]
 
-[ext_resource type="Script" path="res://data/core/FormationData.gd" id="3_formation"]
-[ext_resource type="Script" path="res://data/shapes/ShapeColumn.gd" id="4_shape"]
-[ext_resource type="Resource" path="res://data/enemies/Enemy_ShieldGuard.tres" id="5_shield"]
-[ext_resource type="Resource" path="res://data/enemies/Enemy_Charger.tres" id="6_charger"]
-[ext_resource type="Script" path="res://data/core/QueueData.gd" id="7_queue"]
-[ext_resource type="Resource" path="res://data/enemies/Enemy_SelfDestruct.tres" id="8_self"]
+[sub_resource type="Resource" id="Resource_h4753"]
+script = ExtResource("4_dsxj1")
 
-[sub_resource type="Resource" id="Resource_shape"]
-script = ExtResource("4_shape")
-
-[sub_resource type="Resource" id="Resource_shield"]
-script = ExtResource("3_formation")
-shape = SubResource("Resource_shape")
-enemy_data = ExtResource("5_shield")
-anchor = Vector2(0.96, 0.0)
-count = 2
+[sub_resource type="Resource" id="Resource_pprha"]
+script = ExtResource("3_ukmwa")
+shape = SubResource("Resource_h4753")
+count = 3
 spacing = Vector2(0, 150)
 interval = 0.2
+enemy_data = ExtResource("2_or3t4")
+anchor = Vector2(0.96, 0)
 
-[sub_resource type="Resource" id="Resource_charger"]
-script = ExtResource("3_formation")
-shape = SubResource("Resource_shape")
-enemy_data = ExtResource("6_charger")
-anchor = Vector2(0.9, 0.0)
-count = 3
+[sub_resource type="Resource" id="Resource_k3b2i"]
+script = ExtResource("1_4ivw1")
+spawn = SubResource("Resource_pprha")
+
+[sub_resource type="Resource" id="Resource_8i0l2"]
+script = ExtResource("4_dsxj1")
+
+[sub_resource type="Resource" id="Resource_3fbwq"]
+script = ExtResource("3_ukmwa")
+shape = SubResource("Resource_8i0l2")
+count = 2
 spacing = Vector2(0, 120)
 interval = 0.2
+enemy_data = ExtResource("5_lbiup")
+anchor = Vector2(0.9, 0)
 
-[sub_resource type="Resource" id="Resource_entry_shield"]
-script = ExtResource("2_entry")
-spawn = SubResource("Resource_shield")
-
-[sub_resource type="Resource" id="Resource_entry_charger"]
-script = ExtResource("2_entry")
-spawn = SubResource("Resource_charger")
+[sub_resource type="Resource" id="Resource_dce23"]
+script = ExtResource("1_4ivw1")
+spawn = SubResource("Resource_3fbwq")
 delay = 1.0
 
-[sub_resource type="Resource" id="Resource_self"]
-script = ExtResource("7_queue")
-enemy_data = ExtResource("8_self")
-anchor = Vector2(0.96, 0.0)
+[sub_resource type="Resource" id="Resource_yin4s"]
+script = ExtResource("7_s2htw")
 count = 1
+enemy_data = ExtResource("6_oikr0")
+anchor = Vector2(0.96, 0)
 
-[sub_resource type="Resource" id="Resource_entry_self"]
-script = ExtResource("2_entry")
-spawn = SubResource("Resource_self")
+[sub_resource type="Resource" id="Resource_widw8"]
+script = ExtResource("1_4ivw1")
+spawn = SubResource("Resource_yin4s")
 delay = 2.0
 
 [resource]
-script = ExtResource("1_wave")
-entries = Array[ExtResource("2_entry")]([
-	SubResource("Resource_entry_shield"),
-	SubResource("Resource_entry_charger"),
-	SubResource("Resource_entry_self"),
-])
+script = ExtResource("8_g23qo")
+entries = Array[ExtResource("1_4ivw1")]([SubResource("Resource_k3b2i"), SubResource("Resource_dce23"), SubResource("Resource_widw8")])

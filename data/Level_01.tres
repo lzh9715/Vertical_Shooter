@@ -1,26 +1,117 @@
-[gd_resource type="Resource" script_class="LevelConfig" format=3 uid="uid://b65koqi1msmq5"]
+[gd_resource type="Resource" script_class="LevelConfig" format=3]
 
-[ext_resource type="Script" uid="uid://6wp4d30kylxh" path="res://data/core/WaveData.gd" id="1_c27c6"]
-[ext_resource type="Resource" uid="uid://cuomghm2ns3cn" path="res://data/boss/Boss_Test.tres" id="1_cygu7"]
-[ext_resource type="Script" uid="uid://dsu6mm8yyovve" path="res://scripts/map/LevelConfig.gd" id="2_3mr8q"]
-[ext_resource type="Resource" uid="uid://bat1ik28shbwl" path="res://data/waves/Test_Wave.tres" id="2_bvlip"]
-[ext_resource type="Resource" uid="uid://bqfpgikejj53i" path="res://data/waves/Wave_Elites.tres" id="3_ytolh"]
-[ext_resource type="Script" uid="uid://v88mbjisl7en" path="res://data/reward/RewardData.gd" id="10_reward"]
+[ext_resource type="Script" path="res://data/core/WaveData.gd" id="1_c27c6"]
+[ext_resource type="Resource" path="res://data/boss/Boss_Test.tres" id="1_cygu7"]
+[ext_resource type="Script" path="res://scripts/map/LevelConfig.gd" id="2_3mr8q"]
+[ext_resource type="Script" path="res://data/core/WaveEntry.gd" id="3_d57x5"]
+[ext_resource type="Resource" path="res://data/enemies/Enemy_EliteShieldGuard.tres" id="4_w431h"]
+[ext_resource type="Script" path="res://data/core/QueueData.gd" id="5_wik8e"]
+[ext_resource type="Resource" path="res://data/enemies/Enemy_RangedGrunt.tres" id="6_vv8gh"]
+[ext_resource type="Script" path="res://data/core/FormationData.gd" id="7_j5x0h"]
+[ext_resource type="Script" path="res://data/shapes/ShapeColumn.gd" id="8_7dtbv"]
+[ext_resource type="Script" path="res://data/reward/RewardData.gd" id="10_reward"]
 [ext_resource type="Resource" path="res://data/reward/Reward_Gold.tres" id="11_rgold"]
 [ext_resource type="Resource" path="res://data/reward/Reward_MobRush.tres" id="12_rbattle"]
+[ext_resource type="Resource" path="res://data/enemies/Enemy_MeleeCharger.tres" id="13_5y3an"]
 [ext_resource type="Script" path="res://data/event/EventData.gd" id="13_event"]
 [ext_resource type="Resource" path="res://data/event/Event_LuckyCharm.tres" id="14_elucky"]
+[ext_resource type="Resource" path="res://data/enemies/Enemy_SelfDestructGrunt.tres" id="14_v2rur"]
 [ext_resource type="Resource" path="res://data/event/Event_Pickpocket.tres" id="15_epick"]
 [ext_resource type="Resource" path="res://data/event/Event_Trade.tres" id="16_etrade"]
 
-[ext_resource type="Resource" path="res://data/waves/Wave_NewRoles.tres" id="17_roles"]
+[sub_resource type="Resource" id="Resource_5ixae"]
+script = ExtResource("5_wik8e")
+count = 1
+enemy_data = ExtResource("4_w431h")
+anchor = Vector2(0.96, 0)
+
+[sub_resource type="Resource" id="Resource_svand"]
+script = ExtResource("3_d57x5")
+spawn = SubResource("Resource_5ixae")
+
+[sub_resource type="Resource" id="Resource_k1fcc"]
+script = ExtResource("8_7dtbv")
+
+[sub_resource type="Resource" id="Resource_8uwx8"]
+script = ExtResource("7_j5x0h")
+shape = SubResource("Resource_k1fcc")
+count = 2
+spacing = Vector2(0, 120)
+interval = 0.2
+enemy_data = ExtResource("6_vv8gh")
+anchor = Vector2(0.9, 0)
+
+[sub_resource type="Resource" id="Resource_06pjv"]
+script = ExtResource("3_d57x5")
+spawn = SubResource("Resource_8uwx8")
+delay = 1.5
+
+[sub_resource type="Resource" id="Resource_q27md"]
+script = ExtResource("1_c27c6")
+entries = Array[ExtResource("3_d57x5")]([SubResource("Resource_svand"), SubResource("Resource_06pjv")])
+gap_after = 2.0
+
+[sub_resource type="Resource" id="Resource_h4753"]
+script = ExtResource("8_7dtbv")
+
+[sub_resource type="Resource" id="Resource_pprha"]
+script = ExtResource("7_j5x0h")
+shape = SubResource("Resource_h4753")
+count = 3
+spacing = Vector2(0, 150)
+interval = 0.2
+enemy_data = ExtResource("6_vv8gh")
+anchor = Vector2(0.96, 0)
+
+[sub_resource type="Resource" id="Resource_k3b2i"]
+script = ExtResource("3_d57x5")
+spawn = SubResource("Resource_pprha")
+
+[sub_resource type="Resource" id="Resource_8i0l2"]
+script = ExtResource("8_7dtbv")
+
+[sub_resource type="Resource" id="Resource_3fbwq"]
+script = ExtResource("7_j5x0h")
+shape = SubResource("Resource_8i0l2")
+count = 2
+spacing = Vector2(0, 120)
+interval = 0.2
+enemy_data = ExtResource("13_5y3an")
+anchor = Vector2(0.9, 0)
+
+[sub_resource type="Resource" id="Resource_dce23"]
+script = ExtResource("3_d57x5")
+spawn = SubResource("Resource_3fbwq")
+delay = 1.0
+
+[sub_resource type="Resource" id="Resource_yin4s"]
+script = ExtResource("5_wik8e")
+count = 1
+enemy_data = ExtResource("14_v2rur")
+anchor = Vector2(0.96, 0)
+
+[sub_resource type="Resource" id="Resource_widw8"]
+script = ExtResource("3_d57x5")
+spawn = SubResource("Resource_yin4s")
+delay = 2.0
+
+[sub_resource type="Resource" id="Resource_mshoi"]
+script = ExtResource("1_c27c6")
+entries = Array[ExtResource("3_d57x5")]([SubResource("Resource_k3b2i"), SubResource("Resource_dce23"), SubResource("Resource_widw8")])
 
 [resource]
 script = ExtResource("2_3mr8q")
 display_name = "第一关"
 randomize_map = true
-mob_pool = Array[ExtResource("1_c27c6")]([ExtResource("2_bvlip"), ExtResource("2_bvlip"), ExtResource("17_roles")])
-elite_pool = Array[ExtResource("1_c27c6")]([ExtResource("3_ytolh")])
+middle_layers = 7
+min_nodes_per_layer = 2
+max_nodes_per_layer = 4
+wave_min = 5
+wave_max = 7
+base_difficulty = 1.0
+difficulty_per_layer = 0.1
+mob_pool = Array[ExtResource("1_c27c6")]([SubResource("Resource_mshoi"), SubResource("Resource_mshoi")])
+elite_pool = Array[ExtResource("1_c27c6")]([SubResource("Resource_q27md")])
 boss = ExtResource("1_cygu7")
 reward_pool = Array[ExtResource("10_reward")]([ExtResource("11_rgold"), ExtResource("12_rbattle")])
 event_pool = Array[ExtResource("13_event")]([ExtResource("14_elucky"), ExtResource("15_epick"), ExtResource("16_etrade")])

@@ -124,7 +124,7 @@ func _enter_enter() -> void:
 
 func _update_enter(delta: float) -> void:
 	var s := ScreenUtil.scale_factor()
-	global_position.x = move_toward(global_position.x, _stop_x, entry_speed * s * delta)
+	global_position.x = move_toward(global_position.x, _stop_x, entry_speed * s * speed_scale * delta)
 	if absf(global_position.x - _stop_x) <= 1.0:
 		global_position.x = _stop_x
 		_combat_time = 0.0
@@ -143,7 +143,7 @@ func _enter_advance() -> void:
 
 func _update_advance(delta: float) -> void:
 	var s := ScreenUtil.scale_factor()
-	global_position.x -= advance_speed * s * delta
+	global_position.x -= advance_speed * s * speed_scale * delta
 	_tick_attack(delta)
 	if global_position.x < -despawn_margin:
 		_brain.change(STATE_DESPAWN)
