@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="FormationData" format=3]
+
+[ext_resource type="Resource" path="res://data/enemies/Enemy_MeleeCharger.tres" id="1_iycmt"]
+[ext_resource type="Script" path="res://data/core/FormationData.gd" id="2_a62oq"]
+[ext_resource type="Script" path="res://data/shapes/ShapeColumn.gd" id="3_taw1r"]
+
+[sub_resource type="Resource" id="Resource_b561a"]
+script = ExtResource("3_taw1r")
+
+[resource]
+script = ExtResource("2_a62oq")
+shape = SubResource("Resource_b561a")
+count = 2
+spacing = Vector2(0, 240)
+enemy_data = ExtResource("1_iycmt")

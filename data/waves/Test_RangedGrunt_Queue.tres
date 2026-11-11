@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="QueueData" format=3]
+
+[ext_resource type="Resource" path="res://data/enemies/Enemy_RangedGrunt.tres" id="1_rjm6d"]
+[ext_resource type="Script" path="res://data/core/QueueData.gd" id="2_a6po5"]
+
+[resource]
+script = ExtResource("2_a6po5")
+count = 1
+spacing_time = 0.0
+enemy_data = ExtResource("1_rjm6d")

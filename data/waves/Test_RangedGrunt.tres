@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="WaveData" format=3]
+
+[ext_resource type="Script" path="res://data/core/WaveEntry.gd" id="1_call0"]
+[ext_resource type="Resource" path="res://data/enemies/Enemy_RangedGrunt.tres" id="2_o017f"]
+[ext_resource type="Script" path="res://data/core/QueueData.gd" id="3_hg6n3"]
+[ext_resource type="Script" path="res://data/core/WaveData.gd" id="4_n667p"]
+
+[sub_resource type="Resource" id="Resource_e4f4h"]
+script = ExtResource("3_hg6n3")
+count = 1
+spacing_time = 0.0
+enemy_data = ExtResource("2_o017f")
+
+[sub_resource type="Resource" id="Resource_jlydo"]
+script = ExtResource("1_call0")
+spawn = SubResource("Resource_e4f4h")
+
+[resource]
+script = ExtResource("4_n667p")
+entries = Array[ExtResource("1_call0")]([SubResource("Resource_jlydo")])
+gap_after = 1.0

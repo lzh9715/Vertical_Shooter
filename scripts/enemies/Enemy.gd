@@ -16,6 +16,7 @@ const DEFAULT_BULLET := preload("res://scenes/enemies/enemy_bullet.tscn")
 @export_range(0.0, 0.8, 0.01) var damage_reduction := 0.0
 @export var score_reward := 10
 @export var gold_reward := 5
+@export var contact_damage := -1.0  # 负数 = 使用 attack_power；0 = 无接触伤害
 
 @export_group("表现")
 @export var texture: Texture2D
