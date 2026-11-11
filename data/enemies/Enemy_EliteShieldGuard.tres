@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://data/core/EnemyData.gd" id="1_data"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/elite_shield_guard.tscn" id="2_scene"]
+
+[resource]
+script = ExtResource("1_data")
+scene = ExtResource("2_scene")
+max_hp = 320
+speed = 40.0
+attack_power = 15.0
+defense = 5.0
+damage_reduction = 0.2
+score = 50
+gold = 20
+despawn_margin = 300.0
+contact_damage = 15.0
+visual_scale = 1.5

@@ -1,0 +1,6 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://debug/EliteShieldGuardTest.gd" id="1"]
+
+[node name="EliteShieldGuardTest" type="Node"]
+script = ExtResource("1")

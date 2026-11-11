@@ -1,0 +1,21 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/EliteShieldGuard.gd" id="1_elite"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_elite"]
+size = Vector2(44, 44)
+
+[node name="EliteShieldGuard" type="Area2D" groups=["enemy"]]
+collision_layer = 4
+script = ExtResource("1_elite")
+contact_damage = 15.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_elite")
+
+[node name="Polygon2D" type="Polygon2D" parent="."]
+color = Color(0.56, 0.72, 0.87, 1)
+polygon = PackedVector2Array(-22, -22, 22, -22, 22, 22, -22, 22)
+
+[node name="Body" type="Sprite2D" parent="."]
+visible = false
